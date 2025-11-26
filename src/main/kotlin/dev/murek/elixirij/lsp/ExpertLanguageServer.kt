@@ -2,37 +2,34 @@ package dev.murek.elixirij.lsp
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.project.Project
-import com.redhat.devtools.lsp4ij.LanguageServerFactory
-import com.redhat.devtools.lsp4ij.client.LanguageClientImpl
-import com.redhat.devtools.lsp4ij.server.StreamConnectionProvider
-import org.eclipse.lsp4j.services.LanguageServer
-import java.io.InputStream
-import java.io.OutputStream
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.platform.lsp.api.LspServerSupportProvider
+import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
 
 /**
- * Factory for creating Expert Language Server instances.
+ * LSP server support provider for Expert Language Server.
  */
-class ExpertLanguageServerFactory : LanguageServerFactory {
-    override fun createConnectionProvider(project: Project): StreamConnectionProvider {
-        return ExpertStreamConnectionProvider(project)
-    }
-    
-    override fun createLanguageClient(project: Project): LanguageClientImpl {
-        return LanguageClientImpl(project)
-    }
-    
-    override fun getServerInterface(): Class<out LanguageServer> {
-        return LanguageServer::class.java
+class ExpertLspServerSupportProvider : LspServerSupportProvider {
+    override fun fileOpened(project: Project, file: VirtualFile, serverStarter: LspServerSupportProvider.LspServerStarter) {
+        // Check if this is an Elixir file
+        val extension = file.extension
+        if (extension == "ex" || extension == "exs") {
+            serverStarter.ensureServerStarted(ExpertLspServerDescriptor(project))
+        }
     }
 }
 
 /**
- * Stream connection provider for Expert Language Server.
+ * LSP server descriptor for Expert Language Server.
  */
-class ExpertStreamConnectionProvider(private val project: Project) : StreamConnectionProvider {
-    private var process: Process? = null
+class ExpertLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(project, "Expert") {
     
-    override fun start() {
+    override fun isSupportedFile(file: VirtualFile): Boolean {
+        val extension = file.extension
+        return extension == "ex" || extension == "exs"
+    }
+    
+    override fun createCommandLine(): GeneralCommandLine {
         val downloadManager = ExpertDownloadManager.getInstance()
         
         // Ensure Expert is installed
@@ -52,19 +49,6 @@ class ExpertStreamConnectionProvider(private val project: Project) : StreamConne
             commandLine.withWorkDirectory(basePath)
         }
         
-        process = commandLine.createProcess()
-    }
-    
-    override fun getInputStream(): InputStream? {
-        return process?.inputStream
-    }
-    
-    override fun getOutputStream(): OutputStream? {
-        return process?.outputStream
-    }
-    
-    override fun stop() {
-        process?.destroy()
-        process = null
+        return commandLine
     }
 }

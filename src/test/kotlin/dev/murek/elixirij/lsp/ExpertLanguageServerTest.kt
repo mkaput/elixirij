@@ -14,12 +14,12 @@ import kotlin.io.path.writeText
 class ExpertLanguageServerTest : BasePlatformTestCase() {
     
     private lateinit var downloadManager: ExpertDownloadManager
-    private lateinit var factory: ExpertLanguageServerFactory
+    private lateinit var supportProvider: ExpertLspServerSupportProvider
     
     override fun setUp() {
         super.setUp()
         downloadManager = ExpertDownloadManager.getInstance()
-        factory = ExpertLanguageServerFactory()
+        supportProvider = ExpertLspServerSupportProvider()
     }
     
     override fun tearDown() {
@@ -56,30 +56,34 @@ class ExpertLanguageServerTest : BasePlatformTestCase() {
         }
     }
     
-    fun testFactoryCreatesConnectionProvider() {
-        val connectionProvider = factory.createConnectionProvider(project)
-        assertNotNull("Connection provider should not be null", connectionProvider)
-        assertTrue("Connection provider should be ExpertStreamConnectionProvider",
-            connectionProvider is ExpertStreamConnectionProvider)
+    fun testSupportProviderExists() {
+        assertNotNull("Support provider should not be null", supportProvider)
     }
     
-    fun testFactoryCreatesLanguageClient() {
-        val languageClient = factory.createLanguageClient(project)
-        assertNotNull("Language client should not be null", languageClient)
+    fun testDescriptorSupportsElixirFiles() {
+        val descriptor = ExpertLspServerDescriptor(project)
+        
+        // Test .ex file
+        val exFile = myFixture.addFileToProject("test.ex", "defmodule Test do\nend")
+        assertTrue(".ex files should be supported", 
+            descriptor.isSupportedFile(exFile.virtualFile))
+        
+        // Test .exs file
+        val exsFile = myFixture.addFileToProject("test.exs", "IO.puts \"Hello\"")
+        assertTrue(".exs files should be supported", 
+            descriptor.isSupportedFile(exsFile.virtualFile))
+        
+        // Test non-Elixir file
+        val txtFile = myFixture.addFileToProject("test.txt", "some text")
+        assertFalse("Non-Elixir files should not be supported", 
+            descriptor.isSupportedFile(txtFile.virtualFile))
     }
     
-    fun testFactoryReturnsCorrectServerInterface() {
-        val serverInterface = factory.getServerInterface()
-        assertNotNull("Server interface should not be null", serverInterface)
-        assertEquals("Server interface should be LanguageServer",
-            "LanguageServer", serverInterface.simpleName)
-    }
-    
-    fun testConnectionProviderThrowsWhenExpertNotInstalled() {
-        val connectionProvider = ExpertStreamConnectionProvider(project)
+    fun testDescriptorThrowsWhenExpertNotInstalled() {
+        val descriptor = ExpertLspServerDescriptor(project)
         
         try {
-            connectionProvider.start()
+            descriptor.createCommandLine()
             fail("Should throw IllegalStateException when Expert is not installed")
         } catch (e: IllegalStateException) {
             assertTrue("Exception message should mention installation",
@@ -87,69 +91,34 @@ class ExpertLanguageServerTest : BasePlatformTestCase() {
         }
     }
     
-    fun testConnectionProviderStartsWhenExpertInstalled() {
+    fun testDescriptorCreatesCommandLineWhenExpertInstalled() {
         // Create a mock Expert installation
         createMockExpertExecutable()
         
-        val connectionProvider = ExpertStreamConnectionProvider(project)
+        val descriptor = ExpertLspServerDescriptor(project)
+        val commandLine = descriptor.createCommandLine()
         
-        try {
-            // Start the connection provider
-            // Note: This may fail if project.basePath is null in test environment
-            // In that case, we just verify that the provider was created successfully
-            if (project.basePath != null) {
-                connectionProvider.start()
-                
-                // Verify streams are available
-                assertNotNull("Input stream should not be null", 
-                    connectionProvider.getInputStream())
-                assertNotNull("Output stream should not be null", 
-                    connectionProvider.getOutputStream())
-            } else {
-                // In test environment without a proper project path, just verify creation
-                assertNotNull("Connection provider should be created", connectionProvider)
-            }
-        } catch (e: WorkingDirectoryNotFoundException) {
-            // This is expected in test environment, just verify the provider was created
-            assertNotNull("Connection provider should be created even without working directory", 
-                connectionProvider)
-        } finally {
-            try {
-                connectionProvider.stop()
-            } catch (ignored: Exception) {
-                // Ignore cleanup errors
-            }
-        }
+        assertNotNull("Command line should not be null", commandLine)
+        assertTrue("Command line should contain expert executable",
+            commandLine.exePath.endsWith("expert") || commandLine.exePath.endsWith("expert.exe"))
+        assertTrue("Command line should contain 'lsp' parameter",
+            commandLine.parametersList.parameters.contains("lsp"))
     }
     
-    fun testConnectionProviderStop() {
+    fun testDescriptorHandlesNullProjectBasePath() {
         // Create a mock Expert installation
         createMockExpertExecutable()
         
-        val connectionProvider = ExpertStreamConnectionProvider(project)
+        val descriptor = ExpertLspServerDescriptor(project)
         
         try {
-            // Try to start, but handle case where project.basePath is null
-            if (project.basePath != null) {
-                connectionProvider.start()
-                connectionProvider.stop()
-                
-                // After stopping, streams should be null
-                assertNull("Input stream should be null after stop", 
-                    connectionProvider.getInputStream())
-                assertNull("Output stream should be null after stop", 
-                    connectionProvider.getOutputStream())
-            } else {
-                // Just test that stop can be called without starting
-                connectionProvider.stop()
-                assertNull("Input stream should be null", 
-                    connectionProvider.getInputStream())
+            val commandLine = descriptor.createCommandLine()
+            assertNotNull("Command line should be created even without base path", commandLine)
+        } catch (e: Exception) {
+            // If it fails due to working directory, that's acceptable in test environment
+            if (e !is WorkingDirectoryNotFoundException) {
+                throw e
             }
-        } catch (e: WorkingDirectoryNotFoundException) {
-            // Expected in test environment - just verify stop works
-            connectionProvider.stop()
-            assertNull("Input stream should be null after stop", 
-                connectionProvider.getInputStream())
         }
     }
 }

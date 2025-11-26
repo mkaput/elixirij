@@ -5,7 +5,6 @@
     <vendor>Marek Kaput</vendor>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.redhat.devtools.lsp4ij</depends>
 
     <resource-bundle>messages.ExBundle</resource-bundle>
 
@@ -17,14 +16,7 @@
                   extensions="ex;exs"/>
         
         <postStartupActivity implementation="dev.murek.elixirij.lsp.ExpertStartupActivity"/>
-    </extensions>
-
-    <extensions defaultExtensionNs="com.redhat.devtools.lsp4ij">
-        <server id="expert"
-                name="Expert"
-                factoryClass="dev.murek.elixirij.lsp.ExpertLanguageServerFactory">
-            <description>Expert Language Server for Elixir</description>
-        </server>
-        <languageMapping language="Elixir" serverId="expert"/>
+        
+        <platform.lsp.serverSupportProvider implementation="dev.murek.elixirij.lsp.ExpertLspServerSupportProvider"/>
     </extensions>
 </idea-plugin>
