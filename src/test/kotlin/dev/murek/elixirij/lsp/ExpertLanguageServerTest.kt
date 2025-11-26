@@ -1,10 +1,11 @@
 package dev.murek.elixirij.lsp
 
+import com.intellij.execution.WorkingDirectoryNotFoundException
+import com.intellij.openapi.util.SystemInfo
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.junit.Assert.*
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
-import com.intellij.openapi.util.SystemInfo
 import kotlin.io.path.writeText
 
 /**
@@ -101,7 +102,7 @@ class ExpertLanguageServerTest : BasePlatformTestCase() {
                 // In test environment without a proper project path, just verify creation
                 assertNotNull("Connection provider should be created", connectionProvider)
             }
-        } catch (e: com.intellij.execution.WorkingDirectoryNotFoundException) {
+        } catch (e: WorkingDirectoryNotFoundException) {
             // This is expected in test environment, just verify the provider was created
             assertNotNull("Connection provider should be created even without working directory", 
                 connectionProvider)
@@ -152,7 +153,7 @@ class ExpertLanguageServerTest : BasePlatformTestCase() {
                 assertNull("Input stream should be null", 
                     connectionProvider.getInputStream())
             }
-        } catch (e: com.intellij.execution.WorkingDirectoryNotFoundException) {
+        } catch (e: WorkingDirectoryNotFoundException) {
             // Expected in test environment - just verify stop works
             connectionProvider.stop()
             assertNull("Input stream should be null after stop", 
