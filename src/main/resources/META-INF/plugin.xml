@@ -1,8 +1,8 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>dev.murek.elixirij</id>
-    <name>elixirij</name>
-    <vendor>mkaput</vendor>
+    <name>ElixirIJ</name>
+    <vendor>Marek Kaput</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
