@@ -1,4 +1,4 @@
-package com.github.mkaput.elixirij.startup
+package dev.murek.elixirij.startup
 
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project

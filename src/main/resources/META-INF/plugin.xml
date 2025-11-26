@@ -1,6 +1,6 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.mkaput.elixirij</id>
+    <id>dev.murek.elixirij</id>
     <name>elixirij</name>
     <vendor>mkaput</vendor>
 
@@ -9,7 +9,7 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.mkaput.elixirij.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.mkaput.elixirij.startup.MyProjectActivity" />
+        <toolWindow factoryClass="dev.murek.elixirij.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <postStartupActivity implementation="dev.murek.elixirij.startup.MyProjectActivity" />
     </extensions>
 </idea-plugin>
