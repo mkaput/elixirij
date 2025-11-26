@@ -1,4 +1,4 @@
-package com.github.mkaput.elixirij.toolWindow
+package dev.murek.elixirij.toolWindow
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -8,8 +8,8 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.content.ContentFactory
-import com.github.mkaput.elixirij.MyBundle
-import com.github.mkaput.elixirij.services.MyProjectService
+import dev.murek.elixirij.MyBundle
+import dev.murek.elixirij.services.MyProjectService
 import javax.swing.JButton
 
 

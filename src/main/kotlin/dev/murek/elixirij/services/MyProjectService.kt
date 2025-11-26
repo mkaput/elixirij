@@ -1,9 +1,9 @@
-package com.github.mkaput.elixirij.services
+package dev.murek.elixirij.services
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import com.github.mkaput.elixirij.MyBundle
+import dev.murek.elixirij.MyBundle
 
 @Service(Service.Level.PROJECT)
 class MyProjectService(project: Project) {

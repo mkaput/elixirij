@@ -1,4 +1,4 @@
-package com.github.mkaput.elixirij
+package dev.murek.elixirij
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
