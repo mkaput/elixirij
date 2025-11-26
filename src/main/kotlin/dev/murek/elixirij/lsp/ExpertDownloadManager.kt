@@ -7,9 +7,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.util.SystemInfo
-import java.io.FileOutputStream
-import java.net.HttpURLConnection
-import java.net.URL
+import com.intellij.util.io.HttpRequests
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -197,44 +195,11 @@ class ExpertDownloadManager {
      * Download a file from a URL with progress tracking.
      */
     private fun downloadFile(urlString: String, destination: Path, indicator: ProgressIndicator) {
-        val url = URL(urlString)
-        val connection = url.openConnection() as HttpURLConnection
-        connection.requestMethod = "GET"
-        connection.connectTimeout = 30000
-        connection.readTimeout = 30000
-        
-        try {
-            connection.connect()
-            
-            val responseCode = connection.responseCode
-            if (responseCode != HttpURLConnection.HTTP_OK) {
-                throw Exception("HTTP error code: $responseCode")
+        HttpRequests.request(urlString)
+            .connectTimeout(30000)
+            .readTimeout(30000)
+            .connect { request ->
+                request.saveToFile(destination.toFile(), indicator)
             }
-            
-            val contentLength = connection.contentLengthLong
-            var downloadedBytes = 0L
-            
-            connection.inputStream.use { input ->
-                FileOutputStream(destination.toFile()).use { output ->
-                    val buffer = ByteArray(8192)
-                    var bytesRead: Int
-                    
-                    while (input.read(buffer).also { bytesRead = it } != -1) {
-                        output.write(buffer, 0, bytesRead)
-                        downloadedBytes += bytesRead
-                        
-                        if (contentLength > 0) {
-                            indicator.fraction = downloadedBytes.toDouble() / contentLength * 0.9
-                        }
-                        
-                        if (indicator.isCanceled) {
-                            throw InterruptedException("Download cancelled by user")
-                        }
-                    }
-                }
-            }
-        } finally {
-            connection.disconnect()
-        }
     }
 }
