@@ -9,5 +9,10 @@
     <resource-bundle>messages.ExBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
+        <fileType name="Elixir"
+                  implementationClass="dev.murek.elixirij.ExFileType"
+                  fieldName="INSTANCE"
+                  language="Elixir"
+                  extensions="ex;exs"/>
     </extensions>
 </idea-plugin>
