@@ -25,7 +25,7 @@ class ExpertStartupActivity : ProjectActivity {
                     }
                 }
             } else {
-                // Check for updates in background (once per day)
+                // Check for updates in background (limited to once per UPDATE_CHECK_INTERVAL_MS)
                 downloadManager.checkAndUpdateExpert { success, error ->
                     if (success) {
                         logger.info("Expert language server is up to date")

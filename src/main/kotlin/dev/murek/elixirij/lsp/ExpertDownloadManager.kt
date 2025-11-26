@@ -28,6 +28,7 @@ class ExpertDownloadManager {
         private const val EXPERT_DIR_NAME = "expert"
         private const val EXPERT_EXECUTABLE_NAME = "expert"
         private const val VERSION_FILE_NAME = "version.txt"
+        private const val UPDATE_CHECK_INTERVAL_MS = 24L * 60 * 60 * 1000 // 24 hours in milliseconds
         
         fun getInstance(): ExpertDownloadManager {
             return com.intellij.openapi.components.service()
@@ -150,7 +151,7 @@ class ExpertDownloadManager {
      * Check if an update is available and install it if needed.
      */
     fun checkAndUpdateExpert(onComplete: (Boolean, String?) -> Unit) {
-        // For now, we'll update if Expert is not installed or if it's older than 24 hours
+        // For now, we'll update if Expert is not installed or if it's older than UPDATE_CHECK_INTERVAL_MS
         val shouldUpdate = if (!isExpertInstalled()) {
             true
         } else {
@@ -159,8 +160,8 @@ class ExpertDownloadManager {
                 true
             } else {
                 val lastModified = Files.getLastModifiedTime(versionFile).toMillis()
-                val twentyFourHoursAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000)
-                lastModified < twentyFourHoursAgo
+                val updateThreshold = System.currentTimeMillis() - UPDATE_CHECK_INTERVAL_MS
+                lastModified < updateThreshold
             }
         }
         
@@ -176,14 +177,16 @@ class ExpertDownloadManager {
      */
     private fun detectPlatform(): String? {
         val arch = SystemInfo.OS_ARCH.lowercase()
-        val is64Bit = arch.contains("x86_64") || arch.contains("amd64") || arch.contains("x64")
         val isArm64 = SystemInfo.isAarch64
+        val is64Bit = arch.contains("x86_64") || arch.contains("amd64") || arch.contains("x64")
         
         return when {
+            // Prioritize ARM64 detection to ensure correct platform identification
             SystemInfo.isMac && isArm64 -> "aarch64-apple-darwin"
+            SystemInfo.isLinux && isArm64 -> "aarch64-unknown-linux-gnu"
+            // Fall back to x86_64 for non-ARM platforms
             SystemInfo.isMac && is64Bit -> "x86_64-apple-darwin"
             SystemInfo.isLinux && is64Bit -> "x86_64-unknown-linux-gnu"
-            SystemInfo.isLinux && isArm64 -> "aarch64-unknown-linux-gnu"
             SystemInfo.isWindows && is64Bit -> "x86_64-pc-windows-msvc.exe"
             else -> null
         }

@@ -45,7 +45,12 @@ class ExpertStreamConnectionProvider(private val project: Project) : StreamConne
         val commandLine = GeneralCommandLine()
         commandLine.exePath = expertPath.toString()
         commandLine.addParameter("lsp")
-        commandLine.withWorkDirectory(project.basePath)
+        
+        // Set working directory if available
+        val basePath = project.basePath
+        if (basePath != null) {
+            commandLine.withWorkDirectory(basePath)
+        }
         
         process = commandLine.createProcess()
     }
