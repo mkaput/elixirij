@@ -10,9 +10,9 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <fileType name="Elixir"
-                  implementationClass="dev.murek.elixirij.ExFileType" 
-                  fieldName="INSTANCE" 
-                  language="Elixir" 
+                  implementationClass="dev.murek.elixirij.ExFileType"
+                  fieldName="INSTANCE"
+                  language="Elixir"
                   extensions="ex;exs"/>
     </extensions>
 </idea-plugin>
