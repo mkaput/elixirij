@@ -34,6 +34,28 @@ class ExpertLanguageServerTest : BasePlatformTestCase() {
         }
     }
     
+    /**
+     * Helper method to create a mock Expert executable for testing.
+     */
+    private fun createMockExpertExecutable() {
+        val expertDir = downloadManager.getExpertDirectory()
+        Files.createDirectories(expertDir)
+        val executablePath = downloadManager.getExpertExecutablePath()
+        
+        // Create a simple script that exits immediately
+        if (SystemInfo.isWindows) {
+            executablePath.writeText("@echo off\nREM Mock Expert")
+        } else {
+            executablePath.writeText("#!/bin/sh\necho 'Mock Expert'")
+            val permissions = setOf(
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE,
+                PosixFilePermission.OWNER_EXECUTE
+            )
+            Files.setPosixFilePermissions(executablePath, permissions)
+        }
+    }
+    
     fun testFactoryCreatesConnectionProvider() {
         val connectionProvider = factory.createConnectionProvider(project)
         assertNotNull("Connection provider should not be null", connectionProvider)
@@ -67,22 +89,7 @@ class ExpertLanguageServerTest : BasePlatformTestCase() {
     
     fun testConnectionProviderStartsWhenExpertInstalled() {
         // Create a mock Expert installation
-        val expertDir = downloadManager.getExpertDirectory()
-        Files.createDirectories(expertDir)
-        val executablePath = downloadManager.getExpertExecutablePath()
-        
-        // Create a simple script that exits immediately
-        if (SystemInfo.isWindows) {
-            executablePath.writeText("@echo off\nREM Mock Expert")
-        } else {
-            executablePath.writeText("#!/bin/sh\necho 'Mock Expert'")
-            val permissions = setOf(
-                PosixFilePermission.OWNER_READ,
-                PosixFilePermission.OWNER_WRITE,
-                PosixFilePermission.OWNER_EXECUTE
-            )
-            Files.setPosixFilePermissions(executablePath, permissions)
-        }
+        createMockExpertExecutable()
         
         val connectionProvider = ExpertStreamConnectionProvider(project)
         
@@ -117,22 +124,7 @@ class ExpertLanguageServerTest : BasePlatformTestCase() {
     
     fun testConnectionProviderStop() {
         // Create a mock Expert installation
-        val expertDir = downloadManager.getExpertDirectory()
-        Files.createDirectories(expertDir)
-        val executablePath = downloadManager.getExpertExecutablePath()
-        
-        // Create a simple script
-        if (SystemInfo.isWindows) {
-            executablePath.writeText("@echo off\nREM Mock Expert")
-        } else {
-            executablePath.writeText("#!/bin/sh\nsleep 10")
-            val permissions = setOf(
-                PosixFilePermission.OWNER_READ,
-                PosixFilePermission.OWNER_WRITE,
-                PosixFilePermission.OWNER_EXECUTE
-            )
-            Files.setPosixFilePermissions(executablePath, permissions)
-        }
+        createMockExpertExecutable()
         
         val connectionProvider = ExpertStreamConnectionProvider(project)
         
