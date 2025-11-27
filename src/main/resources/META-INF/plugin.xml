@@ -13,6 +13,7 @@
                   implementationClass="dev.murek.elixirij.ExFileType"
                   fieldName="INSTANCE"
                   language="Elixir"
-                  extensions="ex;exs"/>
+                  extensions="ex;exs"
+                  hashBangs="elixir"/>
     </extensions>
 </idea-plugin>
