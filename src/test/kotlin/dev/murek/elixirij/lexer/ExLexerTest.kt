@@ -1,7 +1,5 @@
 package dev.murek.elixirij.lexer
 
-import com.intellij.psi.TokenType
-import dev.murek.elixirij.psi.ExTypes
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

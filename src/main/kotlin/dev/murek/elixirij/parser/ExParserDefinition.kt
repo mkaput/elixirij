@@ -12,8 +12,9 @@ import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
 import dev.murek.elixirij.ExLanguage
 import dev.murek.elixirij.lexer.ExLexer
+import dev.murek.elixirij.psi.EX_COMMENTS
+import dev.murek.elixirij.psi.EX_STRINGS
 import dev.murek.elixirij.psi.ExFile
-import dev.murek.elixirij.psi.ExTypes
 
 /**
  * Parser definition for the Elixir language.
@@ -41,12 +42,12 @@ class ExParserDefinition : ParserDefinition {
 
     override fun getFileNodeType(): IFileElementType = FILE
 
-    override fun getCommentTokens(): TokenSet = ExTypes.COMMENTS
+    override fun getCommentTokens(): TokenSet = EX_COMMENTS
 
-    override fun getStringLiteralElements(): TokenSet = ExTypes.STRINGS
+    override fun getStringLiteralElements(): TokenSet = EX_STRINGS
 
     override fun createElement(node: ASTNode): PsiElement {
-        throw UnsupportedOperationException("Not yet implemented")
+        throw UnsupportedOperationException(node.elementType.toString())
     }
 
     override fun createFile(viewProvider: FileViewProvider): PsiFile = ExFile(viewProvider)

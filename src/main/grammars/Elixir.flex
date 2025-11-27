@@ -2,7 +2,7 @@ package dev.murek.elixirij.lexer;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import static dev.murek.elixirij.psi.ExTypes.*;
+import static dev.murek.elixirij.psi.ElementTypes.*;
 import static com.intellij.psi.TokenType.WHITE_SPACE;
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
 
@@ -67,164 +67,164 @@ SIGIL_START=\~[a-zA-Z]
 <YYINITIAL> {
     // Whitespace
     {HORIZONTAL_SPACE}+                { return WHITE_SPACE; }
-    {EOL_CHAR}                         { return EOL; }
+    {EOL_CHAR}                         { return EX_EOL; }
     
     // Comments
-    {COMMENT}                          { return COMMENT; }
+    {COMMENT}                          { return EX_COMMENT; }
     
     // Keywords (must come before identifiers)
-    "true"                             { return TRUE; }
-    "false"                            { return FALSE; }
-    "nil"                              { return NIL; }
-    "do"                               { return DO; }
-    "end"                              { return END; }
-    "fn"                               { return FN; }
-    "after"                            { return AFTER; }
-    "else"                             { return ELSE; }
-    "catch"                            { return CATCH; }
-    "rescue"                           { return RESCUE; }
-    "when"                             { return WHEN; }
-    "in"                               { return IN; }
-    "not"                              { return NOT; }
-    "and"                              { return AND; }
-    "or"                               { return OR; }
+    "true"                             { return EX_TRUE; }
+    "false"                            { return EX_FALSE; }
+    "nil"                              { return EX_NIL; }
+    "do"                               { return EX_DO; }
+    "end"                              { return EX_END; }
+    "fn"                               { return EX_FN; }
+    "after"                            { return EX_AFTER; }
+    "else"                             { return EX_ELSE; }
+    "catch"                            { return EX_CATCH; }
+    "rescue"                           { return EX_RESCUE; }
+    "when"                             { return EX_WHEN; }
+    "in"                               { return EX_IN; }
+    "not"                              { return EX_NOT; }
+    "and"                              { return EX_AND; }
+    "or"                               { return EX_OR; }
     
     // Three-character operators (must come before two-character)
-    "==="                              { return EQ_EQ_EQ; }
-    "!=="                              { return NOT_EQ_EQ; }
-    "<~>"                              { return LT_TILDE_GT; }
-    "<<~"                              { return LT_LT_TILDE; }
-    "~>>"                              { return TILDE_GT_GT; }
-    "<<<"                              { return LT_LT_LT; }
-    ">>>"                              { return GT_GT_GT; }
-    "<|>"                              { return LT_PIPE_GT; }
-    "..."                              { return DOT_DOT_DOT; }
-    "+++"                              { return PLUS_PLUS_PLUS; }
-    "---"                              { return MINUS_MINUS_MINUS; }
-    "&&&"                              { return AMP_AMP_AMP; }
-    "|||"                              { return PIPE_PIPE_PIPE; }
-    "..//"                             { return DOT_DOT_SLASH_SLASH; }
+    "==="                              { return EX_EQ_EQ_EQ; }
+    "!=="                              { return EX_NOT_EQ_EQ; }
+    "<~>"                              { return EX_LT_TILDE_GT; }
+    "<<~"                              { return EX_LT_LT_TILDE; }
+    "~>>"                              { return EX_TILDE_GT_GT; }
+    "<<<"                              { return EX_LT_LT_LT; }
+    ">>>"                              { return EX_GT_GT_GT; }
+    "<|>"                              { return EX_LT_PIPE_GT; }
+    "..."                              { return EX_DOT_DOT_DOT; }
+    "+++"                              { return EX_PLUS_PLUS_PLUS; }
+    "---"                              { return EX_MINUS_MINUS_MINUS; }
+    "&&&"                              { return EX_AMP_AMP_AMP; }
+    "|||"                              { return EX_PIPE_PIPE_PIPE; }
+    "..//"                             { return EX_DOT_DOT_SLASH_SLASH; }
     
     // Two-character operators
-    "=="                               { return EQ_EQ; }
-    "!="                               { return NOT_EQ; }
-    "<="                               { return LT_EQ; }
-    ">="                               { return GT_EQ; }
-    "=~"                               { return EQ_TILDE; }
-    "&&"                               { return AMP_AMP; }
-    "||"                               { return PIPE_PIPE; }
-    "->"                               { return ARROW; }
-    "<-"                               { return LEFT_ARROW; }
-    "=>"                               { return FAT_ARROW; }
-    "|>"                               { return PIPE_GT; }
-    "<~"                               { return LT_TILDE; }
-    "~>"                               { return TILDE_GT; }
-    ".."                               { return DOT_DOT; }
-    "++"                               { return PLUS_PLUS; }
-    "--"                               { return MINUS_MINUS; }
-    "<>"                               { return LT_GT; }
-    "**"                               { return STAR_STAR; }
-    "::"                               { return COLON_COLON; }
-    "\\\\"                             { return BACK_SLASH_BACK_SLASH; }
-    "//"                               { return SLASH_SLASH; }
-    "<<"                               { return LT_LT; }
-    ">>"                               { return GT_GT; }
-    "%{"                               { return PERCENT_LBRACE; }
+    "=="                               { return EX_EQ_EQ; }
+    "!="                               { return EX_NOT_EQ; }
+    "<="                               { return EX_LT_EQ; }
+    ">="                               { return EX_GT_EQ; }
+    "=~"                               { return EX_EQ_TILDE; }
+    "&&"                               { return EX_AMP_AMP; }
+    "||"                               { return EX_PIPE_PIPE; }
+    "->"                               { return EX_ARROW; }
+    "<-"                               { return EX_LEFT_ARROW; }
+    "=>"                               { return EX_FAT_ARROW; }
+    "|>"                               { return EX_PIPE_GT; }
+    "<~"                               { return EX_LT_TILDE; }
+    "~>"                               { return EX_TILDE_GT; }
+    ".."                               { return EX_DOT_DOT; }
+    "++"                               { return EX_PLUS_PLUS; }
+    "--"                               { return EX_MINUS_MINUS; }
+    "<>"                               { return EX_LT_GT; }
+    "**"                               { return EX_STAR_STAR; }
+    "::"                               { return EX_COLON_COLON; }
+    "\\\\"                             { return EX_BACK_SLASH_BACK_SLASH; }
+    "//"                               { return EX_SLASH_SLASH; }
+    "<<"                               { return EX_LT_LT; }
+    ">>"                               { return EX_GT_GT; }
+    "%{"                               { return EX_PERCENT_LBRACE; }
     
     // Single-character operators
-    "@"                                { return AT; }
-    "!"                                { return EXCLAMATION; }
-    "^"                                { return CARET; }
-    "~"                                { return TILDE; }
-    "&"                                { return AMPERSAND; }
-    "+"                                { return PLUS; }
-    "-"                                { return MINUS; }
-    "*"                                { return STAR; }
-    "/"                                { return SLASH; }
-    "="                                { return EQ; }
-    "<"                                { return LT; }
-    ">"                                { return GT; }
-    "|"                                { return PIPE; }
+    "@"                                { return EX_AT; }
+    "!"                                { return EX_EXCLAMATION; }
+    "^"                                { return EX_CARET; }
+    "~"                                { return EX_TILDE; }
+    "&"                                { return EX_AMPERSAND; }
+    "+"                                { return EX_PLUS; }
+    "-"                                { return EX_MINUS; }
+    "*"                                { return EX_STAR; }
+    "/"                                { return EX_SLASH; }
+    "="                                { return EX_EQ; }
+    "<"                                { return EX_LT; }
+    ">"                                { return EX_GT; }
+    "|"                                { return EX_PIPE; }
     
     // Delimiters
-    "("                                { return LPAREN; }
-    ")"                                { return RPAREN; }
-    "["                                { return LBRACKET; }
-    "]"                                { return RBRACKET; }
-    "{"                                { return LBRACE; }
-    "}"                                { return RBRACE; }
+    "("                                { return EX_LPAREN; }
+    ")"                                { return EX_RPAREN; }
+    "["                                { return EX_LBRACKET; }
+    "]"                                { return EX_RBRACKET; }
+    "{"                                { return EX_LBRACE; }
+    "}"                                { return EX_RBRACE; }
     
     // Punctuation
-    "."                                { return DOT; }
-    ","                                { return COMMA; }
-    ":"                                { return COLON; }
-    ";"                                { return SEMICOLON; }
-    "%"                                { return PERCENT; }
+    "."                                { return EX_DOT; }
+    ","                                { return EX_COMMA; }
+    ":"                                { return EX_COLON; }
+    ";"                                { return EX_SEMICOLON; }
+    "%"                                { return EX_PERCENT; }
     
     // Char literals - escape sequences
-    "?\\n"                             { return CHAR; }
-    "?\\r"                             { return CHAR; }
-    "?\\t"                             { return CHAR; }
-    "?\\s"                             { return CHAR; }
-    "?\\0"                             { return CHAR; }
-    "?\\\\"                            { return CHAR; }
-    "?\\?"                             { return CHAR; }
+    "?\\n"                             { return EX_CHAR; }
+    "?\\r"                             { return EX_CHAR; }
+    "?\\t"                             { return EX_CHAR; }
+    "?\\s"                             { return EX_CHAR; }
+    "?\\0"                             { return EX_CHAR; }
+    "?\\\\"                            { return EX_CHAR; }
+    "?\\?"                             { return EX_CHAR; }
     // Char literals - regular
-    "?"[^\s]                           { return CHAR; }
+    "?"[^\s]                           { return EX_CHAR; }
     
     // Numbers
-    {FLOAT_LITERAL}                    { return FLOAT; }
-    {INTEGER}                          { return INTEGER; }
+    {FLOAT_LITERAL}                    { return EX_FLOAT; }
+    {INTEGER}                          { return EX_INTEGER; }
     
     // Atoms - operator atoms
-    ":..."                             { return ATOM; }
-    ":.."                              { return ATOM; }
-    ":<<>>"                            { return ATOM; }
-    ":%{}"                             { return ATOM; }
-    ":{}"                              { return ATOM; }
-    ":&"                               { return ATOM; }
-    ":..//"                            { return ATOM; }
-    ":+"                               { return ATOM; }
-    ":-"                               { return ATOM; }
-    ":*"                               { return ATOM; }
-    ":/"                               { return ATOM; }
-    ":!"                               { return ATOM; }
-    ":^"                               { return ATOM; }
-    ":|"                               { return ATOM; }
-    ":@"                               { return ATOM; }
-    ":<"                               { return ATOM; }
-    ":>"                               { return ATOM; }
-    ":="                               { return ATOM; }
+    ":..."                             { return EX_ATOM; }
+    ":.."                              { return EX_ATOM; }
+    ":<<>>"                            { return EX_ATOM; }
+    ":%{}"                             { return EX_ATOM; }
+    ":{}"                              { return EX_ATOM; }
+    ":&"                               { return EX_ATOM; }
+    ":..//"                            { return EX_ATOM; }
+    ":+"                               { return EX_ATOM; }
+    ":-"                               { return EX_ATOM; }
+    ":*"                               { return EX_ATOM; }
+    ":/"                               { return EX_ATOM; }
+    ":!"                               { return EX_ATOM; }
+    ":^"                               { return EX_ATOM; }
+    ":|"                               { return EX_ATOM; }
+    ":@"                               { return EX_ATOM; }
+    ":<"                               { return EX_ATOM; }
+    ":>"                               { return EX_ATOM; }
+    ":="                               { return EX_ATOM; }
     // Atoms - keyword atoms  
-    ":" {ATOM_HEAD}                    { return ATOM; }
+    ":" {ATOM_HEAD}                    { return EX_ATOM; }
     // Atoms - quoted
-    ":\"" [^\"]* "\""                  { return ATOM_QUOTED; }
-    ":\'" [^\']* "\'"                  { return ATOM_QUOTED; }
+    ":\"" [^\"]* "\""                  { return EX_ATOM_QUOTED; }
+    ":\'" [^\']* "\'"                  { return EX_ATOM_QUOTED; }
     
     // Sigils - heredocs first
-    {SIGIL_START} "\"\"\"" ~"\"\"\""   { return SIGIL; }
-    {SIGIL_START} "\'\'\'" ~"\'\'\'"   { return SIGIL; }
+    {SIGIL_START} "\"\"\"" ~"\"\"\""   { return EX_SIGIL; }
+    {SIGIL_START} "\'\'\'" ~"\'\'\'"   { return EX_SIGIL; }
     // Sigils - regular delimiters
-    {SIGIL_START} "\"" [^\"]* "\""     { return SIGIL; }
-    {SIGIL_START} "\'" [^\']* "\'"     { return SIGIL; }
-    {SIGIL_START} "/" [^/]* "/"        { return SIGIL; }
-    {SIGIL_START} "|" [^|]* "|"        { return SIGIL; }
-    {SIGIL_START} "(" [^)]* ")"        { return SIGIL; }
-    {SIGIL_START} "[" [^\]]* "]"       { return SIGIL; }
-    {SIGIL_START} "{" [^}]* "}"        { return SIGIL; }
-    {SIGIL_START} "<" [^>]* ">"        { return SIGIL; }
+    {SIGIL_START} "\"" [^\"]* "\""     { return EX_SIGIL; }
+    {SIGIL_START} "\'" [^\']* "\'"     { return EX_SIGIL; }
+    {SIGIL_START} "/" [^/]* "/"        { return EX_SIGIL; }
+    {SIGIL_START} "|" [^|]* "|"        { return EX_SIGIL; }
+    {SIGIL_START} "(" [^)]* ")"        { return EX_SIGIL; }
+    {SIGIL_START} "[" [^\]]* "]"       { return EX_SIGIL; }
+    {SIGIL_START} "{" [^}]* "}"        { return EX_SIGIL; }
+    {SIGIL_START} "<" [^>]* ">"        { return EX_SIGIL; }
     
     // Strings - heredocs must be before regular strings
-    "\"\"\"" ~"\"\"\""                 { return HEREDOC; }
-    "\'\'\'" ~"\'\'\'"                 { return CHARLIST_HEREDOC; }
+    "\"\"\"" ~"\"\"\""                 { return EX_HEREDOC; }
+    "\'\'\'" ~"\'\'\'"                 { return EX_CHARLIST_HEREDOC; }
     
     // Strings - regular (simplified - handle escape sequences inside)
-    "\"" ([^\\\"] | "\\" .)* "\""      { return STRING; }
-    "\'" ([^\\\'] | "\\" .)* "\'"      { return CHARLIST; }
+    "\"" ([^\\\"] | "\\" .)* "\""      { return EX_STRING; }
+    "\'" ([^\\\'] | "\\" .)* "\'"      { return EX_CHARLIST; }
     
     // Identifiers and aliases
-    {ALIAS}                            { return ALIAS; }
-    {IDENTIFIER}                       { return IDENTIFIER; }
+    {ALIAS}                            { return EX_ALIAS; }
+    {IDENTIFIER}                       { return EX_IDENTIFIER; }
     
     // Catch all bad characters
     [^]                                { return BAD_CHARACTER; }
