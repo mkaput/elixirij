@@ -1,5 +1,6 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
@@ -9,6 +10,7 @@ plugins {
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
     alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
+    alias(libs.plugins.grammarKit) // Grammar-Kit for JFlex lexer generation
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -99,7 +101,8 @@ intellijPlatform {
         // The pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html#specifying-a-release-channel
-        channels = providers.gradleProperty("pluginVersion").map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
+        channels = providers.gradleProperty("pluginVersion")
+            .map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
     }
 
     pluginVerification {
@@ -133,6 +136,31 @@ tasks {
 
     publishPlugin {
         dependsOn(patchChangelog)
+    }
+}
+
+// Configure JFlex lexer generation
+val generateElixirLexer = tasks.register<GenerateLexerTask>("generateElixirLexer") {
+    sourceFile.set(file("src/main/grammars/Elixir.flex"))
+    targetOutputDir.set(file("src/gen/dev/murek/elixirij/lexer"))
+    purgeOldFiles.set(true)
+}
+
+// Ensure lexer is generated before compiling
+tasks.named("compileKotlin") {
+    dependsOn(generateElixirLexer)
+}
+
+tasks.named("compileJava") {
+    dependsOn(generateElixirLexer)
+}
+
+// Add generated sources to the source sets
+sourceSets {
+    main {
+        java {
+            srcDir("src/gen")
+        }
     }
 }
 

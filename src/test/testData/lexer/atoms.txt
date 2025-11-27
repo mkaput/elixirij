@@ -1,0 +1,3 @@
+ATOM (':foo')
+WHITE_SPACE (' ')
+ATOM (':bar_baz')

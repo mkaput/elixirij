@@ -1,0 +1,1 @@
+STRING ('"hello #{name}"')

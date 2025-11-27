@@ -1,0 +1,3 @@
+STRING ('"hello"')
+WHITE_SPACE (' ')
+STRING ('"world\n"')

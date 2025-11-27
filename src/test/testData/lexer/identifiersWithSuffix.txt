@@ -1,0 +1,7 @@
+IDENTIFIER ('abc?')
+WHITE_SPACE (' ')
+IDENTIFIER ('abc!')
+WHITE_SPACE (' ')
+IDENTIFIER ('a0c?')
+WHITE_SPACE (' ')
+IDENTIFIER ('a0c!')
