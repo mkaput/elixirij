@@ -30,11 +30,6 @@ private const val UPDATE_CHECK_INTERVAL_MS = 24L * 60 * 60 * 1000 // 24 hours in
 @Service(Service.Level.APP)
 class ExpertDownloadManager {
 
-    companion object {
-        @JvmStatic
-        fun getInstance(): ExpertDownloadManager = service()
-    }
-
     /**
      * Get the directory where Expert is stored.
      * Uses IntelliJ's plugin-specific directory for proper isolation.

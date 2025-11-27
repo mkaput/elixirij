@@ -1,5 +1,6 @@
 package dev.murek.elixirij.lsp
 
+import com.intellij.openapi.components.service
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import dev.murek.elixirij.ExFileType
 import java.util.concurrent.CountDownLatch
@@ -29,7 +30,7 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
      * Returns true if Expert is ready to use, false if download failed (e.g., network unavailable).
      */
     private fun ensureExpertDownloaded(): Boolean {
-        val downloadManager = ExpertDownloadManager.getInstance()
+        val downloadManager = service<ExpertDownloadManager>()
 
         if (downloadManager.isInstalled()) {
             downloadSucceeded.set(true)
@@ -73,7 +74,7 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
     fun `test download real expert binary`() {
         if (skipIfExpertUnavailable()) return
 
-        val downloadManager = ExpertDownloadManager.getInstance()
+        val downloadManager = service<ExpertDownloadManager>()
 
         assertTrue("Expert should be downloaded and installed", downloadManager.isInstalled())
         assertTrue("Expert executable file should exist", downloadManager.getExecutablePath().toFile().exists())
@@ -82,7 +83,7 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
     fun `test real expert version retrieval`() {
         if (skipIfExpertUnavailable()) return
 
-        val version = ExpertDownloadManager.getInstance().getInstalledVersion()
+        val version = service<ExpertDownloadManager>().getInstalledVersion()
 
         assertNotNull("Should be able to get Expert version", version)
         assertTrue("Version should not be empty", version!!.isNotBlank())
@@ -128,7 +129,7 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
         assertTrue("Elixir file should be supported", descriptor.isSupportedFile(mainFile.virtualFile))
 
         // Create command line and verify configuration
-        val downloadManager = ExpertDownloadManager.getInstance()
+        val downloadManager = service<ExpertDownloadManager>()
         val commandLine = descriptor.createCommandLine()
 
         assertEquals("Should use --stdio parameter", "--stdio", commandLine.parametersList.parameters.firstOrNull())

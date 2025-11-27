@@ -1,6 +1,7 @@
 package dev.murek.elixirij.lsp
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
@@ -14,7 +15,7 @@ class ExpertStartupActivity : ProjectActivity {
 
     override suspend fun execute(project: Project) {
         ApplicationManager.getApplication().executeOnPooledThread {
-            val downloadManager = ExpertDownloadManager.getInstance()
+            val downloadManager = service<ExpertDownloadManager>()
 
             if (!downloadManager.isInstalled()) {
                 LOG.info("Expert language server not found. Starting initial download...")

@@ -1,5 +1,6 @@
 package dev.murek.elixirij.lsp
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 
@@ -11,7 +12,7 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase
 class ExpertDownloadManagerTest : BasePlatformTestCase() {
 
     fun `test directory path contains elixirij and expert`() {
-        val expertDir = ExpertDownloadManager.getInstance().getDirectory()
+        val expertDir = service<ExpertDownloadManager>().getDirectory()
 
         assertTrue(
             "Expert directory path should contain 'elixirij'",
@@ -24,7 +25,7 @@ class ExpertDownloadManagerTest : BasePlatformTestCase() {
     }
 
     fun `test executable path ends with expert`() {
-        val executablePath = ExpertDownloadManager.getInstance().getExecutablePath()
+        val executablePath = service<ExpertDownloadManager>().getExecutablePath()
 
         assertTrue(
             "Executable path should end with 'expert'",
