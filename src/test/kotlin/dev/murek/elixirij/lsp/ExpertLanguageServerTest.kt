@@ -79,18 +79,6 @@ class ExpertLanguageServerTest : BasePlatformTestCase() {
             descriptor.isSupportedFile(txtFile.virtualFile))
     }
     
-    fun testDescriptorThrowsWhenExpertNotInstalled() {
-        val descriptor = ExpertLspServerDescriptor(project)
-        
-        try {
-            descriptor.createCommandLine()
-            fail("Should throw IllegalStateException when Expert is not installed")
-        } catch (e: IllegalStateException) {
-            assertTrue("Exception message should mention installation",
-                e.message?.contains("not installed") == true)
-        }
-    }
-    
     fun testDescriptorCreatesCommandLineWhenExpertInstalled() {
         // Create a mock Expert installation
         createMockExpertExecutable()

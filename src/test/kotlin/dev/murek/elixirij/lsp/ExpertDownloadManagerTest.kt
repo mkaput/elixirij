@@ -99,26 +99,26 @@ class ExpertDownloadManagerTest : BasePlatformTestCase() {
         assertNull("Version should be null when Expert is not installed", version)
     }
     
-    fun testGetInstalledVersionWhenInstalled() {
-        // Create a mock version file
+    fun testGetInstalledVersionWhenBinaryCannotProvideVersion() {
+        // Create a mock installed Expert that doesn't respond to --version
         Files.createDirectories(testExpertDir)
-        val versionFile = testExpertDir.resolve("version.txt")
-        val expectedVersion = "nightly-123456789"
-        versionFile.writeText(expectedVersion)
+        val executablePath = downloadManager.getExpertExecutablePath()
+        executablePath.writeText("fake expert binary")
         
-        val version = downloadManager.getInstalledVersion()
-        assertNotNull("Version should not be null when version file exists", version)
-        assertEquals("Version should match what's in the file", expectedVersion, version)
-    }
-    
-    fun testGetInstalledVersionWithWhitespace() {
-        // Create a version file with whitespace
-        Files.createDirectories(testExpertDir)
-        val versionFile = testExpertDir.resolve("version.txt")
-        versionFile.writeText("  nightly-123456789  \n")
+        // Set executable permissions on Unix-like systems
+        if (!SystemInfo.isWindows) {
+            val permissions = setOf(
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE,
+                PosixFilePermission.OWNER_EXECUTE
+            )
+            Files.setPosixFilePermissions(executablePath, permissions)
+        }
         
+        // The fake binary won't respond to --version properly
         val version = downloadManager.getInstalledVersion()
-        assertEquals("Version should be trimmed", "nightly-123456789", version)
+        // Version should be null since the fake binary can't execute properly
+        assertNull("Version should be null when binary cannot provide version", version)
     }
     
     fun testDetectPlatformReturnsValidString() {

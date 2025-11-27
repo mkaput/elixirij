@@ -1,20 +1,19 @@
 package dev.murek.elixirij.lsp
 
 import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.lang.LanguageUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServerSupportProvider
 import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
-import dev.murek.elixirij.ExLanguage
+import com.intellij.platform.lsp.api.LspServerSupportProvider.LspServerStarter
+import dev.murek.elixirij.ExFileType
 
 /**
  * LSP server support provider for Expert Language Server.
  */
 class ExpertLspServerSupportProvider : LspServerSupportProvider {
-    override fun fileOpened(project: Project, file: VirtualFile, serverStarter: LspServerSupportProvider.LspServerStarter) {
-        // Check if this is an Elixir file
-        if (LanguageUtil.getLanguageForPsi(project, file) == ExLanguage) {
+    override fun fileOpened(project: Project, file: VirtualFile, serverStarter: LspServerStarter) {
+        if (file.fileType == ExFileType) {
             serverStarter.ensureServerStarted(ExpertLspServerDescriptor(project))
         }
     }
@@ -26,29 +25,45 @@ class ExpertLspServerSupportProvider : LspServerSupportProvider {
 class ExpertLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(project, "Expert") {
     
     override fun isSupportedFile(file: VirtualFile): Boolean {
-        return LanguageUtil.getLanguageForPsi(project, file) == ExLanguage
+        return file.fileType == ExFileType
     }
     
     override fun createCommandLine(): GeneralCommandLine {
         val downloadManager = ExpertDownloadManager.getInstance()
         
-        // Ensure Expert is installed
+        // Trigger download if not installed and wait
         if (!downloadManager.isExpertInstalled()) {
-            throw IllegalStateException("Expert language server is not installed. Please install it from the settings.")
+            var downloadComplete = false
+            var downloadError: String? = null
+            
+            downloadManager.downloadAndInstallExpert { success, error ->
+                downloadComplete = true
+                if (!success) {
+                    downloadError = error
+                }
+            }
+            
+            // Wait for download with timeout
+            val timeout = System.currentTimeMillis() + 60000 // 60 second timeout
+            while (!downloadComplete && System.currentTimeMillis() < timeout) {
+                Thread.sleep(100)
+            }
+            
+            if (downloadError != null) {
+                throw IllegalStateException("Failed to download Expert: $downloadError")
+            }
+            
+            if (!downloadManager.isExpertInstalled()) {
+                throw IllegalStateException("Expert language server is not installed. Download timed out.")
+            }
         }
         
         val expertPath = downloadManager.getExpertExecutablePath()
         
-        val commandLine = GeneralCommandLine()
-        commandLine.exePath = expertPath.toString()
-        commandLine.addParameter("lsp")
-        
-        // Set working directory if available
-        val basePath = project.basePath
-        if (basePath != null) {
-            commandLine.withWorkDirectory(basePath)
+        return GeneralCommandLine(expertPath.toString(), "lsp").apply {
+            // Set working directory - uses project base path
+            // This works correctly with multiproject workspaces as each project gets its own LSP server instance
+            project.basePath?.let { withWorkDirectory(it) }
         }
-        
-        return commandLine
     }
 }

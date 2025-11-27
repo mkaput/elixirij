@@ -2,7 +2,8 @@ package dev.murek.elixirij.lsp
 
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -19,26 +20,26 @@ import kotlin.io.path.exists
  */
 @Service(Service.Level.APP)
 class ExpertDownloadManager {
-    private val logger = Logger.getInstance(ExpertDownloadManager::class.java)
     
     companion object {
+        private val LOG = logger<ExpertDownloadManager>()
+        
         private const val EXPERT_NIGHTLY_BASE_URL = "https://github.com/elixir-lang/expert/releases/download/nightly"
         private const val EXPERT_DIR_NAME = "expert"
         private const val EXPERT_EXECUTABLE_NAME = "expert"
-        private const val VERSION_FILE_NAME = "version.txt"
         private const val UPDATE_CHECK_INTERVAL_MS = 24L * 60 * 60 * 1000 // 24 hours in milliseconds
         
-        fun getInstance(): ExpertDownloadManager {
-            return com.intellij.openapi.components.service()
-        }
+        @JvmStatic
+        fun getInstance(): ExpertDownloadManager = service()
     }
     
     /**
      * Get the directory where Expert is stored.
+     * Uses IntelliJ's plugin-specific directory for proper isolation.
      */
     fun getExpertDirectory(): Path {
-        val pluginSystemDir = PathManager.getSystemPath()
-        return Path.of(pluginSystemDir, "elixirij", EXPERT_DIR_NAME)
+        val pluginDir = PathManager.getPluginsPath()
+        return Path.of(pluginDir, "elixirij", EXPERT_DIR_NAME)
     }
     
     /**
@@ -57,19 +58,21 @@ class ExpertDownloadManager {
     }
     
     /**
-     * Get the currently installed version of Expert.
+     * Get the currently installed version of Expert by running the CLI.
      * Returns null if not installed or version cannot be determined.
      */
     fun getInstalledVersion(): String? {
-        val versionFile = getExpertDirectory().resolve(VERSION_FILE_NAME)
-        return if (versionFile.exists()) {
-            try {
-                Files.readString(versionFile).trim()
-            } catch (e: Exception) {
-                logger.warn("Failed to read Expert version file", e)
-                null
-            }
-        } else {
+        if (!isExpertInstalled()) return null
+        
+        return try {
+            val process = ProcessBuilder(getExpertExecutablePath().toString(), "--version")
+                .redirectErrorStream(true)
+                .start()
+            val output = process.inputStream.bufferedReader().readText().trim()
+            process.waitFor()
+            if (process.exitValue() == 0) output else null
+        } catch (e: Exception) {
+            LOG.warn("Failed to get Expert version", e)
             null
         }
     }
@@ -125,11 +128,6 @@ class ExpertDownloadManager {
                             Files.setPosixFilePermissions(executablePath, permissions)
                         }
                         
-                        // Save version information
-                        val versionFile = expertDir.resolve(VERSION_FILE_NAME)
-                        val timestamp = System.currentTimeMillis()
-                        Files.writeString(versionFile, "nightly-$timestamp")
-                        
                         indicator.fraction = 1.0
                         onComplete(true, null)
                     } finally {
@@ -138,7 +136,7 @@ class ExpertDownloadManager {
                         }
                     }
                 } catch (e: Exception) {
-                    logger.error("Failed to download Expert", e)
+                    LOG.error("Failed to download Expert", e)
                     onComplete(false, "Failed to download Expert: ${e.message}")
                 }
             }
@@ -147,20 +145,16 @@ class ExpertDownloadManager {
     
     /**
      * Check if an update is available and install it if needed.
+     * Uses the binary's modification time to determine if update is needed.
      */
     fun checkAndUpdateExpert(onComplete: (Boolean, String?) -> Unit) {
-        // For now, we'll update if Expert is not installed or if it's older than UPDATE_CHECK_INTERVAL_MS
         val shouldUpdate = if (!isExpertInstalled()) {
             true
         } else {
-            val versionFile = getExpertDirectory().resolve(VERSION_FILE_NAME)
-            if (!versionFile.exists()) {
-                true
-            } else {
-                val lastModified = Files.getLastModifiedTime(versionFile).toMillis()
-                val updateThreshold = System.currentTimeMillis() - UPDATE_CHECK_INTERVAL_MS
-                lastModified < updateThreshold
-            }
+            val executablePath = getExpertExecutablePath()
+            val lastModified = Files.getLastModifiedTime(executablePath).toMillis()
+            val updateThreshold = System.currentTimeMillis() - UPDATE_CHECK_INTERVAL_MS
+            lastModified < updateThreshold
         }
         
         if (shouldUpdate) {
@@ -193,11 +187,10 @@ class ExpertDownloadManager {
     
     /**
      * Download a file from a URL with progress tracking.
+     * Uses HttpRequests default timeouts.
      */
     private fun downloadFile(urlString: String, destination: Path, indicator: ProgressIndicator) {
         HttpRequests.request(urlString)
-            .connectTimeout(30000)
-            .readTimeout(30000)
             .connect { request ->
                 request.saveToFile(destination.toFile(), indicator)
             }
