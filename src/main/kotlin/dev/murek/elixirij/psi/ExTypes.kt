@@ -128,9 +128,6 @@ object ExTypes {
     // Operators - Pipe
     @JvmField val PIPE = ExTokenType("|")
     
-    // Operators - Stab
-    @JvmField val STAB = ExTokenType("->")
-    
     // Delimiters
     @JvmField val LPAREN = ExTokenType("(")
     @JvmField val RPAREN = ExTokenType(")")
@@ -146,7 +143,6 @@ object ExTypes {
     @JvmField val COMMA = ExTokenType(",")
     @JvmField val COLON = ExTokenType(":")
     @JvmField val SEMICOLON = ExTokenType(";")
-    @JvmField val QUESTION = ExTokenType("?")
     @JvmField val PERCENT = ExTokenType("%")
     @JvmField val PERCENT_LBRACE = ExTokenType("%{")
     
