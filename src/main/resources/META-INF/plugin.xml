@@ -18,5 +18,8 @@
 
         <lang.commenter language="Elixir"
                         implementationClass="dev.murek.elixirij.commenter.ExCommenter"/>
+
+        <lang.parserDefinition language="Elixir"
+                               implementationClass="dev.murek.elixirij.parser.ExParserDefinition"/>
     </extensions>
 </idea-plugin>

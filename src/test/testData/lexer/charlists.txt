@@ -1,0 +1,3 @@
+CHARLIST (''hello'')
+WHITE_SPACE (' ')
+CHARLIST (''world\n'')

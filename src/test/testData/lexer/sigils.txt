@@ -1,0 +1,5 @@
+SIGIL ('~r/foo/')
+WHITE_SPACE (' ')
+SIGIL ('~s[bar]')
+WHITE_SPACE (' ')
+SIGIL ('~w(baz)')

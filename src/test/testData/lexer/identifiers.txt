@@ -1,0 +1,7 @@
+IDENTIFIER ('foo')
+WHITE_SPACE (' ')
+IDENTIFIER ('bar_baz')
+WHITE_SPACE (' ')
+IDENTIFIER ('hello123')
+WHITE_SPACE (' ')
+IDENTIFIER ('_private')

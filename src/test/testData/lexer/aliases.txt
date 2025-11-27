@@ -1,0 +1,5 @@
+ALIAS ('Foo')
+WHITE_SPACE (' ')
+ALIAS ('BarBaz')
+WHITE_SPACE (' ')
+ALIAS ('MyModule')
