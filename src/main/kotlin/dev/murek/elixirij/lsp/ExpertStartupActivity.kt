@@ -11,11 +11,11 @@ private val LOG = logger<ExpertStartupActivity>()
  * Startup activity to check and download Expert language server if needed.
  */
 class ExpertStartupActivity : ProjectActivity {
-    
+
     override suspend fun execute(project: Project) {
         ApplicationManager.getApplication().executeOnPooledThread {
             val downloadManager = ExpertDownloadManager.getInstance()
-            
+
             if (!downloadManager.isInstalled()) {
                 LOG.info("Expert language server not found. Starting initial download...")
                 downloadManager.downloadAndInstall { success, error ->

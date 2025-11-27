@@ -29,12 +29,12 @@ private const val UPDATE_CHECK_INTERVAL_MS = 24L * 60 * 60 * 1000 // 24 hours in
  */
 @Service(Service.Level.APP)
 class ExpertDownloadManager {
-    
+
     companion object {
         @JvmStatic
         fun getInstance(): ExpertDownloadManager = service()
     }
-    
+
     /**
      * Get the directory where Expert is stored.
      * Uses IntelliJ's plugin-specific directory for proper isolation.
@@ -43,14 +43,14 @@ class ExpertDownloadManager {
         val pluginDir = PathManager.getPluginsPath()
         return Path.of(pluginDir, "elixirij", EXPERT_DIR_NAME)
     }
-    
+
     /**
      * Get the path to the Expert executable.
      */
     fun getExecutablePath(): Path {
         return getDirectory().resolve(EXPERT_EXECUTABLE_NAME)
     }
-    
+
     /**
      * Check if Expert is installed.
      */
@@ -58,14 +58,14 @@ class ExpertDownloadManager {
         val executablePath = getExecutablePath()
         return executablePath.exists() && Files.isExecutable(executablePath)
     }
-    
+
     /**
      * Get the currently installed version of Expert by running the CLI.
      * Returns null if not installed or version cannot be determined.
      */
     fun getInstalledVersion(): String? {
         if (!isInstalled()) return null
-        
+
         return try {
             val commandLine = GeneralCommandLine(getExecutablePath().toString(), "--version")
             val output = ExecUtil.execAndGetOutput(commandLine)
@@ -75,7 +75,7 @@ class ExpertDownloadManager {
             null
         }
     }
-    
+
     /**
      * Download and install the latest nightly build of Expert.
      */
@@ -89,30 +89,30 @@ class ExpertDownloadManager {
                 try {
                     indicator.text = "Determining platform..."
                     val platform = detectPlatform()
-                    
+
                     if (platform == null) {
                         onComplete(false, "Unsupported platform: ${SystemInfo.OS_NAME} ${SystemInfo.OS_ARCH}")
                         return
                     }
-                    
+
                     indicator.text = "Downloading Expert nightly build..."
                     indicator.isIndeterminate = false
-                    
+
                     val expertDir = getDirectory()
                     Files.createDirectories(expertDir)
-                    
+
                     val downloadUrl = "$EXPERT_NIGHTLY_BASE_URL/expert-$platform"
                     val tempFile = Files.createTempFile("expert", ".tmp")
-                    
+
                     try {
                         downloadFile(downloadUrl, tempFile, indicator)
-                        
+
                         indicator.text = "Installing Expert..."
                         indicator.fraction = 0.9
-                        
+
                         val executablePath = getExecutablePath()
                         Files.move(tempFile, executablePath, StandardCopyOption.REPLACE_EXISTING)
-                        
+
                         // Set executable permissions on Unix-like systems
                         if (!SystemInfo.isWindows) {
                             val permissions = setOf(
@@ -126,7 +126,7 @@ class ExpertDownloadManager {
                             )
                             Files.setPosixFilePermissions(executablePath, permissions)
                         }
-                        
+
                         indicator.fraction = 1.0
                         onComplete(true, null)
                     } finally {
@@ -141,7 +141,7 @@ class ExpertDownloadManager {
             }
         })
     }
-    
+
     /**
      * Check if an update is available and install it if needed.
      * Uses the binary's modification time to determine if update is needed.
@@ -155,14 +155,14 @@ class ExpertDownloadManager {
             val updateThreshold = System.currentTimeMillis() - UPDATE_CHECK_INTERVAL_MS
             lastModified < updateThreshold
         }
-        
+
         if (shouldUpdate) {
             downloadAndInstall(onComplete)
         } else {
             onComplete(true, null)
         }
     }
-    
+
     /**
      * Detect the current platform and return the appropriate platform string for Expert downloads.
      */
@@ -171,7 +171,7 @@ class ExpertDownloadManager {
         val isArm64 = SystemInfo.isAarch64
         // Check for x86_64/AMD64 but exclude ARM architectures
         val is64Bit = !isArm64 && (arch.contains("x86_64") || arch.contains("amd64") || arch.contains("x64"))
-        
+
         return when {
             // Prioritize ARM64 detection to ensure correct platform identification
             SystemInfo.isMac && isArm64 -> "aarch64-apple-darwin"
@@ -183,7 +183,7 @@ class ExpertDownloadManager {
             else -> null
         }
     }
-    
+
     /**
      * Download a file from a URL with progress tracking.
      * Uses HttpRequests default timeouts (10 seconds for connect and read).
