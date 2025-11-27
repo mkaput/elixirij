@@ -30,6 +30,11 @@ private const val UPDATE_CHECK_INTERVAL_MS = 24L * 60 * 60 * 1000 // 24 hours in
 @Service(Service.Level.APP)
 class ExpertDownloadManager {
     
+    companion object {
+        @JvmStatic
+        fun getInstance(): ExpertDownloadManager = service()
+    }
+    
     /**
      * Get the directory where Expert is stored.
      * Uses IntelliJ's plugin-specific directory for proper isolation.
@@ -158,11 +163,6 @@ class ExpertDownloadManager {
         }
     }
     
-    companion object {
-        @JvmStatic
-        fun getInstance(): ExpertDownloadManager = service()
-    }
-    
     /**
      * Detect the current platform and return the appropriate platform string for Expert downloads.
      */
@@ -186,6 +186,7 @@ class ExpertDownloadManager {
     
     /**
      * Download a file from a URL with progress tracking.
+     * Uses HttpRequests default timeouts (10 seconds for connect and read).
      */
     private fun downloadFile(urlString: String, destination: Path, indicator: ProgressIndicator) {
         HttpRequests.request(urlString)
