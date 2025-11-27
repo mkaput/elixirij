@@ -13,7 +13,8 @@
                   implementationClass="dev.murek.elixirij.ExFileType"
                   fieldName="INSTANCE"
                   language="Elixir"
-                  extensions="ex;exs"/>
+                  extensions="ex;exs"
+                  hashBangs="elixir"/>
         
         <lang.parserDefinition language="Elixir"
                                implementationClass="dev.murek.elixirij.parser.ExParserDefinition"/>
