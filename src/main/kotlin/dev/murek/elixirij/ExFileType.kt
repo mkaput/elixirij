@@ -8,10 +8,10 @@ import javax.swing.Icon
  */
 object ExFileType : LanguageFileType(ExLanguage) {
     override fun getName(): String = "Elixir"
-    
+
     override fun getDescription(): String = ExBundle.message("filetype.elixir.description")
-    
+
     override fun getDefaultExtension(): String = "ex"
-    
+
     override fun getIcon(): Icon = ExIcons.FILE
 }
