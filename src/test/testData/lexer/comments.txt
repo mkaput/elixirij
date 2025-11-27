@@ -1,0 +1,3 @@
+COMMENT ('# this is a comment')
+EOL ('\n')
+IDENTIFIER ('foo')
