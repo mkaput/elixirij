@@ -147,17 +147,17 @@ class ExTokenType(debugName: String) : IElementType(debugName, ExLanguage)
 @JvmField val EX_EOL = ExTokenType("EOL")
 
 // Token sets for syntax highlighting
-@JvmField val EX_COMMENTS = TokenSet.create(EX_COMMENT)
+val EX_COMMENTS = TokenSet.create(EX_COMMENT)
 
-@JvmField val EX_KEYWORDS = TokenSet.create(
+val EX_KEYWORDS = TokenSet.create(
     EX_TRUE, EX_FALSE, EX_NIL, EX_DO, EX_END, EX_FN, EX_AFTER, EX_ELSE, EX_CATCH, EX_RESCUE, EX_WHEN, EX_IN, EX_NOT, EX_AND, EX_OR
 )
 
-@JvmField val EX_STRINGS = TokenSet.create(EX_STRING, EX_HEREDOC, EX_CHARLIST, EX_CHARLIST_HEREDOC)
+val EX_STRINGS = TokenSet.create(EX_STRING, EX_HEREDOC, EX_CHARLIST, EX_CHARLIST_HEREDOC)
 
-@JvmField val EX_NUMBERS = TokenSet.create(EX_INTEGER, EX_FLOAT, EX_CHAR)
+val EX_NUMBERS = TokenSet.create(EX_INTEGER, EX_FLOAT, EX_CHAR)
 
-@JvmField val EX_OPERATORS = TokenSet.create(
+val EX_OPERATORS = TokenSet.create(
     EX_AT, EX_EXCLAMATION, EX_CARET, EX_TILDE, EX_AMPERSAND,
     EX_PLUS, EX_MINUS, EX_STAR, EX_SLASH,
     EX_EQ, EX_LT, EX_GT, EX_EQ_EQ, EX_NOT_EQ, EX_EQ_EQ_EQ, EX_NOT_EQ_EQ, EX_LT_EQ, EX_GT_EQ, EX_EQ_TILDE,
@@ -169,6 +169,6 @@ class ExTokenType(debugName: String) : IElementType(debugName, ExLanguage)
     EX_STAR_STAR, EX_COLON_COLON, EX_BACK_SLASH_BACK_SLASH, EX_SLASH_SLASH, EX_PIPE
 )
 
-@JvmField val EX_BRACES = TokenSet.create(
+val EX_BRACES = TokenSet.create(
     EX_LPAREN, EX_RPAREN, EX_LBRACKET, EX_RBRACKET, EX_LBRACE, EX_RBRACE, EX_LT_LT, EX_GT_GT
 )
