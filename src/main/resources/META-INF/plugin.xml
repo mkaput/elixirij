@@ -14,5 +14,8 @@
                   fieldName="INSTANCE"
                   language="Elixir"
                   extensions="ex;exs"/>
+        
+        <lang.parserDefinition language="Elixir"
+                               implementationClass="dev.murek.elixirij.parser.ExParserDefinition"/>
     </extensions>
 </idea-plugin>
