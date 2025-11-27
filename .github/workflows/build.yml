@@ -26,6 +26,24 @@ concurrency:
 
 jobs:
 
+  # Ensure code is properly formatted
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+
+      # Check out the current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v6
+
+      # Run ktlint to check code formatting
+      - name: Run ktlint
+        uses: musichin/ktlint-check@v4
+        with:
+          ktlint-version: "1.5.0"
+
   # Prepare the environment and build the plugin
   build:
     name: Build
