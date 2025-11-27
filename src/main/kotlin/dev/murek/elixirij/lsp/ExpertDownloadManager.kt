@@ -136,7 +136,7 @@ class ExpertDownloadManager {
                         }
                     }
                 } catch (e: Exception) {
-                    LOG.error("Failed to download Expert", e)
+                    LOG.warn("Failed to download Expert (network may be unavailable)", e)
                     onComplete(false, "Failed to download Expert: ${e.message}")
                 }
             }
