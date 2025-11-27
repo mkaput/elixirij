@@ -15,6 +15,7 @@
                   language="Elixir"
                   extensions="ex;exs"
                   hashBangs="elixir"/>
+
         <lang.commenter language="Elixir"
                         implementationClass="dev.murek.elixirij.commenter.ExCommenter"/>
     </extensions>
