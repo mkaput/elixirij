@@ -1,1 +1,0 @@
-Foo BarBaz MyModule

@@ -1,5 +1,0 @@
-CHAR ('?a')
-WHITE_SPACE (' ')
-CHAR ('?\n')
-WHITE_SPACE (' ')
-CHAR ('?\t')

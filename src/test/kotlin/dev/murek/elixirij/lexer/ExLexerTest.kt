@@ -1,78 +1,214 @@
 package dev.murek.elixirij.lexer
 
 import com.intellij.lexer.Lexer
-import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.testFramework.LexerTestCase
-import com.intellij.testFramework.UsefulTestCase
-import java.io.File
-import java.io.IOException
 
 /**
- * Tests for the Elixir lexer using fixture files.
- * Each test loads a `.ex` source file and compares lexer output with the corresponding `.txt` file.
+ * Tests for the Elixir lexer.
  */
 class ExLexerTest : LexerTestCase() {
 
     override fun createLexer(): Lexer = ExLexer()
-    override fun getDirPath(): String = "lexer"
+    override fun getDirPath(): String = ""
 
-    private fun getTestDataPath(): String = "src/test/testData"
+    fun testIntegerLiterals() = doTest(
+        "42 0x1F 0o77 0b1010",
+        """INTEGER ('42')
+WHITE_SPACE (' ')
+INTEGER ('0x1F')
+WHITE_SPACE (' ')
+INTEGER ('0o77')
+WHITE_SPACE (' ')
+INTEGER ('0b1010')
+"""
+    )
 
-    private fun doTest() {
-        val testName = getTestNameForFixture()
-        val testDataPath = getTestDataPath()
-        val sourceFile = File("$testDataPath/$dirPath/$testName.ex")
-        val goldFile = File("$testDataPath/$dirPath/$testName.txt")
+    fun testFloatLiterals() = doTest(
+        "3.14 1.0e10 2.5e-3",
+        """FLOAT ('3.14')
+WHITE_SPACE (' ')
+FLOAT ('1.0e10')
+WHITE_SPACE (' ')
+FLOAT ('2.5e-3')
+"""
+    )
 
-        var text = ""
-        try {
-            val fileText = FileUtil.loadFile(sourceFile, Charsets.UTF_8)
-            text = StringUtil.convertLineSeparators(if (shouldTrim()) fileText.trim() else fileText)
-        } catch (e: IOException) {
-            fail("Can't load file $sourceFile: ${e.message}")
-        }
+    fun testKeywords() = doTest(
+        "do end fn true false nil when in not and or",
+        """do ('do')
+WHITE_SPACE (' ')
+end ('end')
+WHITE_SPACE (' ')
+fn ('fn')
+WHITE_SPACE (' ')
+true ('true')
+WHITE_SPACE (' ')
+false ('false')
+WHITE_SPACE (' ')
+nil ('nil')
+WHITE_SPACE (' ')
+when ('when')
+WHITE_SPACE (' ')
+in ('in')
+WHITE_SPACE (' ')
+not ('not')
+WHITE_SPACE (' ')
+and ('and')
+WHITE_SPACE (' ')
+or ('or')
+"""
+    )
 
-        val result = printTokens(text, 0, createLexer())
-        UsefulTestCase.assertSameLinesWithFile(goldFile.canonicalPath, result)
-    }
+    fun testIdentifiers() = doTest(
+        "foo bar_baz hello123 _private",
+        """IDENTIFIER ('foo')
+WHITE_SPACE (' ')
+IDENTIFIER ('bar_baz')
+WHITE_SPACE (' ')
+IDENTIFIER ('hello123')
+WHITE_SPACE (' ')
+IDENTIFIER ('_private')
+"""
+    )
 
-    /**
-     * Converts the test method name to the fixture file name.
-     * For a test method like `test integer literals`, returns "integer_literals".
-     */
-    private fun getTestNameForFixture(): String {
-        // Get the raw test name which will be something like "test integer literals" 
-        // or "testIntegerLiterals" depending on how it's defined
-        val rawName = name ?: throw IllegalStateException("Test name is null")
-        
-        // Remove "test " or "test" prefix
-        val withoutPrefix = when {
-            rawName.startsWith("test ") -> rawName.removePrefix("test ")
-            rawName.startsWith("test") -> rawName.removePrefix("test")
-            else -> rawName
-        }
-        
-        // Convert spaces to underscores and handle camelCase
-        return withoutPrefix
-            .replace(' ', '_')
-            .replace(Regex("([a-z])([A-Z])"), "$1_$2")
-            .lowercase()
-    }
+    fun testAliases() = doTest(
+        "Foo BarBaz MyModule",
+        """ALIAS ('Foo')
+WHITE_SPACE (' ')
+ALIAS ('BarBaz')
+WHITE_SPACE (' ')
+ALIAS ('MyModule')
+"""
+    )
 
-    fun `test integer literals`() = doTest()
-    fun `test float literals`() = doTest()
-    fun `test keywords`() = doTest()
-    fun `test identifiers`() = doTest()
-    fun `test aliases`() = doTest()
-    fun `test atoms`() = doTest()
-    fun `test quoted atoms`() = doTest()
-    fun `test strings`() = doTest()
-    fun `test charlists`() = doTest()
-    fun `test comments`() = doTest()
-    fun `test operators`() = doTest()
-    fun `test delimiters`() = doTest()
-    fun `test char literals`() = doTest()
-    fun `test range operators`() = doTest()
-    fun `test simple elixir function`() = doTest()
+    fun testAtoms() = doTest(
+        ":foo :bar_baz",
+        """ATOM (':foo')
+WHITE_SPACE (' ')
+ATOM (':bar_baz')
+"""
+    )
+
+    fun testQuotedAtoms() = doTest(
+        ":\"quoted atom\"",
+        """ATOM_QUOTED (':"quoted atom"')
+"""
+    )
+
+    fun testStrings() = doTest(
+        "\"hello\" \"world\\n\"",
+        """STRING ('"hello"')
+WHITE_SPACE (' ')
+STRING ('"world\n"')
+"""
+    )
+
+    fun testCharlists() = doTest(
+        "'hello' 'world\\n'",
+        """CHARLIST (''hello'')
+WHITE_SPACE (' ')
+CHARLIST (''world\n'')
+"""
+    )
+
+    fun testComments() = doTest(
+        "# this is a comment\nfoo",
+        """COMMENT ('# this is a comment')
+EOL ('\n')
+IDENTIFIER ('foo')
+"""
+    )
+
+    fun testOperators() = doTest(
+        "+ - * / = == != < > <= >= && || |> -> =>",
+        """+ ('+')
+WHITE_SPACE (' ')
+- ('-')
+WHITE_SPACE (' ')
+* ('*')
+WHITE_SPACE (' ')
+/ ('/')
+WHITE_SPACE (' ')
+= ('=')
+WHITE_SPACE (' ')
+== ('==')
+WHITE_SPACE (' ')
+!= ('!=')
+WHITE_SPACE (' ')
+< ('<')
+WHITE_SPACE (' ')
+> ('>')
+WHITE_SPACE (' ')
+<= ('<=')
+WHITE_SPACE (' ')
+>= ('>=')
+WHITE_SPACE (' ')
+&& ('&&')
+WHITE_SPACE (' ')
+|| ('||')
+WHITE_SPACE (' ')
+|> ('|>')
+WHITE_SPACE (' ')
+-> ('->')
+WHITE_SPACE (' ')
+=> ('=>')
+"""
+    )
+
+    fun testDelimiters() = doTest(
+        "()[]{}",
+        """( ('(')
+) (')')
+[ ('[')
+] (']')
+{ ('{')
+} ('}')
+"""
+    )
+
+    fun testCharLiterals() = doTest(
+        "?a ?\\n ?\\t",
+        """CHAR ('?a')
+WHITE_SPACE (' ')
+CHAR ('?\n')
+WHITE_SPACE (' ')
+CHAR ('?\t')
+"""
+    )
+
+    fun testRangeOperators() = doTest(
+        "1..10 1...10",
+        """INTEGER ('1')
+.. ('..')
+INTEGER ('10')
+WHITE_SPACE (' ')
+INTEGER ('1')
+... ('...')
+INTEGER ('10')
+"""
+    )
+
+    fun testSimpleElixirFunction() = doTest(
+        """def hello(name) do
+  "Hello, " <> name
+end""",
+        """IDENTIFIER ('def')
+WHITE_SPACE (' ')
+IDENTIFIER ('hello')
+( ('(')
+IDENTIFIER ('name')
+) (')')
+WHITE_SPACE (' ')
+do ('do')
+EOL ('\n')
+WHITE_SPACE ('  ')
+STRING ('"Hello, "')
+WHITE_SPACE (' ')
+<> ('<>')
+WHITE_SPACE (' ')
+IDENTIFIER ('name')
+EOL ('\n')
+end ('end')
+"""
+    )
 }

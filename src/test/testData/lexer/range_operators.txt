@@ -1,7 +1,0 @@
-INTEGER ('1')
-.. ('..')
-INTEGER ('10')
-WHITE_SPACE (' ')
-INTEGER ('1')
-... ('...')
-INTEGER ('10')
