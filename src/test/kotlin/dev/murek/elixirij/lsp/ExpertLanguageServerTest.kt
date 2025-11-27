@@ -89,8 +89,8 @@ class ExpertLanguageServerTest : BasePlatformTestCase() {
         assertNotNull("Command line should not be null", commandLine)
         assertTrue("Command line should contain expert executable",
             commandLine.exePath.endsWith("expert") || commandLine.exePath.endsWith("expert.exe"))
-        assertTrue("Command line should contain 'lsp' parameter",
-            commandLine.parametersList.parameters.contains("lsp"))
+        assertTrue("Command line should contain '--stdio' parameter",
+            commandLine.parametersList.parameters.contains("--stdio"))
     }
     
     fun testDescriptorHandlesNullProjectBasePath() {

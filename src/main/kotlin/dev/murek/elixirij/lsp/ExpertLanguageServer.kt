@@ -60,7 +60,7 @@ class ExpertLspServerDescriptor(project: Project) : ProjectWideLspServerDescript
         
         val expertPath = downloadManager.getExpertExecutablePath()
         
-        return GeneralCommandLine(expertPath.toString(), "lsp").apply {
+        return GeneralCommandLine(expertPath.toString(), "--stdio").apply {
             // Set working directory - uses project base path
             // This works correctly with multiproject workspaces as each project gets its own LSP server instance
             project.basePath?.let { withWorkDirectory(it) }
