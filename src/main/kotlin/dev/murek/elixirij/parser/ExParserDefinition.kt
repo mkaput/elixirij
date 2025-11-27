@@ -16,14 +16,9 @@ import dev.murek.elixirij.psi.EX_COMMENTS
 import dev.murek.elixirij.psi.EX_STRINGS
 import dev.murek.elixirij.psi.ExFile
 
-/**
- * Parser definition for the Elixir language.
- */
-class ExParserDefinition : ParserDefinition {
+private val FILE = IFileElementType(ExLanguage)
 
-    companion object {
-        val FILE = IFileElementType(ExLanguage)
-    }
+class ExParserDefinition : ParserDefinition {
 
     override fun createLexer(project: Project?): Lexer = ExLexer()
 
