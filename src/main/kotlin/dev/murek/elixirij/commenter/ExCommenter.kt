@@ -8,7 +8,7 @@ import com.intellij.lang.Commenter
  * Elixir uses `#` for single-line comments and does not have block comments.
  */
 class ExCommenter : Commenter {
-    override fun getLineCommentPrefix(): String = "#"
+    override fun getLineCommentPrefix(): String = "# "
 
     override fun getBlockCommentPrefix(): String? = null
 
