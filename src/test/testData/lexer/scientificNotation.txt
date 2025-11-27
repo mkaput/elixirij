@@ -1,0 +1,5 @@
+FLOAT ('1.0e-1')
+WHITE_SPACE (' ')
+FLOAT ('1.0E+10')
+WHITE_SPACE (' ')
+FLOAT ('1.234e-5')

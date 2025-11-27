@@ -180,6 +180,7 @@ SIGIL_START=\~[a-zA-Z]
     ":<<>>"                            { return EX_ATOM; }
     ":%{}"                             { return EX_ATOM; }
     ":{}"                              { return EX_ATOM; }
+    ":&&&"                             { return EX_ATOM; }
     ":&"                               { return EX_ATOM; }
     ":..//"                            { return EX_ATOM; }
     ":+"                               { return EX_ATOM; }
@@ -188,11 +189,14 @@ SIGIL_START=\~[a-zA-Z]
     ":/"                               { return EX_ATOM; }
     ":!"                               { return EX_ATOM; }
     ":^"                               { return EX_ATOM; }
+    ":|||"                             { return EX_ATOM; }
+    ":||"                              { return EX_ATOM; }
     ":|"                               { return EX_ATOM; }
     ":@"                               { return EX_ATOM; }
     ":<"                               { return EX_ATOM; }
     ":>"                               { return EX_ATOM; }
     ":="                               { return EX_ATOM; }
+    ":&&"                              { return EX_ATOM; }
     // Atoms - keyword atoms  
     ":" {ATOM_HEAD}                    { return EX_ATOM; }
     // Atoms - quoted
