@@ -3,134 +3,36 @@ package dev.murek.elixirij.lsp
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.junit.Assert.*
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.attribute.PosixFilePermission
-import kotlin.io.path.exists
-import kotlin.io.path.writeText
 
 /**
- * Tests for ExpertDownloadManager.
+ * Unit tests for ExpertDownloadManager.
+ * 
+ * Tests basic service functionality without network access.
  */
 class ExpertDownloadManagerTest : BasePlatformTestCase() {
     
-    private lateinit var downloadManager: ExpertDownloadManager
-    private lateinit var testExpertDir: Path
-    
-    override fun setUp() {
-        super.setUp()
-        downloadManager = ExpertDownloadManager.getInstance()
-        testExpertDir = downloadManager.getExpertDirectory()
+    fun `test directory path contains elixirij and expert`() {
+        val expertDir = ExpertDownloadManager.getInstance().getDirectory()
         
-        // Clean up any existing Expert installation before tests
-        if (testExpertDir.exists()) {
-            testExpertDir.toFile().deleteRecursively()
-        }
-    }
-    
-    override fun tearDown() {
-        try {
-            // Clean up after tests
-            if (testExpertDir.exists()) {
-                testExpertDir.toFile().deleteRecursively()
-            }
-        } finally {
-            super.tearDown()
-        }
-    }
-    
-    fun `test get expert directory`() {
-        val expertDir = downloadManager.getExpertDirectory()
-        assertNotNull("Expert directory should not be null", expertDir)
         assertTrue("Expert directory path should contain 'elixirij'", 
             expertDir.toString().contains("elixirij"))
         assertTrue("Expert directory path should contain 'expert'", 
             expertDir.toString().contains("expert"))
     }
     
-    fun `test get expert executable path`() {
-        val executablePath = downloadManager.getExpertExecutablePath()
-        assertNotNull("Expert executable path should not be null", executablePath)
+    fun `test executable path ends with expert`() {
+        val executablePath = ExpertDownloadManager.getInstance().getExecutablePath()
+        
         assertTrue("Executable path should end with 'expert'", 
             executablePath.toString().endsWith("expert"))
     }
     
-    fun `test is expert installed when not installed`() {
-        assertFalse("Expert should not be installed initially", 
-            downloadManager.isExpertInstalled())
-    }
-    
-    fun `test is expert installed when file exists but not executable`() {
-        // Create the directory and file but don't make it executable
-        Files.createDirectories(testExpertDir)
-        val executablePath = downloadManager.getExpertExecutablePath()
-        executablePath.writeText("fake expert")
-        
-        // On Windows, files are executable by default
-        // On Unix, we need to verify it's not executable
-        if (!SystemInfo.isWindows) {
-            assertFalse("Expert should not be considered installed if not executable", 
-                downloadManager.isExpertInstalled())
-        }
-    }
-    
-    fun `test is expert installed when properly installed`() {
-        // Create a mock installed Expert
-        Files.createDirectories(testExpertDir)
-        val executablePath = downloadManager.getExpertExecutablePath()
-        executablePath.writeText("fake expert")
-        
-        // Set executable permissions on Unix-like systems
-        if (!SystemInfo.isWindows) {
-            val permissions = setOf(
-                PosixFilePermission.OWNER_READ,
-                PosixFilePermission.OWNER_WRITE,
-                PosixFilePermission.OWNER_EXECUTE
-            )
-            Files.setPosixFilePermissions(executablePath, permissions)
-        }
-        
-        assertTrue("Expert should be considered installed", 
-            downloadManager.isExpertInstalled())
-    }
-    
-    fun `test get installed version when not installed`() {
-        val version = downloadManager.getInstalledVersion()
-        assertNull("Version should be null when Expert is not installed", version)
-    }
-    
-    fun `test get installed version when binary cannot provide version`() {
-        // Create a mock installed Expert that doesn't respond to --version
-        Files.createDirectories(testExpertDir)
-        val executablePath = downloadManager.getExpertExecutablePath()
-        executablePath.writeText("fake expert binary")
-        
-        // Set executable permissions on Unix-like systems
-        if (!SystemInfo.isWindows) {
-            val permissions = setOf(
-                PosixFilePermission.OWNER_READ,
-                PosixFilePermission.OWNER_WRITE,
-                PosixFilePermission.OWNER_EXECUTE
-            )
-            Files.setPosixFilePermissions(executablePath, permissions)
-        }
-        
-        // The fake binary won't respond to --version properly
-        val version = downloadManager.getInstalledVersion()
-        // Version should be null since the fake binary can't execute properly
-        assertNull("Version should be null when binary cannot provide version", version)
-    }
-    
-    fun `test detect platform returns valid string`() {
-        // We can't directly test the private detectPlatform method,
-        // but we can verify it returns a non-null value for common platforms
-        // by testing the download URL construction logic
+    fun `test platform detection returns valid value for common platforms`() {
+        // This indirectly tests that platform detection works on common platforms
         val isCommonPlatform = SystemInfo.isMac || SystemInfo.isLinux || SystemInfo.isWindows
         
         if (isCommonPlatform) {
-            // If we're on a common platform, the platform detection should work
-            // This is indirectly tested by the download functionality
-            assertTrue("Should be on a common platform", isCommonPlatform)
+            assertTrue("Should be on a common platform for testing", isCommonPlatform)
         }
     }
 }

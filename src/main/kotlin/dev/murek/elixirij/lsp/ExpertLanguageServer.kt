@@ -31,34 +31,13 @@ class ExpertLspServerDescriptor(project: Project) : ProjectWideLspServerDescript
     override fun createCommandLine(): GeneralCommandLine {
         val downloadManager = ExpertDownloadManager.getInstance()
         
-        // Trigger download if not installed and wait
-        if (!downloadManager.isExpertInstalled()) {
-            var downloadComplete = false
-            var downloadError: String? = null
-            
-            downloadManager.downloadAndInstallExpert { success, error ->
-                downloadComplete = true
-                if (!success) {
-                    downloadError = error
-                }
-            }
-            
-            // Wait for download with timeout
-            val timeout = System.currentTimeMillis() + 60000 // 60 second timeout
-            while (!downloadComplete && System.currentTimeMillis() < timeout) {
-                Thread.sleep(100)
-            }
-            
-            if (downloadError != null) {
-                throw IllegalStateException("Failed to download Expert: $downloadError")
-            }
-            
-            if (!downloadManager.isExpertInstalled()) {
-                throw IllegalStateException("Expert language server is not installed. Download timed out.")
-            }
+        if (!downloadManager.isInstalled()) {
+            throw IllegalStateException("Expert language server is not installed. " +
+                "It should be downloaded automatically when opening an Elixir file. " +
+                "Please check your network connection and try reopening the file.")
         }
         
-        val expertPath = downloadManager.getExpertExecutablePath()
+        val expertPath = downloadManager.getExecutablePath()
         
         return GeneralCommandLine(expertPath.toString(), "--stdio").apply {
             // Set working directory - uses project base path

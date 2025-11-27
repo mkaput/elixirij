@@ -1,5 +1,7 @@
 package dev.murek.elixirij.lsp
 
+import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.execution.util.ExecUtil
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -15,29 +17,24 @@ import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.PosixFilePermission
 import kotlin.io.path.exists
 
+private val LOG = logger<ExpertDownloadManager>()
+
+private const val EXPERT_NIGHTLY_BASE_URL = "https://github.com/elixir-lang/expert/releases/download/nightly"
+private const val EXPERT_DIR_NAME = "expert"
+private const val EXPERT_EXECUTABLE_NAME = "expert"
+private const val UPDATE_CHECK_INTERVAL_MS = 24L * 60 * 60 * 1000 // 24 hours in milliseconds
+
 /**
  * Service responsible for downloading and managing Expert language server nightly builds.
  */
 @Service(Service.Level.APP)
 class ExpertDownloadManager {
     
-    companion object {
-        private val LOG = logger<ExpertDownloadManager>()
-        
-        private const val EXPERT_NIGHTLY_BASE_URL = "https://github.com/elixir-lang/expert/releases/download/nightly"
-        private const val EXPERT_DIR_NAME = "expert"
-        private const val EXPERT_EXECUTABLE_NAME = "expert"
-        private const val UPDATE_CHECK_INTERVAL_MS = 24L * 60 * 60 * 1000 // 24 hours in milliseconds
-        
-        @JvmStatic
-        fun getInstance(): ExpertDownloadManager = service()
-    }
-    
     /**
      * Get the directory where Expert is stored.
      * Uses IntelliJ's plugin-specific directory for proper isolation.
      */
-    fun getExpertDirectory(): Path {
+    fun getDirectory(): Path {
         val pluginDir = PathManager.getPluginsPath()
         return Path.of(pluginDir, "elixirij", EXPERT_DIR_NAME)
     }
@@ -45,15 +42,15 @@ class ExpertDownloadManager {
     /**
      * Get the path to the Expert executable.
      */
-    fun getExpertExecutablePath(): Path {
-        return getExpertDirectory().resolve(EXPERT_EXECUTABLE_NAME)
+    fun getExecutablePath(): Path {
+        return getDirectory().resolve(EXPERT_EXECUTABLE_NAME)
     }
     
     /**
      * Check if Expert is installed.
      */
-    fun isExpertInstalled(): Boolean {
-        val executablePath = getExpertExecutablePath()
+    fun isInstalled(): Boolean {
+        val executablePath = getExecutablePath()
         return executablePath.exists() && Files.isExecutable(executablePath)
     }
     
@@ -62,15 +59,12 @@ class ExpertDownloadManager {
      * Returns null if not installed or version cannot be determined.
      */
     fun getInstalledVersion(): String? {
-        if (!isExpertInstalled()) return null
+        if (!isInstalled()) return null
         
         return try {
-            val process = ProcessBuilder(getExpertExecutablePath().toString(), "--version")
-                .redirectErrorStream(true)
-                .start()
-            val output = process.inputStream.bufferedReader().readText().trim()
-            process.waitFor()
-            if (process.exitValue() == 0) output else null
+            val commandLine = GeneralCommandLine(getExecutablePath().toString(), "--version")
+            val output = ExecUtil.execAndGetOutput(commandLine)
+            if (output.exitCode == 0) output.stdout.trim() else null
         } catch (e: Exception) {
             LOG.warn("Failed to get Expert version", e)
             null
@@ -80,7 +74,7 @@ class ExpertDownloadManager {
     /**
      * Download and install the latest nightly build of Expert.
      */
-    fun downloadAndInstallExpert(onComplete: (Boolean, String?) -> Unit) {
+    fun downloadAndInstall(onComplete: (Boolean, String?) -> Unit) {
         ProgressManager.getInstance().run(object : Task.Backgroundable(
             null,
             "Downloading Expert Language Server",
@@ -99,7 +93,7 @@ class ExpertDownloadManager {
                     indicator.text = "Downloading Expert nightly build..."
                     indicator.isIndeterminate = false
                     
-                    val expertDir = getExpertDirectory()
+                    val expertDir = getDirectory()
                     Files.createDirectories(expertDir)
                     
                     val downloadUrl = "$EXPERT_NIGHTLY_BASE_URL/expert-$platform"
@@ -111,7 +105,7 @@ class ExpertDownloadManager {
                         indicator.text = "Installing Expert..."
                         indicator.fraction = 0.9
                         
-                        val executablePath = getExpertExecutablePath()
+                        val executablePath = getExecutablePath()
                         Files.move(tempFile, executablePath, StandardCopyOption.REPLACE_EXISTING)
                         
                         // Set executable permissions on Unix-like systems
@@ -147,21 +141,26 @@ class ExpertDownloadManager {
      * Check if an update is available and install it if needed.
      * Uses the binary's modification time to determine if update is needed.
      */
-    fun checkAndUpdateExpert(onComplete: (Boolean, String?) -> Unit) {
-        val shouldUpdate = if (!isExpertInstalled()) {
+    fun checkAndUpdate(onComplete: (Boolean, String?) -> Unit) {
+        val shouldUpdate = if (!isInstalled()) {
             true
         } else {
-            val executablePath = getExpertExecutablePath()
+            val executablePath = getExecutablePath()
             val lastModified = Files.getLastModifiedTime(executablePath).toMillis()
             val updateThreshold = System.currentTimeMillis() - UPDATE_CHECK_INTERVAL_MS
             lastModified < updateThreshold
         }
         
         if (shouldUpdate) {
-            downloadAndInstallExpert(onComplete)
+            downloadAndInstall(onComplete)
         } else {
             onComplete(true, null)
         }
+    }
+    
+    companion object {
+        @JvmStatic
+        fun getInstance(): ExpertDownloadManager = service()
     }
     
     /**
@@ -187,7 +186,6 @@ class ExpertDownloadManager {
     
     /**
      * Download a file from a URL with progress tracking.
-     * Uses HttpRequests default timeouts.
      */
     private fun downloadFile(urlString: String, destination: Path, indicator: ProgressIndicator) {
         HttpRequests.request(urlString)
