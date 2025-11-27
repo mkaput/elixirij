@@ -1,6 +1,7 @@
 package dev.murek.elixirij.lsp
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import dev.murek.elixirij.ExFileType
 import org.junit.Assert.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -76,7 +77,7 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
     /**
      * Test downloading and installing the real Expert binary.
      */
-    fun testDownloadRealExpertBinary() {
+    fun `test download real expert binary`() {
         val isReady = ensureExpertDownloaded()
         
         if (!isReady) {
@@ -95,7 +96,7 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
     /**
      * Test retrieving the version from the real Expert binary.
      */
-    fun testRealExpertVersionRetrieval() {
+    fun `test real expert version retrieval`() {
         val isReady = ensureExpertDownloaded()
         
         if (!isReady) {
@@ -117,7 +118,7 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
      * Test complete end-to-end flow with real Expert binary.
      * Creates an Elixir project, downloads Expert, and verifies LSP configuration.
      */
-    fun testEndToEndWithRealExpert() {
+    fun `test end-to-end with real expert`() {
         val isReady = ensureExpertDownloaded()
         
         if (!isReady) {
@@ -171,7 +172,7 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
         
         // 2. Verify file type is correctly detected as Elixir
         assertEquals("File should be detected as Elixir", 
-            dev.murek.elixirij.ExFileType, 
+            ExFileType, 
             mainFile.virtualFile.fileType)
         
         // 3. Create descriptor and verify file is supported
@@ -203,7 +204,7 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
     /**
      * Test that the LSP support provider correctly identifies Elixir files.
      */
-    fun testLspSupportProviderWithRealExpert() {
+    fun `test LSP support provider with real expert`() {
         val isReady = ensureExpertDownloaded()
         
         if (!isReady) {

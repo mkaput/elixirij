@@ -39,7 +39,7 @@ class ExpertDownloadManagerTest : BasePlatformTestCase() {
         }
     }
     
-    fun testGetExpertDirectory() {
+    fun `test get expert directory`() {
         val expertDir = downloadManager.getExpertDirectory()
         assertNotNull("Expert directory should not be null", expertDir)
         assertTrue("Expert directory path should contain 'elixirij'", 
@@ -48,19 +48,19 @@ class ExpertDownloadManagerTest : BasePlatformTestCase() {
             expertDir.toString().contains("expert"))
     }
     
-    fun testGetExpertExecutablePath() {
+    fun `test get expert executable path`() {
         val executablePath = downloadManager.getExpertExecutablePath()
         assertNotNull("Expert executable path should not be null", executablePath)
         assertTrue("Executable path should end with 'expert'", 
             executablePath.toString().endsWith("expert"))
     }
     
-    fun testIsExpertInstalledWhenNotInstalled() {
+    fun `test is expert installed when not installed`() {
         assertFalse("Expert should not be installed initially", 
             downloadManager.isExpertInstalled())
     }
     
-    fun testIsExpertInstalledWhenFileExistsButNotExecutable() {
+    fun `test is expert installed when file exists but not executable`() {
         // Create the directory and file but don't make it executable
         Files.createDirectories(testExpertDir)
         val executablePath = downloadManager.getExpertExecutablePath()
@@ -74,7 +74,7 @@ class ExpertDownloadManagerTest : BasePlatformTestCase() {
         }
     }
     
-    fun testIsExpertInstalledWhenProperlyInstalled() {
+    fun `test is expert installed when properly installed`() {
         // Create a mock installed Expert
         Files.createDirectories(testExpertDir)
         val executablePath = downloadManager.getExpertExecutablePath()
@@ -94,12 +94,12 @@ class ExpertDownloadManagerTest : BasePlatformTestCase() {
             downloadManager.isExpertInstalled())
     }
     
-    fun testGetInstalledVersionWhenNotInstalled() {
+    fun `test get installed version when not installed`() {
         val version = downloadManager.getInstalledVersion()
         assertNull("Version should be null when Expert is not installed", version)
     }
     
-    fun testGetInstalledVersionWhenBinaryCannotProvideVersion() {
+    fun `test get installed version when binary cannot provide version`() {
         // Create a mock installed Expert that doesn't respond to --version
         Files.createDirectories(testExpertDir)
         val executablePath = downloadManager.getExpertExecutablePath()
@@ -121,7 +121,7 @@ class ExpertDownloadManagerTest : BasePlatformTestCase() {
         assertNull("Version should be null when binary cannot provide version", version)
     }
     
-    fun testDetectPlatformReturnsValidString() {
+    fun `test detect platform returns valid string`() {
         // We can't directly test the private detectPlatform method,
         // but we can verify it returns a non-null value for common platforms
         // by testing the download URL construction logic
