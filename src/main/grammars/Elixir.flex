@@ -3,8 +3,6 @@ package dev.murek.elixirij.lexer;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import static dev.murek.elixirij.psi.ElementTypes.*;
-import static com.intellij.psi.TokenType.WHITE_SPACE;
-import static com.intellij.psi.TokenType.BAD_CHARACTER;
 
 %%
 

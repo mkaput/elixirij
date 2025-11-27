@@ -2,6 +2,7 @@
 
 package dev.murek.elixirij.psi
 
+import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import dev.murek.elixirij.ExLanguage
@@ -10,6 +11,10 @@ import dev.murek.elixirij.ExLanguage
  * Custom element type for Elixir tokens.
  */
 class ExTokenType(debugName: String) : IElementType(debugName, ExLanguage)
+
+// Re-export standard token types for use in lexer
+@JvmField val WHITE_SPACE: IElementType = TokenType.WHITE_SPACE
+@JvmField val BAD_CHARACTER: IElementType = TokenType.BAD_CHARACTER
 
 // Comments
 @JvmField val EX_COMMENT = ExTokenType("COMMENT")
