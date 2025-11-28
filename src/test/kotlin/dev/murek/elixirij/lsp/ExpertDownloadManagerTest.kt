@@ -26,19 +26,23 @@ class ExpertDownloadManagerTest : BasePlatformTestCase() {
 
     fun `test executable path ends with expert`() {
         val executablePath = service<ExpertDownloadManager>().getExecutablePath()
+        val expectedEnding = if (SystemInfo.isWindows) "expert.exe" else "expert"
 
         assertTrue(
-            "Executable path should end with 'expert'",
-            executablePath.toString().endsWith("expert")
+            "Executable path should end with '$expectedEnding'",
+            executablePath.toString().endsWith(expectedEnding)
         )
     }
 
-    fun `test platform detection returns valid value for common platforms`() {
-        // This indirectly tests that platform detection works on common platforms
-        val isCommonPlatform = SystemInfo.isMac || SystemInfo.isLinux || SystemInfo.isWindows
+    fun `test executable path returns non-null for current platform`() {
+        // Tests that getExecutablePath() returns a valid path on the current platform
+        val manager = service<ExpertDownloadManager>()
+        val executablePath = manager.getExecutablePath()
 
-        if (isCommonPlatform) {
-            assertTrue("Should be on a common platform for testing", isCommonPlatform)
-        }
+        assertNotNull("Executable path should not be null", executablePath)
+        assertTrue(
+            "Executable path should be within plugin directory",
+            executablePath.toString().contains("elixirij")
+        )
     }
 }

@@ -30,6 +30,10 @@ private const val UPDATE_CHECK_INTERVAL_MS = 24L * 60 * 60 * 1000 // 24 hours in
 @Service(Service.Level.APP)
 class ExpertDownloadManager {
 
+    @Volatile
+    private var isDownloading = false
+    private val downloadLock = Any()
+
     /**
      * Get the directory where Expert is stored.
      * Uses IntelliJ's plugin-specific directory for proper isolation.
@@ -41,9 +45,11 @@ class ExpertDownloadManager {
 
     /**
      * Get the path to the Expert executable.
+     * On Windows, the executable has a .exe extension.
      */
     fun getExecutablePath(): Path {
-        return getDirectory().resolve(EXPERT_EXECUTABLE_NAME)
+        val fileName = if (SystemInfo.isWindows) "$EXPERT_EXECUTABLE_NAME.exe" else EXPERT_EXECUTABLE_NAME
+        return getDirectory().resolve(fileName)
     }
 
     /**
@@ -73,8 +79,17 @@ class ExpertDownloadManager {
 
     /**
      * Download and install the latest nightly build of Expert.
+     * Thread-safe: prevents concurrent downloads.
      */
     fun downloadAndInstall() {
+        synchronized(downloadLock) {
+            if (isDownloading) {
+                LOG.info("Download already in progress, skipping")
+                return
+            }
+            isDownloading = true
+        }
+
         ProgressManager.getInstance().run(object : Task.Backgroundable(
             null,
             ExBundle.message("lsp.expert.task.title"),
@@ -129,6 +144,10 @@ class ExpertDownloadManager {
                     }
                 } catch (e: Exception) {
                     LOG.warn("Failed to download Expert (network may be unavailable)", e)
+                } finally {
+                    synchronized(downloadLock) {
+                        isDownloading = false
+                    }
                 }
             }
         })
