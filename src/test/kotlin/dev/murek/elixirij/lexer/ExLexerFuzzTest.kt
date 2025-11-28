@@ -1,17 +1,11 @@
 package dev.murek.elixirij.lexer
 
 import com.intellij.lexer.Lexer
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.testFramework.LexerTestCase
 import kotlin.random.Random
 
-/**
- * Number of fuzzing attempts to make.
- */
 private const val ATTEMPT_COUNT = 10_000
-
-/**
- * Length of each random string in characters.
- */
 private const val STRING_LENGTH = 1024
 
 /**
@@ -29,7 +23,24 @@ class ExLexerFuzzTest : LexerTestCase() {
 
     override fun createLexer(): Lexer = ExLexer()
 
-    override fun getDirPath(): String = throw UnsupportedOperationException("Not used in fuzz tests")
+    override fun getDirPath(): String = throw UnsupportedOperationException()
+
+    fun `test fuzz lexer`() {
+        val seed = getSeed()
+        println("Running fuzz test with seed: $seed")
+        val random = Random(seed)
+
+        for (attempt in 1..ATTEMPT_COUNT) {
+            val input = generateRandomString(random)
+            try {
+                val totalConsumed = tokenizeAndCountConsumed(input)
+                assertEquals("Lexer did not consume entire input", input.length, totalConsumed)
+            } catch (e: Exception) {
+                val input = StringUtil.escapeStringCharacters(input)
+                fail("Lexer threw exception on attempt $attempt (seed=$seed): ${e.message}\nInput:\n$input")
+            }
+        }
+    }
 
     /**
      * Get the seed for the random number generator.
@@ -53,35 +64,13 @@ class ExLexerFuzzTest : LexerTestCase() {
         return Random.nextLong()
     }
 
-    fun testFuzzingWithRandomStrings() {
-        val seed = getSeed()
-        println("Running fuzz test with seed: $seed")
-        val random = Random(seed)
-
-        for (attempt in 1..ATTEMPT_COUNT) {
-            val input = generateRandomString(random, STRING_LENGTH)
-
-            try {
-                val totalConsumed = tokenizeAndCountConsumed(input)
-
-                assertEquals(
-                    "Lexer did not consume entire input on attempt $attempt (seed=$seed)\nInput:\n${escapeString(input)}",
-                    input.length,
-                    totalConsumed
-                )
-            } catch (e: Exception) {
-                fail("Lexer threw exception on attempt $attempt (seed=$seed): ${e.message}\nInput:\n${escapeString(input)}")
-            }
-        }
-    }
-
     /**
      * Generate a random string of the specified length using printable ASCII characters
-     * and some common unicode characters that might appear in Elixir code.
+     * and some common Unicode characters that might appear in Elixir code.
      */
-    private fun generateRandomString(random: Random, length: Int): String {
-        val chars = CharArray(length)
-        for (i in 0 until length) {
+    private fun generateRandomString(random: Random): String {
+        val chars = CharArray(STRING_LENGTH)
+        for (i in 0 until STRING_LENGTH) {
             chars[i] = generateRandomChar(random)
         }
         return String(chars)
@@ -91,7 +80,7 @@ class ExLexerFuzzTest : LexerTestCase() {
      * Generate a random character. Produces a mix of:
      * - Printable ASCII characters (space to tilde)
      * - Whitespace characters (newlines, carriage returns, tabs, spaces)
-     * - Some unicode characters
+     * - Some Unicode characters
      */
     private fun generateRandomChar(random: Random): Char {
         return when (random.nextInt(100)) {
@@ -99,6 +88,7 @@ class ExLexerFuzzTest : LexerTestCase() {
                 // 80% printable ASCII (space to tilde: 32-126)
                 (32 + random.nextInt(95)).toChar()
             }
+
             in 80..89 -> {
                 // 10% whitespace characters
                 when (random.nextInt(4)) {
@@ -108,6 +98,7 @@ class ExLexerFuzzTest : LexerTestCase() {
                     else -> ' '
                 }
             }
+
             else -> {
                 // 10% various unicode characters
                 when (random.nextInt(5)) {
@@ -119,26 +110,6 @@ class ExLexerFuzzTest : LexerTestCase() {
                 }
             }
         }
-    }
-
-    /**
-     * Escape a string for safe display in error messages.
-     * Converts control characters and non-printable characters to their escape sequences.
-     */
-    private fun escapeString(input: String): String {
-        val sb = StringBuilder()
-        for (char in input) {
-            when {
-                char == '\n' -> sb.append("\\n")
-                char == '\r' -> sb.append("\\r")
-                char == '\t' -> sb.append("\\t")
-                char == '\\' -> sb.append("\\\\")
-                char < ' ' || char.code == 0x7F -> sb.append("\\u${char.code.toString(16).padStart(4, '0')}")
-                char.code > 0x7F -> sb.append("\\u${char.code.toString(16).padStart(4, '0')}")
-                else -> sb.append(char)
-            }
-        }
-        return sb.toString()
     }
 
     /**
@@ -155,20 +126,17 @@ class ExLexerFuzzTest : LexerTestCase() {
 
             // Verify token bounds are valid
             assertTrue(
-                "Token start ($tokenStart) should not be negative",
-                tokenStart >= 0
+                "Token start ($tokenStart) should not be negative", tokenStart >= 0
             )
             assertTrue(
                 "Token should start at expected position $expectedPosition but starts at $tokenStart",
                 tokenStart == expectedPosition
             )
             assertTrue(
-                "Token end ($tokenEnd) should not be before start ($tokenStart)",
-                tokenEnd >= tokenStart
+                "Token end ($tokenEnd) should not be before start ($tokenStart)", tokenEnd >= tokenStart
             )
             assertTrue(
-                "Token end ($tokenEnd) should not exceed input length (${input.length})",
-                tokenEnd <= input.length
+                "Token end ($tokenEnd) should not exceed input length (${input.length})", tokenEnd <= input.length
             )
 
             expectedPosition = tokenEnd
