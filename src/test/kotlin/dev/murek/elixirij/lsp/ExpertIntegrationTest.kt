@@ -3,8 +3,6 @@ package dev.murek.elixirij.lsp
 import com.intellij.openapi.components.service
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import dev.murek.elixirij.ExFileType
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -44,16 +42,21 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
 
         downloadAttempted.set(true)
 
-        val latch = CountDownLatch(1)
-        var success = false
+        downloadManager.downloadAndInstall()
 
-        downloadManager.downloadAndInstall { result, _ ->
-            success = result
-            latch.countDown()
-        }
+        // Give it some time to start the download task
+        Thread.sleep(5000)
 
         // Wait up to 2 minutes for download to complete
-        latch.await(2, TimeUnit.MINUTES)
+        val startTime = System.currentTimeMillis()
+        val timeout = 2 * 60 * 1000 // 2 minutes
+        while (System.currentTimeMillis() - startTime < timeout) {
+            if (downloadManager.isInstalled()) {
+                downloadSucceeded.set(true)
+                return true
+            }
+            Thread.sleep(1000)
+        }
 
         val isInstalled = downloadManager.isInstalled()
         downloadSucceeded.set(isInstalled)

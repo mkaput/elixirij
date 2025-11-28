@@ -74,7 +74,7 @@ class ExpertDownloadManager {
     /**
      * Download and install the latest nightly build of Expert.
      */
-    fun downloadAndInstall(onComplete: (Boolean, String?) -> Unit) {
+    fun downloadAndInstall() {
         ProgressManager.getInstance().run(object : Task.Backgroundable(
             null,
             ExBundle.message("lsp.expert.task.title"),
@@ -85,14 +85,7 @@ class ExpertDownloadManager {
                     val platform = detectPlatform()
 
                     if (platform == null) {
-                        onComplete(
-                            false,
-                            ExBundle.message(
-                                "lsp.expert.error.unsupported",
-                                SystemInfo.OS_NAME,
-                                SystemInfo.OS_ARCH
-                            )
-                        )
+                        LOG.warn("Unsupported platform: ${SystemInfo.OS_NAME} ${SystemInfo.OS_ARCH}")
                         return
                     }
 
@@ -129,7 +122,6 @@ class ExpertDownloadManager {
                         }
 
                         indicator.fraction = 1.0
-                        onComplete(true, null)
                     } finally {
                         if (tempFile.exists()) {
                             Files.deleteIfExists(tempFile)
@@ -137,7 +129,6 @@ class ExpertDownloadManager {
                     }
                 } catch (e: Exception) {
                     LOG.warn("Failed to download Expert (network may be unavailable)", e)
-                    onComplete(false, ExBundle.message("lsp.expert.error.downloadFailed", e.message ?: ""))
                 }
             }
         })
@@ -147,7 +138,7 @@ class ExpertDownloadManager {
      * Check if an update is available and install it if needed.
      * Uses the binary's modification time to determine if update is needed.
      */
-    fun checkAndUpdate(onComplete: (Boolean, String?) -> Unit) {
+    fun checkAndUpdate() {
         val shouldUpdate = if (!isInstalled()) {
             true
         } else {
@@ -158,9 +149,7 @@ class ExpertDownloadManager {
         }
 
         if (shouldUpdate) {
-            downloadAndInstall(onComplete)
-        } else {
-            onComplete(true, null)
+            downloadAndInstall()
         }
     }
 
