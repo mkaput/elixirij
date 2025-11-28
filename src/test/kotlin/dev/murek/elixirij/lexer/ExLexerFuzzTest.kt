@@ -5,67 +5,54 @@ import com.intellij.testFramework.LexerTestCase
 import kotlin.random.Random
 
 /**
+ * Number of fuzzing attempts to make.
+ */
+private const val ATTEMPT_COUNT = 10_000
+
+/**
+ * Length of each random string in characters.
+ */
+private const val STRING_LENGTH = 1024
+
+/**
  * Fuzzing test for the Elixir lexer.
  *
  * This test generates random strings and verifies that the lexer can process them
  * without failing. The lexer should be able to handle any input, even if it produces
  * BAD_CHARACTER tokens for invalid content.
+ *
+ * The random seed is configurable via environment variable "ELIXIRIJ_FUZZ_SEED"
+ * or system property "elixirij.fuzz.seed", allowing reproducible test runs.
+ * If not specified, a random seed is used for each run.
  */
 class ExLexerFuzzTest : LexerTestCase() {
 
-    companion object {
-        /**
-         * Default seed for the random number generator. Can be overridden via system property.
-         */
-        private const val DEFAULT_SEED = 42L
-
-        /**
-         * Number of fuzzing attempts to make.
-         */
-        private const val ATTEMPT_COUNT = 10_000
-
-        /**
-         * Length of each random string in characters.
-         */
-        private const val STRING_LENGTH = 1024
-    }
-
     override fun createLexer(): Lexer = ExLexer()
 
-    override fun getDirPath(): String = "src/test/testData/lexer"
+    override fun getDirPath(): String = throw UnsupportedOperationException("Not used in fuzz tests")
 
     /**
      * Get the seed for the random number generator.
      * This can be configured via:
+     * - Environment variable "ELIXIRIJ_FUZZ_SEED" (takes precedence)
      * - System property "elixirij.fuzz.seed"
-     * - Environment variable "ELIXIRIJ_FUZZ_SEED"
      *
-     * System property takes precedence over environment variable.
+     * If neither is set, a random seed is generated.
      */
     private fun getSeed(): Long {
-        val seedProperty = System.getProperty("elixirij.fuzz.seed")
-        if (seedProperty != null) {
-            return seedProperty.toLongOrNull()
-                ?: throw IllegalArgumentException("Invalid seed value in system property 'elixirij.fuzz.seed': $seedProperty")
-        }
         val seedEnv = System.getenv("ELIXIRIJ_FUZZ_SEED")
         if (seedEnv != null) {
             return seedEnv.toLongOrNull()
                 ?: throw IllegalArgumentException("Invalid seed value in environment variable 'ELIXIRIJ_FUZZ_SEED': $seedEnv")
         }
-        return DEFAULT_SEED
+        val seedProperty = System.getProperty("elixirij.fuzz.seed")
+        if (seedProperty != null) {
+            return seedProperty.toLongOrNull()
+                ?: throw IllegalArgumentException("Invalid seed value in system property 'elixirij.fuzz.seed': $seedProperty")
+        }
+        return Random.nextLong()
     }
 
-    /**
-     * Test that the lexer can handle random input without throwing exceptions.
-     *
-     * The test generates [ATTEMPT_COUNT] random strings of [STRING_LENGTH] characters each
-     * and verifies that the lexer can process all of them completely. The lexer is
-     * expected to tokenize the entire input, even if some tokens are BAD_CHARACTER.
-     *
-     * The random seed is configurable via the system property "elixirij.fuzz.seed"
-     * or environment variable "ELIXIRIJ_FUZZ_SEED", allowing reproducible test runs.
-     */
     fun testFuzzingWithRandomStrings() {
         val seed = getSeed()
         println("Running fuzz test with seed: $seed")
@@ -78,12 +65,12 @@ class ExLexerFuzzTest : LexerTestCase() {
                 val totalConsumed = tokenizeAndCountConsumed(input)
 
                 assertEquals(
-                    "Lexer did not consume entire input on attempt $attempt (seed=$seed)",
+                    "Lexer did not consume entire input on attempt $attempt (seed=$seed)\nInput:\n${escapeString(input)}",
                     input.length,
                     totalConsumed
                 )
             } catch (e: Exception) {
-                fail("Lexer threw exception on attempt $attempt (seed=$seed): ${e.message}\nInput:\n$input")
+                fail("Lexer threw exception on attempt $attempt (seed=$seed): ${e.message}\nInput:\n${escapeString(input)}")
             }
         }
     }
@@ -132,6 +119,26 @@ class ExLexerFuzzTest : LexerTestCase() {
                 }
             }
         }
+    }
+
+    /**
+     * Escape a string for safe display in error messages.
+     * Converts control characters and non-printable characters to their escape sequences.
+     */
+    private fun escapeString(input: String): String {
+        val sb = StringBuilder()
+        for (char in input) {
+            when {
+                char == '\n' -> sb.append("\\n")
+                char == '\r' -> sb.append("\\r")
+                char == '\t' -> sb.append("\\t")
+                char == '\\' -> sb.append("\\\\")
+                char < ' ' || char.code == 0x7F -> sb.append("\\u${char.code.toString(16).padStart(4, '0')}")
+                char.code > 0x7F -> sb.append("\\u${char.code.toString(16).padStart(4, '0')}")
+                else -> sb.append(char)
+            }
+        }
+        return sb.toString()
     }
 
     /**
