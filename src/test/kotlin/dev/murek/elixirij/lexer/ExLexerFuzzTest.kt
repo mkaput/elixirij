@@ -17,7 +17,7 @@ class ExLexerFuzzTest : LexerTestCase() {
         /**
          * Default seed for the random number generator. Can be overridden via system property.
          */
-        private val DEFAULT_SEED = 42L
+        private const val DEFAULT_SEED = 42L
 
         /**
          * Number of fuzzing attempts to make.
@@ -45,10 +45,15 @@ class ExLexerFuzzTest : LexerTestCase() {
     private fun getSeed(): Long {
         val seedProperty = System.getProperty("elixirij.fuzz.seed")
         if (seedProperty != null) {
-            return seedProperty.toLongOrNull() ?: DEFAULT_SEED
+            return seedProperty.toLongOrNull()
+                ?: throw IllegalArgumentException("Invalid seed value in system property 'elixirij.fuzz.seed': $seedProperty")
         }
         val seedEnv = System.getenv("ELIXIRIJ_FUZZ_SEED")
-        return seedEnv?.toLongOrNull() ?: DEFAULT_SEED
+        if (seedEnv != null) {
+            return seedEnv.toLongOrNull()
+                ?: throw IllegalArgumentException("Invalid seed value in environment variable 'ELIXIRIJ_FUZZ_SEED': $seedEnv")
+        }
+        return DEFAULT_SEED
     }
 
     /**
@@ -63,6 +68,7 @@ class ExLexerFuzzTest : LexerTestCase() {
      */
     fun testFuzzingWithRandomStrings() {
         val seed = getSeed()
+        println("Running fuzz test with seed: $seed")
         val random = Random(seed)
 
         for (attempt in 1..ATTEMPT_COUNT) {
@@ -77,7 +83,7 @@ class ExLexerFuzzTest : LexerTestCase() {
                     totalConsumed
                 )
             } catch (e: Exception) {
-                fail("Lexer threw exception on attempt $attempt (seed=$seed): ${e.message}\nInput: ${input.take(100)}...")
+                fail("Lexer threw exception on attempt $attempt (seed=$seed): ${e.message}\nInput:\n$input")
             }
         }
     }
@@ -97,7 +103,7 @@ class ExLexerFuzzTest : LexerTestCase() {
     /**
      * Generate a random character. Produces a mix of:
      * - Printable ASCII characters (space to tilde)
-     * - Newlines and tabs
+     * - Whitespace characters (newlines, carriage returns, tabs, spaces)
      * - Some unicode characters
      */
     private fun generateRandomChar(random: Random): Char {
@@ -135,7 +141,7 @@ class ExLexerFuzzTest : LexerTestCase() {
         val lexer = createLexer()
         lexer.start(input)
 
-        var totalConsumed = 0
+        var expectedPosition = 0
         while (lexer.tokenType != null) {
             val tokenStart = lexer.tokenStart
             val tokenEnd = lexer.tokenEnd
@@ -146,6 +152,10 @@ class ExLexerFuzzTest : LexerTestCase() {
                 tokenStart >= 0
             )
             assertTrue(
+                "Token should start at expected position $expectedPosition but starts at $tokenStart",
+                tokenStart == expectedPosition
+            )
+            assertTrue(
                 "Token end ($tokenEnd) should not be before start ($tokenStart)",
                 tokenEnd >= tokenStart
             )
@@ -154,14 +164,10 @@ class ExLexerFuzzTest : LexerTestCase() {
                 tokenEnd <= input.length
             )
 
-            // Track the furthest position consumed
-            if (tokenEnd > totalConsumed) {
-                totalConsumed = tokenEnd
-            }
-
+            expectedPosition = tokenEnd
             lexer.advance()
         }
 
-        return totalConsumed
+        return expectedPosition
     }
 }
