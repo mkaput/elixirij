@@ -36,16 +36,17 @@ class ExpertLspServerDescriptor(project: Project) : ProjectWideLspServerDescript
             throw IllegalStateException(
                 "Expert language server is not installed. " +
                     "It should be downloaded automatically when opening an Elixir file. " +
-                    "Please check your network connection and try reopening the file."
+                    "Please check your network connection and restart the IDE to trigger another download attempt."
             )
         }
 
         val expertPath = downloadManager.getExecutablePath()
 
         return GeneralCommandLine(expertPath.toString(), "--stdio").apply {
-            // Set working directory - uses project base path
+            // Set working directory - uses project base path if available, otherwise falls back to user.home
             // This works correctly with multiproject workspaces as each project gets its own LSP server instance
-            project.basePath?.let { withWorkDirectory(it) }
+            val workDir = project.basePath ?: System.getProperty("user.home")
+            withWorkDirectory(workDir)
         }
     }
 }

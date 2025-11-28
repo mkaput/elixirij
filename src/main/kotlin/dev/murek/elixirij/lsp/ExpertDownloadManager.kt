@@ -178,8 +178,8 @@ class ExpertDownloadManager {
     private fun detectPlatform(): String? {
         val arch = SystemInfo.OS_ARCH.lowercase()
         val isArm64 = SystemInfo.isAarch64
-        // Check for x86_64/AMD64 but exclude ARM architectures
-        val is64Bit = !isArm64 && (arch.contains("x86_64") || arch.contains("amd64") || arch.contains("x64"))
+        // Check for x86_64/AMD64
+        val is64Bit = arch.contains("x86_64") || arch.contains("amd64") || arch.contains("x64")
 
         return when {
             // Prioritize ARM64 detection to ensure correct platform identification
@@ -195,7 +195,7 @@ class ExpertDownloadManager {
 
     /**
      * Download a file from a URL with progress tracking.
-     * Uses HttpRequests default timeouts (10 seconds for connect and read).
+     * Uses HttpRequests default timeouts.
      */
     private fun downloadFile(urlString: String, destination: Path, indicator: ProgressIndicator) {
         HttpRequests.request(urlString)

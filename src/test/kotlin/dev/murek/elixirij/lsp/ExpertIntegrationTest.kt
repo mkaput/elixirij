@@ -1,9 +1,13 @@
 package dev.murek.elixirij.lsp
 
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import dev.murek.elixirij.ExFileType
+import org.junit.Assume
 import java.util.concurrent.atomic.AtomicBoolean
+
+private val LOG = logger<ExpertIntegrationTest>()
 
 /**
  * End-to-end integration tests for Expert Language Server.
@@ -12,8 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * They verify the complete flow from downloading Expert to using it with Elixir files.
  *
  * Note: These tests require network access to download Expert. If network is unavailable
- * (e.g., in CI environments with restricted network), tests will pass with a message
- * indicating Expert could not be downloaded.
+ * (e.g., in CI environments with restricted network), tests will be skipped using JUnit's
+ * Assume mechanism.
  */
 class ExpertIntegrationTest : BasePlatformTestCase() {
 
@@ -44,9 +48,6 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
 
         downloadManager.downloadAndInstall()
 
-        // Give it some time to start the download task
-        Thread.sleep(5000)
-
         // Wait up to 2 minutes for download to complete
         val startTime = System.currentTimeMillis()
         val timeout = 2 * 60 * 1000 // 2 minutes
@@ -64,18 +65,15 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
     }
 
     /**
-     * Skip helper that prints a message when Expert is unavailable.
+     * Skip tests if Expert is unavailable using JUnit's Assume mechanism.
      */
-    private fun skipIfExpertUnavailable(): Boolean {
-        if (!ensureExpertDownloaded()) {
-            println("SKIPPED: Expert binary could not be downloaded (network may be unavailable)")
-            return true
-        }
-        return false
+    private fun assumeExpertAvailable() {
+        val available = ensureExpertDownloaded()
+        Assume.assumeTrue("Expert binary could not be downloaded (network may be unavailable)", available)
     }
 
     fun `test download real expert binary`() {
-        if (skipIfExpertUnavailable()) return
+        assumeExpertAvailable()
 
         val downloadManager = service<ExpertDownloadManager>()
 
@@ -84,17 +82,17 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
     }
 
     fun `test real expert version retrieval`() {
-        if (skipIfExpertUnavailable()) return
+        assumeExpertAvailable()
 
         val version = service<ExpertDownloadManager>().getInstalledVersion()
 
         assertNotNull("Should be able to get Expert version", version)
         assertTrue("Version should not be empty", version!!.isNotBlank())
-        println("Expert version: $version")
+        LOG.info("Expert version: $version")
     }
 
     fun `test end-to-end with real expert`() {
-        if (skipIfExpertUnavailable()) return
+        assumeExpertAvailable()
 
         // Create a realistic Elixir hello world project
         myFixture.addFileToProject(
@@ -135,7 +133,7 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
         val downloadManager = service<ExpertDownloadManager>()
         val commandLine = descriptor.createCommandLine()
 
-        assertEquals("Should use --stdio parameter", "--stdio", commandLine.parametersList.parameters.firstOrNull())
+        assertEquals("Should only have --stdio parameter", listOf("--stdio"), commandLine.parametersList.parameters)
         assertEquals(
             "Should use real Expert executable",
             downloadManager.getExecutablePath().toString(),
@@ -147,7 +145,7 @@ class ExpertIntegrationTest : BasePlatformTestCase() {
     }
 
     fun `test LSP support provider with real expert`() {
-        if (skipIfExpertUnavailable()) return
+        assumeExpertAvailable()
 
         // Create Elixir files
         val exFile = myFixture.addFileToProject(
