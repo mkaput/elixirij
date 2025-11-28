@@ -1,0 +1,167 @@
+package dev.murek.elixirij.lexer
+
+import com.intellij.lexer.Lexer
+import com.intellij.testFramework.LexerTestCase
+import kotlin.random.Random
+
+/**
+ * Fuzzing test for the Elixir lexer.
+ *
+ * This test generates random strings and verifies that the lexer can process them
+ * without failing. The lexer should be able to handle any input, even if it produces
+ * BAD_CHARACTER tokens for invalid content.
+ */
+class ExLexerFuzzTest : LexerTestCase() {
+
+    companion object {
+        /**
+         * Default seed for the random number generator. Can be overridden via system property.
+         */
+        private val DEFAULT_SEED = 42L
+
+        /**
+         * Number of fuzzing attempts to make.
+         */
+        private const val ATTEMPT_COUNT = 10_000
+
+        /**
+         * Length of each random string in bytes.
+         */
+        private const val STRING_LENGTH = 1024
+    }
+
+    override fun createLexer(): Lexer = ExLexer()
+
+    override fun getDirPath(): String = "src/test/testData/lexer"
+
+    /**
+     * Get the seed for the random number generator.
+     * This can be configured via:
+     * - System property "elixirij.fuzz.seed"
+     * - Environment variable "ELIXIRIJ_FUZZ_SEED"
+     *
+     * System property takes precedence over environment variable.
+     */
+    private fun getSeed(): Long {
+        val seedProperty = System.getProperty("elixirij.fuzz.seed")
+        if (seedProperty != null) {
+            return seedProperty.toLongOrNull() ?: DEFAULT_SEED
+        }
+        val seedEnv = System.getenv("ELIXIRIJ_FUZZ_SEED")
+        return seedEnv?.toLongOrNull() ?: DEFAULT_SEED
+    }
+
+    /**
+     * Test that the lexer can handle random input without throwing exceptions.
+     *
+     * The test generates [ATTEMPT_COUNT] random strings of [STRING_LENGTH] bytes each
+     * and verifies that the lexer can process all of them completely. The lexer is
+     * expected to tokenize the entire input, even if some tokens are BAD_CHARACTER.
+     *
+     * The random seed is configurable via the system property "elixirij.fuzz.seed"
+     * or environment variable "ELIXIRIJ_FUZZ_SEED", allowing reproducible test runs.
+     */
+    fun testFuzzingWithRandomStrings() {
+        val seed = getSeed()
+        val random = Random(seed)
+
+        for (attempt in 1..ATTEMPT_COUNT) {
+            val input = generateRandomString(random, STRING_LENGTH)
+
+            try {
+                val totalConsumed = tokenizeAndCountConsumed(input)
+
+                assertEquals(
+                    "Lexer did not consume entire input on attempt $attempt (seed=$seed)",
+                    input.length,
+                    totalConsumed
+                )
+            } catch (e: Exception) {
+                fail("Lexer threw exception on attempt $attempt (seed=$seed): ${e.message}\nInput: ${input.take(100)}...")
+            }
+        }
+    }
+
+    /**
+     * Generate a random string of the specified length using printable ASCII characters
+     * and some common unicode characters that might appear in Elixir code.
+     */
+    private fun generateRandomString(random: Random, length: Int): String {
+        val chars = CharArray(length)
+        for (i in 0 until length) {
+            chars[i] = generateRandomChar(random)
+        }
+        return String(chars)
+    }
+
+    /**
+     * Generate a random character. Produces a mix of:
+     * - Printable ASCII characters (space to tilde)
+     * - Newlines and tabs
+     * - Some unicode characters
+     */
+    private fun generateRandomChar(random: Random): Char {
+        return when (random.nextInt(100)) {
+            in 0..79 -> {
+                // 80% printable ASCII (space to tilde: 32-126)
+                (32 + random.nextInt(95)).toChar()
+            }
+            in 80..89 -> {
+                // 10% whitespace characters
+                when (random.nextInt(4)) {
+                    0 -> '\n'
+                    1 -> '\r'
+                    2 -> '\t'
+                    else -> ' '
+                }
+            }
+            else -> {
+                // 10% various unicode characters
+                when (random.nextInt(5)) {
+                    0 -> (0x00C0 + random.nextInt(64)).toChar() // Latin Extended-A
+                    1 -> (0x0400 + random.nextInt(256)).toChar() // Cyrillic
+                    2 -> (0x4E00 + random.nextInt(1000)).toChar() // CJK
+                    3 -> (0x03B1 + random.nextInt(25)).toChar() // Greek lowercase
+                    else -> (0x2200 + random.nextInt(256)).toChar() // Mathematical Operators
+                }
+            }
+        }
+    }
+
+    /**
+     * Tokenize the input and return the total number of characters consumed.
+     */
+    private fun tokenizeAndCountConsumed(input: String): Int {
+        val lexer = createLexer()
+        lexer.start(input)
+
+        var totalConsumed = 0
+        while (lexer.tokenType != null) {
+            val tokenStart = lexer.tokenStart
+            val tokenEnd = lexer.tokenEnd
+
+            // Verify token bounds are valid
+            assertTrue(
+                "Token start ($tokenStart) should not be negative",
+                tokenStart >= 0
+            )
+            assertTrue(
+                "Token end ($tokenEnd) should not be before start ($tokenStart)",
+                tokenEnd >= tokenStart
+            )
+            assertTrue(
+                "Token end ($tokenEnd) should not exceed input length (${input.length})",
+                tokenEnd <= input.length
+            )
+
+            // Track the furthest position consumed
+            if (tokenEnd > totalConsumed) {
+                totalConsumed = tokenEnd
+            }
+
+            lexer.advance()
+        }
+
+        return totalConsumed
+    }
+}
