@@ -25,7 +25,7 @@ class ExLexerFuzzTest : LexerTestCase() {
         private const val ATTEMPT_COUNT = 10_000
 
         /**
-         * Length of each random string in bytes.
+         * Length of each random string in characters.
          */
         private const val STRING_LENGTH = 1024
     }
@@ -54,7 +54,7 @@ class ExLexerFuzzTest : LexerTestCase() {
     /**
      * Test that the lexer can handle random input without throwing exceptions.
      *
-     * The test generates [ATTEMPT_COUNT] random strings of [STRING_LENGTH] bytes each
+     * The test generates [ATTEMPT_COUNT] random strings of [STRING_LENGTH] characters each
      * and verifies that the lexer can process all of them completely. The lexer is
      * expected to tokenize the entire input, even if some tokens are BAD_CHARACTER.
      *
