@@ -4,13 +4,13 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.util.ExecUtil
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.util.io.HttpRequests
+import dev.murek.elixirij.ExBundle
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -77,20 +77,26 @@ class ExpertDownloadManager {
     fun downloadAndInstall(onComplete: (Boolean, String?) -> Unit) {
         ProgressManager.getInstance().run(object : Task.Backgroundable(
             null,
-            "Downloading Expert Language Server",
+            ExBundle.message("lsp.expert.task.title"),
             true
         ) {
             override fun run(indicator: ProgressIndicator) {
                 try {
-                    indicator.text = "Determining platform..."
                     val platform = detectPlatform()
 
                     if (platform == null) {
-                        onComplete(false, "Unsupported platform: ${SystemInfo.OS_NAME} ${SystemInfo.OS_ARCH}")
+                        onComplete(
+                            false,
+                            ExBundle.message(
+                                "lsp.expert.error.unsupported",
+                                SystemInfo.OS_NAME,
+                                SystemInfo.OS_ARCH
+                            )
+                        )
                         return
                     }
 
-                    indicator.text = "Downloading Expert nightly build..."
+                    indicator.text = ExBundle.message("lsp.expert.progress.downloading")
                     indicator.isIndeterminate = false
 
                     val expertDir = getDirectory()
@@ -102,7 +108,7 @@ class ExpertDownloadManager {
                     try {
                         downloadFile(downloadUrl, tempFile, indicator)
 
-                        indicator.text = "Installing Expert..."
+                        indicator.text = ExBundle.message("lsp.expert.progress.installing")
                         indicator.fraction = 0.9
 
                         val executablePath = getExecutablePath()
@@ -131,7 +137,7 @@ class ExpertDownloadManager {
                     }
                 } catch (e: Exception) {
                     LOG.warn("Failed to download Expert (network may be unavailable)", e)
-                    onComplete(false, "Failed to download Expert: ${e.message}")
+                    onComplete(false, ExBundle.message("lsp.expert.error.downloadFailed", e.message ?: ""))
                 }
             }
         })
