@@ -3,8 +3,10 @@ package dev.murek.elixirij.highlighting
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.options.OptionsBundle
 import com.intellij.openapi.options.colors.AttributesDescriptor
 import dev.murek.elixirij.ExBundle
+import java.util.function.Supplier
 
 /**
  * Defines text attributes for Elixir syntax highlighting.
@@ -14,99 +16,99 @@ import dev.murek.elixirij.ExBundle
 enum class ExTextAttributes(
     externalName: String,
     fallbackKey: TextAttributesKey?,
-    displayName: String
+    displayNameSupplier: Supplier<String>
 ) {
     COMMENT(
         "ELIXIR_COMMENT",
         DefaultLanguageHighlighterColors.LINE_COMMENT,
-        "color.settings.comment"
+        OptionsBundle.messagePointer("options.language.defaults.line.comment")
     ),
     KEYWORD(
         "ELIXIR_KEYWORD",
         DefaultLanguageHighlighterColors.KEYWORD,
-        "color.settings.keyword"
+        OptionsBundle.messagePointer("options.language.defaults.keyword")
     ),
     STRING(
         "ELIXIR_STRING",
         DefaultLanguageHighlighterColors.STRING,
-        "color.settings.string"
+        OptionsBundle.messagePointer("options.language.defaults.string")
     ),
     NUMBER(
         "ELIXIR_NUMBER",
         DefaultLanguageHighlighterColors.NUMBER,
-        "color.settings.number"
+        OptionsBundle.messagePointer("options.language.defaults.number")
     ),
     ATOM(
         "ELIXIR_ATOM",
         DefaultLanguageHighlighterColors.CONSTANT,
-        "color.settings.atom"
+        ExBundle.messagePointer("color.settings.atom")
     ),
     MODULE(
         "ELIXIR_MODULE",
         DefaultLanguageHighlighterColors.CLASS_NAME,
-        "color.settings.module"
+        ExBundle.messagePointer("color.settings.module")
     ),
     IDENTIFIER(
         "ELIXIR_IDENTIFIER",
         DefaultLanguageHighlighterColors.IDENTIFIER,
-        "color.settings.identifier"
+        OptionsBundle.messagePointer("options.language.defaults.identifier")
     ),
     OPERATOR(
         "ELIXIR_OPERATOR",
         DefaultLanguageHighlighterColors.OPERATION_SIGN,
-        "color.settings.operator"
+        OptionsBundle.messagePointer("options.language.defaults.operation")
     ),
     BRACES(
         "ELIXIR_BRACES",
         DefaultLanguageHighlighterColors.BRACES,
-        "color.settings.braces"
+        OptionsBundle.messagePointer("options.language.defaults.braces")
     ),
     BRACKETS(
         "ELIXIR_BRACKETS",
         DefaultLanguageHighlighterColors.BRACKETS,
-        "color.settings.brackets"
+        OptionsBundle.messagePointer("options.language.defaults.brackets")
     ),
     BINARY_DELIMITERS(
         "ELIXIR_BINARY_DELIMITERS",
         DefaultLanguageHighlighterColors.BRACES,
-        "color.settings.binary.delimiters"
+        ExBundle.messagePointer("color.settings.binary.delimiters")
     ),
     PARENTHESES(
         "ELIXIR_PARENTHESES",
         DefaultLanguageHighlighterColors.PARENTHESES,
-        "color.settings.parentheses"
+        OptionsBundle.messagePointer("options.language.defaults.parentheses")
     ),
     COMMA(
         "ELIXIR_COMMA",
         DefaultLanguageHighlighterColors.COMMA,
-        "color.settings.comma"
+        OptionsBundle.messagePointer("options.language.defaults.comma")
     ),
     SEMICOLON(
         "ELIXIR_SEMICOLON",
         DefaultLanguageHighlighterColors.SEMICOLON,
-        "color.settings.semicolon"
+        OptionsBundle.messagePointer("options.language.defaults.semicolon")
     ),
     DOT(
         "ELIXIR_DOT",
         DefaultLanguageHighlighterColors.DOT,
-        "color.settings.dot"
+        OptionsBundle.messagePointer("options.language.defaults.dot")
     ),
     SIGIL(
         "ELIXIR_SIGIL",
         DefaultLanguageHighlighterColors.STRING,
-        "color.settings.sigil"
+        ExBundle.messagePointer("color.settings.sigil")
     ),
     MODULE_ATTRIBUTE(
         "ELIXIR_MODULE_ATTRIBUTE",
         DefaultLanguageHighlighterColors.METADATA,
-        "color.settings.module.attribute"
+        OptionsBundle.messagePointer("options.language.defaults.metadata")
     ),
     BAD_CHARACTER(
         "ELIXIR_BAD_CHARACTER",
         HighlighterColors.BAD_CHARACTER,
-        "color.settings.bad.character"
+        OptionsBundle.messagePointer("options.java.attribute.descriptor.bad.character")
     );
 
     val attribute: TextAttributesKey = TextAttributesKey.createTextAttributesKey(externalName, fallbackKey)
-    val descriptor: AttributesDescriptor = AttributesDescriptor(ExBundle.message(displayName), attribute)
+    val descriptor: AttributesDescriptor = AttributesDescriptor(displayNameSupplier, attribute)
 }

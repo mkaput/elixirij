@@ -5,8 +5,8 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.options.colors.AttributesDescriptor
 import com.intellij.openapi.options.colors.ColorDescriptor
 import com.intellij.openapi.options.colors.ColorSettingsPage
-import dev.murek.elixirij.ExBundle
 import dev.murek.elixirij.ExIcons
+import dev.murek.elixirij.ExLanguage
 import javax.swing.Icon
 
 /**
@@ -15,7 +15,7 @@ import javax.swing.Icon
  */
 class ExColorSettingsPage : ColorSettingsPage {
 
-    override fun getDisplayName(): String = ExBundle.message("color.settings.title")
+    override fun getDisplayName(): String = ExLanguage.displayName
 
     override fun getIcon(): Icon = ExIcons.FILE
 
