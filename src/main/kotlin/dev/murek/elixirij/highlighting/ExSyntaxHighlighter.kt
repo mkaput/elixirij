@@ -44,6 +44,7 @@ class ExSyntaxHighlighter : SyntaxHighlighterBase() {
             tokenType in EX_OPERATORS -> pack(ExTextAttributes.OPERATOR)
             tokenType in EX_CURLY_BRACES -> pack(ExTextAttributes.BRACES)
             tokenType in EX_SQUARE_BRACKETS -> pack(ExTextAttributes.BRACKETS)
+            tokenType in EX_BINARY_DELIMITERS -> pack(ExTextAttributes.BINARY_DELIMITERS)
             tokenType in EX_PARENTHESES -> pack(ExTextAttributes.PARENTHESES)
             tokenType == EX_COMMA -> pack(ExTextAttributes.COMMA)
             tokenType == EX_SEMICOLON -> pack(ExTextAttributes.SEMICOLON)

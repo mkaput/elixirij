@@ -66,6 +66,11 @@ enum class ExTextAttributes(
         DefaultLanguageHighlighterColors.BRACKETS,
         "color.settings.brackets"
     ),
+    BINARY_DELIMITERS(
+        "ELIXIR_BINARY_DELIMITERS",
+        DefaultLanguageHighlighterColors.BRACES,
+        "color.settings.binary.delimiters"
+    ),
     PARENTHESES(
         "ELIXIR_PARENTHESES",
         DefaultLanguageHighlighterColors.PARENTHESES,

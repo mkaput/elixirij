@@ -358,6 +358,8 @@ val EX_BRACES = TokenSet.create(
 // More specific token sets for syntax highlighting
 val EX_CURLY_BRACES = TokenSet.create(EX_LBRACE, EX_RBRACE, EX_PERCENT_LBRACE)
 
-val EX_SQUARE_BRACKETS = TokenSet.create(EX_LBRACKET, EX_RBRACKET, EX_LT_LT, EX_GT_GT)
+val EX_SQUARE_BRACKETS = TokenSet.create(EX_LBRACKET, EX_RBRACKET)
+
+val EX_BINARY_DELIMITERS = TokenSet.create(EX_LT_LT, EX_GT_GT)
 
 val EX_PARENTHESES = TokenSet.create(EX_LPAREN, EX_RPAREN)
