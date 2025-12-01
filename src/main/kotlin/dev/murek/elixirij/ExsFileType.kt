@@ -3,9 +3,6 @@ package dev.murek.elixirij
 import com.intellij.openapi.fileTypes.LanguageFileType
 import javax.swing.Icon
 
-/**
- * Elixir script file type definition.
- */
 object ExsFileType : LanguageFileType(ExLanguage) {
     override fun getName(): String = "Elixir Script"
 
@@ -13,5 +10,5 @@ object ExsFileType : LanguageFileType(ExLanguage) {
 
     override fun getDefaultExtension(): String = "exs"
 
-    override fun getIcon(): Icon = ExIcons.FILE
+    override fun getIcon(): Icon = ExIcons.SCRIPT_FILE
 }
