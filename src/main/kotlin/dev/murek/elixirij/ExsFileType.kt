@@ -9,7 +9,7 @@ import javax.swing.Icon
 object ExsFileType : LanguageFileType(ExLanguage) {
     override fun getName(): String = "Elixir Script"
 
-    override fun getDescription(): String = ExBundle.message("filetype.elixir.script.description")
+    override fun getDescription(): String = ExBundle.message("filetype.elixirScript.description")
 
     override fun getDefaultExtension(): String = "exs"
 
