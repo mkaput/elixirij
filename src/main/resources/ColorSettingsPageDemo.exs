@@ -22,7 +22,7 @@ defmodule MyModule do
     integer = 42
     float = 3.14
     hex = 0xFF
-    binary = 0b1010
+    bin = 0b1010
     char = ?a
     atom = :my_atom
     quoted_atom = :"quoted atom"
@@ -31,6 +31,7 @@ defmodule MyModule do
     list = [1, 2, 3]
     tuple = {1, 2, 3}
     map = %{key: "value"}
+    bitstring = <<1, 2, 3>>
   end
 
   def operators do
