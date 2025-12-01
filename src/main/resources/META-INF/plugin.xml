@@ -36,5 +36,11 @@
     <postStartupActivity implementation="dev.murek.elixirij.lsp.ExpertStartupActivity"/>
 
     <platform.lsp.serverSupportProvider implementation="dev.murek.elixirij.lsp.ExpertLspServerSupportProvider"/>
+
+    <projectConfigurable
+        parentId="language"
+        instance="dev.murek.elixirij.lsp.ExpertConfigurable"
+        id="dev.murek.elixirij.settings"
+        key="configurable.elixir.displayName"/>
   </extensions>
 </idea-plugin>

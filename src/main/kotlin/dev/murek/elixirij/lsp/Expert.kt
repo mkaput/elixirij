@@ -6,6 +6,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.platform.lsp.api.LspServerManager
 import kotlinx.coroutines.CoroutineScope
 import java.nio.file.Path
+import kotlin.io.path.Path
+import kotlin.io.path.exists
 
 /**
  * The entry-point interface for getting the Expert LS instance for a project.
@@ -17,6 +19,8 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
         fun getInstance(project: Project): Expert = project.service()
     }
 
+    private val settings = ExpertSettings.getInstance(project)
+
     /**
      * Get a ready to use Expert executable for this project, or `null` if none is available.
      *
@@ -24,13 +28,23 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
      * [checkUpdates] to let the user download and install Expert. All of this is wrapped in
      * [withCurrentExecutableOrRequestSetup] nicely.
      */
-    fun currentExecutable(): Path? = null
+    fun currentExecutable(): Path? {
+        return when (settings.mode) {
+            ExpertMode.DISABLED -> null
+            ExpertMode.AUTOMATIC -> null // TODO("We don't manage local Expert installs yet.")
+            ExpertMode.CUSTOM -> {
+                settings.customExecutablePath?.let { Path(it) }?.takeIf { it.exists() }
+            }
+        }
+    }
 
     /**
      * Trigger update check/fresh install if needed and permitted by the user for this project.
      */
     fun checkUpdates() {
-        // TODO: We don't manage local Expert installs yet.
+        if (settings.mode == ExpertMode.AUTOMATIC) {
+            // TODO("We don't manage local Expert installs yet.")1
+        }
     }
 
     /**
@@ -45,13 +59,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
             else -> block(executable)
         }
 
-    private fun restartLsp(stopAndRestart: Boolean = false) {
-        val providerClass = ExpertLspServerSupportProvider::class.java
-        val lspServerManager = LspServerManager.getInstance(project)
-        if (stopAndRestart) {
-            lspServerManager.stopAndRestartIfNeeded(providerClass)
-        } else {
-            lspServerManager.startServersIfNeeded(providerClass)
-        }
+    private fun onSettingsChange() {
+        LspServerManager.getInstance(project).stopAndRestartIfNeeded(ExpertLspServerSupportProvider::class.java)
     }
 }
