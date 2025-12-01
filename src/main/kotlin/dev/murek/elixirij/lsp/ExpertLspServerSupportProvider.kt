@@ -7,15 +7,18 @@ import com.intellij.platform.lsp.api.LspServerSupportProvider
 import com.intellij.platform.lsp.api.lsWidget.LspServerWidgetItem
 import dev.murek.elixirij.ExFileType
 import dev.murek.elixirij.ExIcons
+import dev.murek.elixirij.ExsFileType
 
 class ExpertLspServerSupportProvider : LspServerSupportProvider {
     override fun fileOpened(
         project: Project, file: VirtualFile, serverStarter: LspServerSupportProvider.LspServerStarter
     ) {
-        if (file.fileType == ExFileType) {
-            val expert = Expert.getInstance(project)
-            expert.withCurrentExecutableOrRequestSetup {
-                serverStarter.ensureServerStarted(ExpertLspServerDescriptor(project, it))
+        when (file.fileType) {
+            ExFileType, ExsFileType -> {
+                val expert = Expert.getInstance(project)
+                expert.withCurrentExecutableOrRequestSetup {
+                    serverStarter.ensureServerStarted(ExpertLspServerDescriptor(project, it))
+                }
             }
         }
     }
