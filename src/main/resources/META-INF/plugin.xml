@@ -19,7 +19,6 @@
     <fileType name="Elixir Script"
               implementationClass="dev.murek.elixirij.ExsFileType"
               fieldName="INSTANCE"
-              language="Elixir"
               extensions="exs"/>
 
     <lang.commenter language="Elixir"
