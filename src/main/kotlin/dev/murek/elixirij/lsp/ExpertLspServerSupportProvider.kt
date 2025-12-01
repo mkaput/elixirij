@@ -24,5 +24,5 @@ class ExpertLspServerSupportProvider : LspServerSupportProvider {
     }
 
     override fun createLspServerWidgetItem(lspServer: LspServer, currentFile: VirtualFile?): LspServerWidgetItem =
-        LspServerWidgetItem(lspServer, currentFile, ExIcons.FILE, "dev.murek.elixirij.settings")
+        LspServerWidgetItem(lspServer, currentFile, ExIcons.FILE, ExpertConfigurable::class.java)
 }
