@@ -13,14 +13,25 @@
               implementationClass="dev.murek.elixirij.ExFileType"
               fieldName="INSTANCE"
               language="Elixir"
-              extensions="ex;exs"
+              extensions="ex"
               hashBangs="elixir"/>
+
+    <fileType name="Elixir Script"
+              implementationClass="dev.murek.elixirij.ExsFileType"
+              fieldName="INSTANCE"
+              language="Elixir"
+              extensions="exs"/>
 
     <lang.commenter language="Elixir"
                     implementationClass="dev.murek.elixirij.commenter.ExCommenter"/>
 
     <lang.parserDefinition language="Elixir"
                            implementationClass="dev.murek.elixirij.parser.ExParserDefinition"/>
+
+    <lang.syntaxHighlighterFactory language="Elixir"
+                                   implementationClass="dev.murek.elixirij.highlighting.ExSyntaxHighlighter$Factory"/>
+
+    <colorSettingsPage implementation="dev.murek.elixirij.highlighting.ExColorSettingsPage"/>
 
     <postStartupActivity implementation="dev.murek.elixirij.lsp.ExpertStartupActivity"/>
 
