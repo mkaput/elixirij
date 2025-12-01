@@ -12,53 +12,37 @@ import com.intellij.psi.tree.IElementType
 import dev.murek.elixirij.lexer.ExLexer
 import dev.murek.elixirij.psi.*
 
-/**
- * Syntax highlighter for Elixir language.
- * Maps token types to text attributes for syntax highlighting.
- */
 class ExSyntaxHighlighter : SyntaxHighlighterBase() {
 
-    /**
-     * Factory for creating Elixir syntax highlighters.
-     */
     class Factory : SyntaxHighlighterFactory() {
-        override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): SyntaxHighlighter {
-            return ExSyntaxHighlighter()
-        }
+        override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): SyntaxHighlighter =
+            ExSyntaxHighlighter()
     }
 
     override fun getHighlightingLexer(): Lexer = ExLexer()
 
-    override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
-        return when {
-            tokenType in EX_COMMENTS -> pack(ExTextAttributes.COMMENT)
-            tokenType in EX_KEYWORDS -> pack(ExTextAttributes.KEYWORD)
-            tokenType in EX_STRINGS -> pack(ExTextAttributes.STRING)
-            tokenType in EX_NUMBERS -> pack(ExTextAttributes.NUMBER)
-            tokenType == EX_ATOM || tokenType == EX_ATOM_QUOTED -> pack(ExTextAttributes.ATOM)
-            tokenType == EX_ALIAS -> pack(ExTextAttributes.MODULE)
-            tokenType == EX_IDENTIFIER -> pack(ExTextAttributes.IDENTIFIER)
-            tokenType == EX_SIGIL -> pack(ExTextAttributes.SIGIL)
-            // Handle EX_AT before EX_OPERATORS since @ is used for module attributes in Elixir
-            tokenType == EX_AT -> pack(ExTextAttributes.MODULE_ATTRIBUTE)
-            tokenType in EX_OPERATORS -> pack(ExTextAttributes.OPERATOR)
-            tokenType in EX_CURLY_BRACES -> pack(ExTextAttributes.BRACES)
-            tokenType in EX_SQUARE_BRACKETS -> pack(ExTextAttributes.BRACKETS)
-            tokenType in EX_BINARY_DELIMITERS -> pack(ExTextAttributes.BINARY_DELIMITERS)
-            tokenType in EX_PARENTHESES -> pack(ExTextAttributes.PARENTHESES)
-            tokenType == EX_COMMA -> pack(ExTextAttributes.COMMA)
-            tokenType == EX_SEMICOLON -> pack(ExTextAttributes.SEMICOLON)
-            tokenType == EX_DOT -> pack(ExTextAttributes.DOT)
-            tokenType == TokenType.BAD_CHARACTER -> pack(ExTextAttributes.BAD_CHARACTER)
-            else -> EMPTY_KEYS
-        }
+    override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> = when (tokenType) {
+        in EX_COMMENTS -> pack(ExTextAttributes.COMMENT)
+        in EX_KEYWORDS -> pack(ExTextAttributes.KEYWORD)
+        in EX_STRINGS -> pack(ExTextAttributes.STRING)
+        in EX_NUMBERS -> pack(ExTextAttributes.NUMBER)
+        EX_ATOM, EX_ATOM_QUOTED -> pack(ExTextAttributes.ATOM)
+        EX_ALIAS -> pack(ExTextAttributes.MODULE)
+        EX_IDENTIFIER -> pack(ExTextAttributes.IDENTIFIER)
+        EX_SIGIL -> pack(ExTextAttributes.SIGIL)
+        // Handle EX_AT before EX_OPERATORS since @ is used for module attributes in Elixir
+        EX_AT -> pack(ExTextAttributes.MODULE_ATTRIBUTE)
+        in EX_OPERATORS -> pack(ExTextAttributes.OPERATOR)
+        in EX_BRACES -> pack(ExTextAttributes.BRACES)
+        in EX_BRACKETS -> pack(ExTextAttributes.BRACKETS)
+        in EX_BINARY_DELIMITERS -> pack(ExTextAttributes.BINARY_DELIMITERS)
+        in EX_PARENS -> pack(ExTextAttributes.PARENTHESES)
+        EX_COMMA -> pack(ExTextAttributes.COMMA)
+        EX_SEMICOLON -> pack(ExTextAttributes.SEMICOLON)
+        EX_DOT -> pack(ExTextAttributes.DOT)
+        TokenType.BAD_CHARACTER -> pack(ExTextAttributes.BAD_CHARACTER)
+        else -> emptyArray()
     }
 
-    private fun pack(attr: ExTextAttributes): Array<TextAttributesKey> {
-        return arrayOf(attr.attribute)
-    }
-
-    companion object {
-        private val EMPTY_KEYS = emptyArray<TextAttributesKey>()
-    }
+    private fun pack(attr: ExTextAttributes): Array<TextAttributesKey> = arrayOf(attr.attribute)
 }

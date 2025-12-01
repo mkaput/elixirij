@@ -71,7 +71,7 @@ enum class ExTextAttributes(
     BINARY_DELIMITERS(
         "ELIXIR_BINARY_DELIMITERS",
         DefaultLanguageHighlighterColors.BRACES,
-        ExBundle.messagePointer("color.settings.binary.delimiters")
+        ExBundle.messagePointer("color.settings.binaryDelimiters")
     ),
     PARENTHESES(
         "ELIXIR_PARENTHESES",
@@ -101,7 +101,7 @@ enum class ExTextAttributes(
     MODULE_ATTRIBUTE(
         "ELIXIR_MODULE_ATTRIBUTE",
         DefaultLanguageHighlighterColors.METADATA,
-        OptionsBundle.messagePointer("options.language.defaults.metadata")
+        ExBundle.messagePointer("color.settings.attribute")
     ),
     BAD_CHARACTER(
         "ELIXIR_BAD_CHARACTER",
