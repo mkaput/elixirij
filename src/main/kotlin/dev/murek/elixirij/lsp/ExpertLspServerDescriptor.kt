@@ -5,12 +5,14 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
 import dev.murek.elixirij.ExFileType
+import dev.murek.elixirij.ExsFileType
 import java.nio.file.Path
 
 class ExpertLspServerDescriptor(project: Project, private val executable: Path) :
     ProjectWideLspServerDescriptor(project, "Expert") {
 
-    override fun isSupportedFile(file: VirtualFile): Boolean = file.fileType == ExFileType
+    override fun isSupportedFile(file: VirtualFile): Boolean =
+        file.fileType == ExFileType || file.fileType == ExsFileType
 
     override fun createCommandLine(): GeneralCommandLine =
         GeneralCommandLine(executable.toString(), "--stdio").withWorkDirectory(project.basePath)

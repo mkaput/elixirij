@@ -50,7 +50,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
      */
     fun checkUpdates() {
         if (settings.mode == ExpertMode.AUTOMATIC) {
-            // TODO("We don't manage local Expert installs yet.")1
+            // TODO("We don't manage local Expert installs yet.")
         }
     }
 

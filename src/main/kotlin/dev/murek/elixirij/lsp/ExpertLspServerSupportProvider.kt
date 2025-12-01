@@ -24,6 +24,5 @@ class ExpertLspServerSupportProvider : LspServerSupportProvider {
     }
 
     override fun createLspServerWidgetItem(lspServer: LspServer, currentFile: VirtualFile?): LspServerWidgetItem =
-        // TODO: Link to Expert settings page when it'll be implemented.
         LspServerWidgetItem(lspServer, currentFile, ExIcons.FILE)
 }
