@@ -13,8 +13,14 @@
               implementationClass="dev.murek.elixirij.ExFileType"
               fieldName="INSTANCE"
               language="Elixir"
-              extensions="ex;exs"
+              extensions="ex"
               hashBangs="elixir"/>
+
+    <fileType name="Elixir Script"
+              implementationClass="dev.murek.elixirij.ExsFileType"
+              fieldName="INSTANCE"
+              language="Elixir"
+              extensions="exs"/>
 
     <lang.commenter language="Elixir"
                     implementationClass="dev.murek.elixirij.commenter.ExCommenter"/>
