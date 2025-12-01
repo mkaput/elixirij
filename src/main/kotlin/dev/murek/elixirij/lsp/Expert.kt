@@ -21,6 +21,13 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
 
     private val settings = ExpertSettings.getInstance(project)
 
+    init {
+        project.messageBus.connect(cs)
+            .subscribe(ExpertSettingsListener.TOPIC, ExpertSettingsListener {
+                onSettingsChange()
+            })
+    }
+
     /**
      * Get a ready to use Expert executable for this project, or `null` if none is available.
      *

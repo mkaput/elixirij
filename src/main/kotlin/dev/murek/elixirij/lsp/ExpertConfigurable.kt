@@ -49,6 +49,11 @@ class ExpertConfigurable(private val project: Project) : BoundConfigurable(
         }
     }
 
+    override fun apply() {
+        super.apply()
+        settings.fireSettingsChanged()
+    }
+
     override fun reset() {
         super.reset()
         modeProperty.set(settings.mode)

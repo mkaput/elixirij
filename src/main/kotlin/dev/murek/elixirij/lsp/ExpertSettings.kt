@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project
 
 @Service(Service.Level.PROJECT)
 @State(name = "ExpertSettings")
-class ExpertSettings : SimplePersistentStateComponent<ExpertSettings.State>(State()) {
+class ExpertSettings(private val project: Project) : SimplePersistentStateComponent<ExpertSettings.State>(State()) {
 
     class State : BaseState() {
         var mode by enum(ExpertMode.AUTOMATIC)
@@ -28,4 +28,15 @@ class ExpertSettings : SimplePersistentStateComponent<ExpertSettings.State>(Stat
         set(value) {
             state.customExecutablePath = value?.ifBlank { null }
         }
+
+    /**
+     * Notify all listeners that settings have changed.
+     *
+     * This should be called after settings are modified (e.g., in [ExpertConfigurable.apply]).
+     */
+    fun fireSettingsChanged() {
+        project.messageBus
+            .syncPublisher(ExpertSettingsListener.TOPIC)
+            .settingsChanged()
+    }
 }

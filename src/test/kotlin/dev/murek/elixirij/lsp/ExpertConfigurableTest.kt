@@ -180,6 +180,18 @@ class ExpertConfigurableTest : BasePlatformTestCase() {
         assertFalse("Not modified after changing back to original", configurable.isModified)
     }
 
+    fun `test apply notifies settings changed listeners`() {
+        var notified = false
+        project.messageBus.connect(testRootDisposable)
+            .subscribe(ExpertSettingsListener.TOPIC, ExpertSettingsListener { notified = true })
+
+        val configurable = createConfigurable()
+        configurable.createComponent()
+        configurable.apply()
+
+        assertTrue("Settings changed listener should be notified", notified)
+    }
+
     private fun isComponentOrParentVisible(component: JComponent): Boolean {
         var current: java.awt.Component? = component
         while (current != null) {
