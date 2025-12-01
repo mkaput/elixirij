@@ -21,5 +21,10 @@
 
     <lang.parserDefinition language="Elixir"
                            implementationClass="dev.murek.elixirij.parser.ExParserDefinition"/>
+
+    <lang.syntaxHighlighterFactory language="Elixir"
+                                   implementationClass="dev.murek.elixirij.highlighting.ExSyntaxHighlighter$Factory"/>
+
+    <colorSettingsPage implementation="dev.murek.elixirij.highlighting.ExColorSettingsPage"/>
   </extensions>
 </idea-plugin>
