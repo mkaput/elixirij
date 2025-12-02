@@ -17,7 +17,8 @@ This file provides step-by-step instructions for setting up the ElixirIJ develop
 
 1. **Clone and Navigate to Repository**
    ```bash
-   cd /home/runner/work/elixirij/elixirij
+   git clone https://github.com/mkaput/elixirij.git
+   cd elixirij
    ```
 
 2. **Verify Gradle Wrapper**
