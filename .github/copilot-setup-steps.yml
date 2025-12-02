@@ -1,0 +1,27 @@
+# GitHub Copilot setup steps for ElixirIJ development environment
+# This file prepares a fully working development environment for the coding agent
+# Documentation: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/customize-the-agent-environment
+
+steps:
+  # Set up Java Development Kit (JDK) 21
+  # Required by the project (see gradle.properties and build.gradle.kts)
+  - name: Setup Java
+    uses: actions/setup-java@v5
+    with:
+      distribution: zulu
+      java-version: 21
+
+  # Set up Gradle build tool
+  # This project uses Gradle 9.2.1 (see gradle.properties)
+  - name: Setup Gradle
+    uses: gradle/actions/setup-gradle@v5
+
+  # Generate the Elixir lexer from JFlex grammar file
+  # The lexer is required before compilation and is generated from src/main/grammars/Elixir.flex
+  - name: Generate Elixir Lexer
+    run: ./gradlew generateElixirLexer
+
+  # Build the plugin to ensure all dependencies are resolved
+  # This will download IntelliJ Platform SDK and all required dependencies
+  - name: Build Plugin
+    run: ./gradlew buildPlugin
