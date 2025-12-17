@@ -1,4 +1,4 @@
-package dev.murek.elixirij.highlighting
+package dev.murek.elixirij.ide.highlighting
 
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighter

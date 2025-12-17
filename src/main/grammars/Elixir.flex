@@ -1,8 +1,8 @@
-package dev.murek.elixirij.lexer;
+package dev.murek.elixirij.lang;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import static dev.murek.elixirij.psi.ElementTypes.*;
+import static dev.murek.elixirij.lang.ElementTypes.*;
 
 %%
 
@@ -57,7 +57,7 @@ ATOM_HEAD={LOWERCASE}{IDENTIFIER_TAIL}
 // Comments
 COMMENT=#[^\r\n]*
 
-// Sigil prefixes  
+// Sigil prefixes
 SIGIL_START=\~[a-zA-Z]
 
 %%
@@ -66,10 +66,10 @@ SIGIL_START=\~[a-zA-Z]
     // Whitespace
     {HORIZONTAL_SPACE}+                { return WHITE_SPACE; }
     {EOL_CHAR}                         { return EX_EOL; }
-    
+
     // Comments
     {COMMENT}                          { return EX_COMMENT; }
-    
+
     // Keywords (must come before identifiers)
     "true"                             { return EX_TRUE; }
     "false"                            { return EX_FALSE; }
@@ -86,7 +86,7 @@ SIGIL_START=\~[a-zA-Z]
     "not"                              { return EX_NOT; }
     "and"                              { return EX_AND; }
     "or"                               { return EX_OR; }
-    
+
     // Three-character operators (must come before two-character)
     "==="                              { return EX_EQ_EQ_EQ; }
     "!=="                              { return EX_NOT_EQ_EQ; }
@@ -102,7 +102,7 @@ SIGIL_START=\~[a-zA-Z]
     "&&&"                              { return EX_AMP_AMP_AMP; }
     "|||"                              { return EX_PIPE_PIPE_PIPE; }
     "..//"                             { return EX_DOT_DOT_SLASH_SLASH; }
-    
+
     // Two-character operators
     "=="                               { return EX_EQ_EQ; }
     "!="                               { return EX_NOT_EQ; }
@@ -128,7 +128,7 @@ SIGIL_START=\~[a-zA-Z]
     "<<"                               { return EX_LT_LT; }
     ">>"                               { return EX_GT_GT; }
     "%{"                               { return EX_PERCENT_LBRACE; }
-    
+
     // Single-character operators
     "@"                                { return EX_AT; }
     "!"                                { return EX_EXCLAMATION; }
@@ -143,7 +143,7 @@ SIGIL_START=\~[a-zA-Z]
     "<"                                { return EX_LT; }
     ">"                                { return EX_GT; }
     "|"                                { return EX_PIPE; }
-    
+
     // Delimiters
     "("                                { return EX_LPAREN; }
     ")"                                { return EX_RPAREN; }
@@ -151,14 +151,14 @@ SIGIL_START=\~[a-zA-Z]
     "]"                                { return EX_RBRACKET; }
     "{"                                { return EX_LBRACE; }
     "}"                                { return EX_RBRACE; }
-    
+
     // Punctuation
     "."                                { return EX_DOT; }
     ","                                { return EX_COMMA; }
     ":"                                { return EX_COLON; }
     ";"                                { return EX_SEMICOLON; }
     "%"                                { return EX_PERCENT; }
-    
+
     // Char literals - escape sequences
     "?\\n"                             { return EX_CHAR; }
     "?\\r"                             { return EX_CHAR; }
@@ -169,11 +169,11 @@ SIGIL_START=\~[a-zA-Z]
     "?\\?"                             { return EX_CHAR; }
     // Char literals - regular
     "?"[^\s]                           { return EX_CHAR; }
-    
+
     // Numbers
     {FLOAT_LITERAL}                    { return EX_FLOAT; }
     {INTEGER}                          { return EX_INTEGER; }
-    
+
     // Atoms - operator atoms
     ":..."                             { return EX_ATOM; }
     ":.."                              { return EX_ATOM; }
@@ -197,12 +197,12 @@ SIGIL_START=\~[a-zA-Z]
     ":>"                               { return EX_ATOM; }
     ":="                               { return EX_ATOM; }
     ":&&"                              { return EX_ATOM; }
-    // Atoms - keyword atoms  
+    // Atoms - keyword atoms
     ":" {ATOM_HEAD}                    { return EX_ATOM; }
     // Atoms - quoted
     ":\"" [^\"]* "\""                  { return EX_ATOM_QUOTED; }
     ":\'" [^\']* "\'"                  { return EX_ATOM_QUOTED; }
-    
+
     // Sigils - heredocs first
     {SIGIL_START} "\"\"\"" ~"\"\"\""   { return EX_SIGIL; }
     {SIGIL_START} "\'\'\'" ~"\'\'\'"   { return EX_SIGIL; }
@@ -215,19 +215,19 @@ SIGIL_START=\~[a-zA-Z]
     {SIGIL_START} "[" [^\]]* "]"       { return EX_SIGIL; }
     {SIGIL_START} "{" [^}]* "}"        { return EX_SIGIL; }
     {SIGIL_START} "<" [^>]* ">"        { return EX_SIGIL; }
-    
+
     // Strings - heredocs must be before regular strings
     "\"\"\"" ~"\"\"\""                 { return EX_HEREDOC; }
     "\'\'\'" ~"\'\'\'"                 { return EX_CHARLIST_HEREDOC; }
-    
+
     // Strings - regular (simplified - handle escape sequences inside)
     "\"" ([^\\\"] | "\\" .)* "\""      { return EX_STRING; }
     "\'" ([^\\\'] | "\\" .)* "\'"      { return EX_CHARLIST; }
-    
+
     // Identifiers and aliases
     {ALIAS}                            { return EX_ALIAS; }
     {IDENTIFIER}                       { return EX_IDENTIFIER; }
-    
+
     // Catch all bad characters
     [^]                                { return BAD_CHARACTER; }
 }

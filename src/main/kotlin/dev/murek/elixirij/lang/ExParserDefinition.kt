@@ -1,4 +1,4 @@
-package dev.murek.elixirij.parser
+package dev.murek.elixirij.lang
 
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition
@@ -11,10 +11,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
 import dev.murek.elixirij.ExLanguage
-import dev.murek.elixirij.lexer.ExLexer
-import dev.murek.elixirij.psi.EX_COMMENTS
-import dev.murek.elixirij.psi.EX_STRINGS
-import dev.murek.elixirij.psi.ExFile
 
 private val FILE = IFileElementType(ExLanguage)
 

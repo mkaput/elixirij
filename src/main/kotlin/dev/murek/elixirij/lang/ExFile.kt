@@ -1,10 +1,10 @@
-package dev.murek.elixirij.psi
+package dev.murek.elixirij.lang
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.psi.FileViewProvider
 import dev.murek.elixirij.ExBundle
-import dev.murek.elixirij.ExFileType
+import dev.murek.elixirij.lang.ExFileType
 import dev.murek.elixirij.ExLanguage
 
 /**

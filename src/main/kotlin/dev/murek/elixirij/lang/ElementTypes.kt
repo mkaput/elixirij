@@ -1,6 +1,6 @@
 @file:JvmName("ElementTypes")
 
-package dev.murek.elixirij.psi
+package dev.murek.elixirij.lang
 
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
