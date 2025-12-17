@@ -16,12 +16,8 @@ steps:
   - name: Setup Gradle
     uses: gradle/actions/setup-gradle@v5
 
-  # Generate the Elixir lexer from JFlex grammar file
-  # The lexer is required before compilation and is generated from src/main/grammars/Elixir.flex
-  - name: Generate Elixir Lexer
-    run: ./gradlew generateElixirLexer
-
   # Build the plugin to ensure all dependencies are resolved
   # This will download IntelliJ Platform SDK and all required dependencies
+  # Note: Lexer generation is automatically handled by the build process
   - name: Build Plugin
     run: ./gradlew buildPlugin
