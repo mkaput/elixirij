@@ -3,7 +3,6 @@ package dev.murek.elixirij.lsp
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.platform.lsp.api.LspServerManager
 import kotlinx.coroutines.CoroutineScope
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -19,14 +18,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
         fun getInstance(project: Project): Expert = project.service()
     }
 
-    private val settings = ExpertSettings.getInstance(project)
-
-    init {
-        project.messageBus.connect(cs)
-            .subscribe(ExpertSettingsListener.TOPIC, ExpertSettingsListener {
-                onSettingsChange()
-            })
-    }
+    private val settings = ExLspSettings.getInstance(project)
 
     /**
      * Get a ready to use Expert executable for this project, or `null` if none is available.
@@ -36,11 +28,11 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
      * [withCurrentExecutableOrRequestSetup] nicely.
      */
     fun currentExecutable(): Path? {
-        return when (settings.mode) {
+        return when (settings.expertMode) {
             ExpertMode.DISABLED -> null
             ExpertMode.AUTOMATIC -> null // TODO("We don't manage local Expert installs yet.")
             ExpertMode.CUSTOM -> {
-                settings.customExecutablePath?.let { Path(it) }?.takeIf { it.exists() }
+                settings.expertCustomExecutablePath?.let { Path(it) }?.takeIf { it.exists() }
             }
         }
     }
@@ -49,7 +41,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
      * Trigger update check/fresh install if needed and permitted by the user for this project.
      */
     fun checkUpdates() {
-        if (settings.mode == ExpertMode.AUTOMATIC) {
+        if (settings.expertMode == ExpertMode.AUTOMATIC) {
             // TODO("We don't manage local Expert installs yet.")
         }
     }
@@ -65,8 +57,4 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
             null -> checkUpdates().let { null }
             else -> block(executable)
         }
-
-    private fun onSettingsChange() {
-        LspServerManager.getInstance(project).stopAndRestartIfNeeded(ExpertLspServerSupportProvider::class.java)
-    }
 }

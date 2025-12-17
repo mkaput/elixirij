@@ -5,10 +5,11 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServer
 import com.intellij.platform.lsp.api.LspServerSupportProvider
 import com.intellij.platform.lsp.api.lsWidget.LspServerWidgetItem
+import dev.murek.elixirij.ExConfigurable
 import dev.murek.elixirij.ExIcons
 import dev.murek.elixirij.lang.isElixir
 
-class ExpertLspServerSupportProvider : LspServerSupportProvider {
+class ExLspServerSupportProvider : LspServerSupportProvider {
     override fun fileOpened(
         project: Project, file: VirtualFile, serverStarter: LspServerSupportProvider.LspServerStarter
     ) {
@@ -21,5 +22,5 @@ class ExpertLspServerSupportProvider : LspServerSupportProvider {
     }
 
     override fun createLspServerWidgetItem(lspServer: LspServer, currentFile: VirtualFile?): LspServerWidgetItem =
-        LspServerWidgetItem(lspServer, currentFile, ExIcons.FILE, ExpertConfigurable::class.java)
+        LspServerWidgetItem(lspServer, currentFile, ExIcons.FILE, ExConfigurable::class.java)
 }
