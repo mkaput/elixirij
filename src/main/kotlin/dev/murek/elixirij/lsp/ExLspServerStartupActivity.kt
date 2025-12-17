@@ -5,9 +5,9 @@ import com.intellij.openapi.startup.ProjectActivity
 
 
 /**
- * Startup activity to check and download the Expert language server if needed.
+ * Startup activity to check and download Elixir language servers if needed.
  */
-class ExpertStartupActivity : ProjectActivity {
+class ExLspServerStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
         Expert.getInstance(project).checkUpdates()
     }

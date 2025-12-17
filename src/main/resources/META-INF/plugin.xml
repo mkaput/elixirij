@@ -32,13 +32,13 @@
 
     <colorSettingsPage implementation="dev.murek.elixirij.ide.highlighting.ExColorSettingsPage"/>
 
-    <postStartupActivity implementation="dev.murek.elixirij.lsp.ExpertStartupActivity"/>
+    <postStartupActivity implementation="dev.murek.elixirij.lsp.ExLspServerStartupActivity"/>
 
-    <platform.lsp.serverSupportProvider implementation="dev.murek.elixirij.lsp.ExpertLspServerSupportProvider"/>
+    <platform.lsp.serverSupportProvider implementation="dev.murek.elixirij.lsp.ExLspServerSupportProvider"/>
 
     <projectConfigurable
       parentId="language"
-      instance="dev.murek.elixirij.lsp.ExpertConfigurable"
+      instance="dev.murek.elixirij.ExConfigurable"
       id="dev.murek.elixirij.settings"
       key="configurable.elixir.displayName"/>
   </extensions>
