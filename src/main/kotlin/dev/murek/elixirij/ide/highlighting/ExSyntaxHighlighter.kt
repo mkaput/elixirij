@@ -1,4 +1,4 @@
-package dev.murek.elixirij.highlighting
+package dev.murek.elixirij.ide.highlighting
 
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.colors.TextAttributesKey
@@ -9,8 +9,25 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
-import dev.murek.elixirij.lexer.ExLexer
-import dev.murek.elixirij.psi.*
+import dev.murek.elixirij.lang.EX_ALIAS
+import dev.murek.elixirij.lang.EX_AT
+import dev.murek.elixirij.lang.EX_ATOM
+import dev.murek.elixirij.lang.EX_ATOM_QUOTED
+import dev.murek.elixirij.lang.EX_BINARY_DELIMITERS
+import dev.murek.elixirij.lang.EX_BRACES
+import dev.murek.elixirij.lang.EX_BRACKETS
+import dev.murek.elixirij.lang.EX_COMMA
+import dev.murek.elixirij.lang.EX_COMMENTS
+import dev.murek.elixirij.lang.EX_DOT
+import dev.murek.elixirij.lang.EX_IDENTIFIER
+import dev.murek.elixirij.lang.EX_KEYWORDS
+import dev.murek.elixirij.lang.EX_NUMBERS
+import dev.murek.elixirij.lang.EX_OPERATORS
+import dev.murek.elixirij.lang.EX_PARENS
+import dev.murek.elixirij.lang.EX_SEMICOLON
+import dev.murek.elixirij.lang.EX_SIGIL
+import dev.murek.elixirij.lang.EX_STRINGS
+import dev.murek.elixirij.lang.ExLexer
 
 class ExSyntaxHighlighter : SyntaxHighlighterBase() {
 

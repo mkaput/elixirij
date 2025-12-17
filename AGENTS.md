@@ -25,7 +25,7 @@ We target the latest and greatest platform version and modern Elixir language co
 ./gradlew check
 
 # Run single test
-./gradlew test --tests "dev.murek.elixirij.lexer.ExLexerTest.testIntegerLiterals"
+./gradlew test --tests "dev.murek.elixirij.lang.ExLexerTest.testIntegerLiterals"
 
 # Format code
 # This project uses .editorconfig for code style conventions.

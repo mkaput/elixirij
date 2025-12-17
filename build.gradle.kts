@@ -142,7 +142,7 @@ tasks {
 // Configure JFlex lexer generation
 val generateElixirLexer = tasks.register<GenerateLexerTask>("generateElixirLexer") {
     sourceFile.set(file("src/main/grammars/Elixir.flex"))
-    targetOutputDir.set(file("src/gen/dev/murek/elixirij/lexer"))
+    targetOutputDir.set(file("src/gen/dev/murek/elixirij/lang"))
     purgeOldFiles.set(true)
 }
 

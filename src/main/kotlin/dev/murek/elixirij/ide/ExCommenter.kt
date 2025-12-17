@@ -1,4 +1,4 @@
-package dev.murek.elixirij.commenter
+package dev.murek.elixirij.ide
 
 import com.intellij.lang.Commenter
 

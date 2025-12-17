@@ -1,4 +1,4 @@
-package dev.murek.elixirij.lexer
+package dev.murek.elixirij.lang
 
 import com.intellij.lexer.FlexAdapter
 
