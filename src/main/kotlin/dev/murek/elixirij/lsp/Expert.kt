@@ -22,10 +22,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
+import java.nio.file.attribute.FileTime
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.io.path.Path
-import kotlin.io.path.div
-import kotlin.io.path.exists
+import kotlin.io.path.*
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.ExperimentalTime
+import kotlin.time.toKotlinInstant
 
 private val LOG = logger<Expert>()
 
@@ -40,7 +44,9 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
     }
 
     private val settings = ExLspSettings.getInstance(project)
+
     private val downloading = AtomicBoolean(false)
+    val isDownloading: Boolean get() = downloading.get()
 
     override fun ensureServerStarted(serverStarter: LspServerSupportProvider.LspServerStarter) {
         val executable = currentExecutable()
@@ -60,10 +66,29 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
 
     override fun checkUpdates() {
         if (settings.expertMode == ExpertMode.AUTOMATIC) {
-            if (currentExecutable() == null) {
+            val path = getDownloadedBinaryPath()
+            if (isStale(path)) {
                 downloadExecutable()
             }
         }
+    }
+
+    /**
+     * Deletes the cached Expert executable.
+     */
+    fun deleteCachedExecutable() {
+        Files.deleteIfExists(getDownloadedBinaryPath())
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun isStale(path: Path): Boolean {
+        if (!path.exists()) {
+            return true
+        }
+
+        val lastModified = path.getLastModifiedTime().toInstant().toKotlinInstant()
+        val age = Clock.System.now() - lastModified
+        return age > 24.hours
     }
 
     private fun downloadExecutable() {
@@ -87,17 +112,38 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
 
                 val url = "https://github.com/elixir-lang/expert/releases/download/nightly/$assetName"
                 val destination = getDownloadedBinaryPath()
+                val isUpdate = destination.exists()
 
                 withBackgroundProgress(project, ExBundle.message("lsp.expert.download.task.title")) {
                     withContext(Dispatchers.IO) {
                         Files.createDirectories(destination.parent)
-                        HttpRequests.request(url).saveToFile(destination, null)
+                        HttpRequests.request(url).connect { request ->
+                            val remoteLastModified = request.connection.lastModified
+                            if (isUpdate && remoteLastModified != 0L) {
+                                val localLastModified = Files.getLastModifiedTime(destination).toMillis()
+                                if (remoteLastModified == localLastModified) {
+                                    LOG.info("expert is up to date (timestamp: $remoteLastModified)")
+                                    return@connect
+                                }
+                            }
 
-                        if (!SystemInfo.isWindows) {
-                            destination.toFile().setExecutable(true)
+                            request.saveToFile(destination, null)
+                            if (!SystemInfo.isWindows) {
+                                destination.toFile().setExecutable(true)
+                            }
+                            if (remoteLastModified != 0L) {
+                                Files.setLastModifiedTime(destination, FileTime.fromMillis(remoteLastModified))
+                            }
                         }
                     }
                 }
+
+                @Suppress("DialogTitleCapitalization") NotificationGroupManager.getInstance()
+                    .getNotificationGroup("ElixirIJ").createNotification(
+                        title = ExBundle.message("lsp.expert.download.task.title"),
+                        content = ExBundle.message("lsp.expert.download.updated"),
+                        type = NotificationType.INFORMATION
+                    ).notify(project)
 
                 LspServerManager.getInstance(project).stopAndRestartIfNeeded(ExLspServerSupportProvider::class.java)
             } catch (e: Throwable) {
