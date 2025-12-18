@@ -7,7 +7,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.coroutineToIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.platform.ide.progress.withBackgroundProgress
@@ -18,9 +18,7 @@ import com.intellij.util.system.CpuArch
 import com.intellij.util.system.OS
 import dev.murek.elixirij.ExBundle
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.FileTime
@@ -119,7 +117,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
                 val isUpdate = destination.exists()
 
                 withBackgroundProgress(project, ExBundle.message("lsp.expert.download.task.title")) {
-                    withContext(Dispatchers.IO) {
+                    coroutineToIndicator { indicator ->
                         Files.createDirectories(destination.parent)
                         HttpRequests.request(url).connect { request ->
                             val remoteLastModified = request.connection.lastModified
@@ -131,7 +129,8 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
                                 }
                             }
 
-                            request.saveToFile(destination, ProgressManager.getGlobalProgressIndicator())
+                            request.saveToFile(destination, indicator)
+
                             if (!SystemInfo.isWindows) {
                                 destination.toFile().setExecutable(true)
                             }
