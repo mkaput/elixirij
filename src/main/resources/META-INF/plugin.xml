@@ -41,5 +41,7 @@
       instance="dev.murek.elixirij.ExConfigurable"
       id="dev.murek.elixirij.settings"
       key="configurable.elixir.displayName"/>
+
+    <notificationGroup id="ElixirIJ" displayType="BALLOON" key="notification.group.elixirij"/>
   </extensions>
 </idea-plugin>
