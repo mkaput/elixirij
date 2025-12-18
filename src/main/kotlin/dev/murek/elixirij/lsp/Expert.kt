@@ -7,6 +7,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.platform.ide.progress.withBackgroundProgress
@@ -22,10 +23,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.FileTime
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.io.path.*
+import kotlin.io.path.Path
+import kotlin.io.path.div
+import kotlin.io.path.exists
+import kotlin.io.path.getLastModifiedTime
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
@@ -51,6 +54,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
     override fun ensureServerStarted(serverStarter: LspServerSupportProvider.LspServerStarter) {
         val executable = currentExecutable()
         check(executable != null)
+        LOG.info("Starting Expert from $executable")
         serverStarter.ensureServerStarted(ExpertLspServerDescriptor(project, executable))
     }
 
@@ -98,7 +102,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
             try {
                 val assetName = getAssetName()
                 if (assetName == null) {
-                    LOG.warn("expert is unsupported on this platform: ${OS.CURRENT} ${CpuArch.CURRENT}, skipping download")
+                    LOG.warn("Expert is unsupported on this platform: ${OS.CURRENT} ${CpuArch.CURRENT}, skipping download")
 
                     @Suppress("DialogTitleCapitalization") NotificationGroupManager.getInstance()
                         .getNotificationGroup("ElixirIJ").createNotification(
@@ -122,12 +126,12 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
                             if (isUpdate && remoteLastModified != 0L) {
                                 val localLastModified = Files.getLastModifiedTime(destination).toMillis()
                                 if (remoteLastModified == localLastModified) {
-                                    LOG.info("expert is up to date (timestamp: $remoteLastModified)")
+                                    LOG.info("Expert is up to date (timestamp: $remoteLastModified)")
                                     return@connect
                                 }
                             }
 
-                            request.saveToFile(destination, null)
+                            request.saveToFile(destination, ProgressManager.getGlobalProgressIndicator())
                             if (!SystemInfo.isWindows) {
                                 destination.toFile().setExecutable(true)
                             }
@@ -147,7 +151,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
 
                 LspServerManager.getInstance(project).stopAndRestartIfNeeded(ExLspServerSupportProvider::class.java)
             } catch (e: Throwable) {
-                thisLogger().error("failed to download expert", e)
+                thisLogger().error("Failed to download expert", e)
 
             } finally {
                 downloading.set(false)
@@ -156,7 +160,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
     }
 
     private fun getDownloadedBinaryPath(): Path =
-        PathManager.getCommonDataPath() / "elixirij" / "expert" / (getAssetName() ?: "expert_unknown_unknown")
+        PathManager.getSystemDir() / "elixirij" / "expert" / (getAssetName() ?: "expert_unknown_unknown")
 
     private fun getAssetName(): String? {
         val arch = when (CpuArch.CURRENT) {
