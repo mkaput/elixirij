@@ -56,14 +56,9 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
         serverStarter.ensureServerStarted(ExpertLspServerDescriptor(project, executable))
     }
 
-    override fun currentExecutable(): Path? {
-        return when (settings.expertMode) {
-            ExpertMode.DISABLED -> null
-            ExpertMode.AUTOMATIC -> getDownloadedBinaryPath().takeIf { it.exists() }
-            ExpertMode.CUSTOM -> {
-                settings.expertCustomExecutablePath?.let { Path(it) }?.takeIf { it.exists() }
-            }
-        }
+    override fun currentExecutable(): Path? = when (settings.expertMode) {
+        ExpertMode.AUTOMATIC -> getDownloadedBinaryPath().takeIf { it.exists() }
+        ExpertMode.CUSTOM -> settings.expertCustomExecutablePath?.let { Path(it) }?.takeIf { it.exists() }
     }
 
     override fun checkUpdates() {

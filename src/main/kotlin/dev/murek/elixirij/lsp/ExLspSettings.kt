@@ -3,13 +3,16 @@ package dev.murek.elixirij.lsp
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
 
-enum class ExpertMode { DISABLED, AUTOMATIC, CUSTOM }
+enum class CodeIntelligenceService { EXPERT, NONE }
+
+enum class ExpertMode { AUTOMATIC, CUSTOM }
 
 @Service(Service.Level.PROJECT)
 @State(name = "ExLspServerSettings")
 class ExLspSettings : SimplePersistentStateComponent<ExLspSettings.State>(State()) {
 
     class State : BaseState() {
+        var codeIntelligenceService by enum(CodeIntelligenceService.EXPERT)
         var expertMode by enum(ExpertMode.AUTOMATIC)
         var expertCustomExecutablePath by string()
     }
@@ -18,6 +21,12 @@ class ExLspSettings : SimplePersistentStateComponent<ExLspSettings.State>(State(
         @JvmStatic
         fun getInstance(project: Project): ExLspSettings = project.service()
     }
+
+    var codeIntelligenceService: CodeIntelligenceService
+        get() = state.codeIntelligenceService
+        set(value) {
+            state.codeIntelligenceService = value
+        }
 
     var expertMode: ExpertMode
         get() = state.expertMode

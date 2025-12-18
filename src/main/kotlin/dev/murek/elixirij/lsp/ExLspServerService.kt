@@ -29,6 +29,10 @@ interface ExLspServerService {
     fun checkUpdates()
 
     companion object {
-        fun getConfiguredServiceInstance(project: Project): ExLspServerService = Expert.getInstance(project)
+        fun getConfiguredServiceInstance(project: Project): ExLspServerService =
+            when (ExLspSettings.getInstance(project).codeIntelligenceService) {
+                CodeIntelligenceService.NONE -> NoCodeIntelligenceService
+                CodeIntelligenceService.EXPERT -> Expert.getInstance(project)
+            }
     }
 }
