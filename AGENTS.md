@@ -34,4 +34,9 @@ We target the latest and greatest platform version and modern Elixir language co
 
 # Run inspections
 ./gradlew qodanaScan
+
+# Extract IntelliJ Platform sources
+# Use this when you need to read through IntelliJ Platform sources
+# Extracts sources to .intellijPlatform/sources and prints the path
+./bin/intellij-platform-src
 ```

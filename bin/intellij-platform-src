@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# IntelliJ Platform Source Extractor
+# Extracts IntelliJ Platform sources from Gradle cache to .intellijPlatform/sources
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+OUTPUT_DIR="$PROJECT_ROOT/.intellijPlatform/sources"
+
+# Get platform version from gradle.properties
+PLATFORM_VERSION=$(grep '^platformVersion=' "$PROJECT_ROOT/gradle.properties" | cut -d'=' -f2)
+
+if [ -z "$PLATFORM_VERSION" ]; then
+    echo "Error: Could not find platformVersion in gradle.properties" >&2
+    exit 1
+fi
+
+echo "Looking for IntelliJ Platform $PLATFORM_VERSION sources..." >&2
+
+# Find the sources JAR in Gradle cache
+SOURCES_JAR=$(find ~/.gradle/caches/modules-2/files-2.1 -type f -name "idea-${PLATFORM_VERSION}-sources.jar" 2>/dev/null | head -n 1)
+
+if [ -z "$SOURCES_JAR" ]; then
+    echo "Error: Could not find idea-${PLATFORM_VERSION}-sources.jar in Gradle cache" >&2
+    echo "Hint: Run './gradlew buildPlugin' first to download dependencies" >&2
+    exit 1
+fi
+
+echo "Found sources JAR: $SOURCES_JAR" >&2
+
+# Remove existing extraction if present
+if [ -d "$OUTPUT_DIR" ]; then
+    echo "Removing existing extraction at $OUTPUT_DIR..." >&2
+    rm -rf "$OUTPUT_DIR"
+fi
+
+# Create output directory
+echo "Creating output directory..." >&2
+mkdir -p "$OUTPUT_DIR"
+
+# Extract sources
+echo "Extracting sources to $OUTPUT_DIR..." >&2
+cd "$OUTPUT_DIR"
+if ! jar xf "$SOURCES_JAR" 2>&1 | sed 's/^/  /' >&2; then
+    echo "Error: Failed to extract sources" >&2
+    exit 1
+fi
+
+echo "Successfully extracted IntelliJ Platform sources" >&2
+
+# Print the absolute path to stdout (this is the main output)
+echo "$OUTPUT_DIR"
