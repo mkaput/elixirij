@@ -8,7 +8,7 @@ enum class CodeIntelligenceService { EXPERT, NONE }
 enum class ExpertMode { AUTOMATIC, CUSTOM }
 
 @Service(Service.Level.PROJECT)
-@State(name = "ExLspServerSettings")
+@State(name = "ExLspServerSettings", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
 class ExLspSettings : SimplePersistentStateComponent<ExLspSettings.State>(State()) {
 
     class State : BaseState() {
