@@ -5,5 +5,6 @@
 .junie
 .kotlin
 .qodana
+.refs
 build
 src/gen
