@@ -8,6 +8,7 @@ import com.intellij.platform.lsp.api.LspServerManager
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.listCellRenderer.textListCellRenderer
 import dev.murek.elixirij.lsp.CodeIntelligenceService
+import dev.murek.elixirij.lsp.ElixirLSMode
 import dev.murek.elixirij.lsp.ExLspServerSupportProvider
 import dev.murek.elixirij.lsp.ExLspSettings
 import dev.murek.elixirij.lsp.ExpertMode
@@ -24,6 +25,7 @@ class ExConfigurable(private val project: Project) : BoundConfigurable(
                     when (it) {
                         null -> null
                         CodeIntelligenceService.EXPERT -> ExBundle.message("configurable.codeIntelligenceService.expert")
+                        CodeIntelligenceService.ELIXIR_LS -> ExBundle.message("configurable.codeIntelligenceService.elixirls")
                         CodeIntelligenceService.NONE -> ExBundle.message("configurable.codeIntelligenceService.none")
                     }
                 }).bindItem(lspSettings::codeIntelligenceService.toMutableProperty().toNullableProperty())
@@ -44,6 +46,24 @@ class ExConfigurable(private val project: Project) : BoundConfigurable(
                     FileChooserDescriptorFactory.createSingleFileOrExecutableAppDescriptor()
                         .withTitle(ExBundle.message("configurable.expert.customPath.browseTitle")), project
                 ).bindText(lspSettings::expertCustomExecutablePath.toNonNullableProperty("")).align(AlignX.FILL)
+            }
+        }
+
+        group(ExBundle.message("configurable.elixirls.group.title")) {
+            buttonsGroup {
+                row {
+                    radioButton(ExBundle.message("configurable.elixirls.mode.automatic"), ElixirLSMode.AUTOMATIC)
+                }
+                row {
+                    radioButton(ExBundle.message("configurable.elixirls.mode.custom"), ElixirLSMode.CUSTOM)
+                }
+            }.bind(lspSettings::elixirLSMode)
+
+            row(ExBundle.message("configurable.elixirls.customPath.label")) {
+                textFieldWithBrowseButton(
+                    FileChooserDescriptorFactory.createSingleFileOrExecutableAppDescriptor()
+                        .withTitle(ExBundle.message("configurable.elixirls.customPath.browseTitle")), project
+                ).bindText(lspSettings::elixirLSCustomExecutablePath.toNonNullableProperty("")).align(AlignX.FILL)
             }
         }
     }
