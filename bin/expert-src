@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ElixirLS Source Cloner
-# Clones elixir-lsp/elixir-ls repository to .refs/elixir-ls
+# Expert Source Cloner
+# Clones elixir-lang/expert repository to .refs/expert
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-OUTPUT_DIR="$PROJECT_ROOT/.refs/elixir-ls"
-REPO_URL="https://github.com/elixir-lsp/elixir-ls.git"
+OUTPUT_DIR="$PROJECT_ROOT/.refs/expert"
+REPO_URL="https://github.com/elixir-lang/expert.git"
 
 # If already cloned then just print the output and quit.
 if [ -d "$OUTPUT_DIR" ]; then
@@ -16,18 +16,18 @@ if [ -d "$OUTPUT_DIR" ]; then
     exit 0
 fi
 
-echo "Cloning ElixirLS source repository..." >&2
+echo "Cloning Expert source repository..." >&2
 
 # Create .refs directory if it doesn't exist
 mkdir -p "$(dirname "$OUTPUT_DIR")"
 
 # Clone the repository
 if ! git clone "$REPO_URL" "$OUTPUT_DIR" 2>&1 | sed 's/^/  /' >&2; then
-    echo "Error: Failed to clone ElixirLS repository" >&2
+    echo "Error: Failed to clone Expert repository" >&2
     exit 1
 fi
 
-echo "Successfully cloned ElixirLS source repository" >&2
+echo "Successfully cloned Expert source repository" >&2
 
 # Print the absolute path to stdout (this is the main output)
 echo "$OUTPUT_DIR"

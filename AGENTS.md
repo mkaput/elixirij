@@ -37,21 +37,17 @@ We target the latest and greatest platform version and modern Elixir language co
 
 # Extract IntelliJ Platform sources
 # Use this when you need to read through IntelliJ Platform sources
-# Extracts sources to .refs/intellij-platform and prints the path
 ./bin/intellij-platform-src
 
 # Clone Elixir language source repository
 # Use this when you need to read through Elixir source code
-# Clones elixir-lang/elixir to .refs/elixir and prints the path
 ./bin/elixir-src
 
-# Clone ElixirLS source repository
-# Use this when you need to read through ElixirLS source code
-# Clones elixir-lsp/elixir-ls to .refs/elixir-ls and prints the path
+# Clone Expert source repository
+# Use this when you need to read through Expert source code
 ./bin/expert-src
 
 # Clone IntelliJ-Elixir source repository
 # Use this when you need to read through IntelliJ-Elixir source code
-# Clones KronicDeth/intellij-elixir to .refs/intellij-elixir and prints the path
 ./bin/intellij-elixir-src
 ```
