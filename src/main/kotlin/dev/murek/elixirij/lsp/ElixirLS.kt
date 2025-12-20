@@ -31,7 +31,7 @@ class ElixirLS(private val project: Project) : ExLspServerService {
     }
 
     override fun currentExecutable(): Path? = when (settings.elixirLSMode) {
-        ElixirLSMode.AUTOMATIC -> null // Automatic mode not yet implemented for ElixirLS
+        ElixirLSMode.AUTOMATIC -> null // TODO: Automatic mode not yet implemented for ElixirLS
         ElixirLSMode.CUSTOM -> settings.elixirLSCustomExecutablePath?.let { Path(it) }?.takeIf { it.exists() }
     }
 

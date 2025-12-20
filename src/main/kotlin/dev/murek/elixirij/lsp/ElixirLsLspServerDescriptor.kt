@@ -13,5 +13,5 @@ class ElixirLsLspServerDescriptor(project: Project, private val executable: Path
     override fun isSupportedFile(file: VirtualFile): Boolean = file.fileType.isElixir
 
     override fun createCommandLine(): GeneralCommandLine =
-        GeneralCommandLine(executable.toString()).withWorkDirectory(project.basePath)
+        GeneralCommandLine(executable.toString(), "--stdio").withWorkDirectory(project.basePath)
 }
