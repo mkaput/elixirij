@@ -1,0 +1,60 @@
+{
+  parserClass="dev.murek.elixirij.lang.parser.ExParser"
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+  
+  psiClassPrefix="Ex"
+  psiImplClassSuffix="Impl"
+  psiPackage="dev.murek.elixirij.lang.psi"
+  psiImplPackage="dev.murek.elixirij.lang.psi.impl"
+  
+  elementTypeHolderClass="dev.murek.elixirij.lang.psi.ExTypes"
+  elementTypeClass="dev.murek.elixirij.lang.psi.ExElementType"
+  tokenTypeClass="dev.murek.elixirij.lang.psi.ExTokenType"
+  
+  // Use tokens from ElementTypes.kt
+  generate=[tokens="no"]
+  
+  tokens = [
+    space='regexp:\s+'
+    comment='regexp:#[^\r\n]*'
+  ]
+}
+
+// Root rule
+root ::= topLevelExpressions
+
+topLevelExpressions ::= expression* {
+  pin=1
+}
+
+// Expressions (simplified for initial implementation)
+expression ::= primaryExpression
+
+primaryExpression ::= literal
+                    | identifier
+                    | alias
+                    | atom
+
+literal ::= integer
+          | float
+          | char
+          | string
+          | charlist
+          | true
+          | false
+          | nil
+
+integer ::= EX_INTEGER
+float ::= EX_FLOAT
+char ::= EX_CHAR
+string ::= EX_STRING
+charlist ::= EX_CHARLIST
+true ::= EX_TRUE
+false ::= EX_FALSE
+nil ::= EX_NIL
+
+identifier ::= EX_IDENTIFIER
+
+alias ::= EX_ALIAS
+
+atom ::= EX_ATOM | EX_ATOM_QUOTED
