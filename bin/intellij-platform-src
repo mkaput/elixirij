@@ -2,11 +2,11 @@
 set -euo pipefail
 
 # IntelliJ Platform Source Extractor
-# Extracts IntelliJ Platform sources from Gradle cache to .intellijPlatform/sources
+# Extracts IntelliJ Platform sources from Gradle cache to .refs/intellij-platform
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-OUTPUT_DIR="$PROJECT_ROOT/.intellijPlatform/sources"
+OUTPUT_DIR="$PROJECT_ROOT/.refs/intellij-platform"
 
 # If already extracted than just print the output and quit.
 if [ -d "$OUTPUT_DIR" ]; then
