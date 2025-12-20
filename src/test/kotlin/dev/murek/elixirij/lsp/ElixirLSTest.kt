@@ -2,14 +2,27 @@ package dev.murek.elixirij.lsp
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import java.nio.file.Files
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.div
 
 class ElixirLSTest : BasePlatformTestCase() {
     private val elixirLS get() = ElixirLS.getInstance(project)
+    private var originalElixirLSMode: ElixirLSMode? = null
 
     override fun setUp() {
         super.setUp()
-        ExLspSettings.getInstance(project).elixirLSMode = ElixirLSMode.CUSTOM
+        val settings = ExLspSettings.getInstance(project)
+        originalElixirLSMode = settings.elixirLSMode
+        settings.elixirLSMode = ElixirLSMode.CUSTOM
+    }
+
+    override fun tearDown() {
+        try {
+            val settings = ExLspSettings.getInstance(project)
+            originalElixirLSMode?.let { settings.elixirLSMode = it }
+        } finally {
+            super.tearDown()
+        }
     }
 
     fun `test elixirls returns null when no custom path configured`() {
@@ -33,8 +46,12 @@ class ElixirLSTest : BasePlatformTestCase() {
             assertNotNull(executable)
             assertEquals(tempFile, executable)
         } finally {
-            Files.deleteIfExists(tempFile)
-            Files.deleteIfExists(tempDir)
+            try {
+                tempFile.deleteExisting()
+                tempDir.deleteExisting()
+            } catch (e: Exception) {
+                // Ignore cleanup errors
+            }
         }
     }
 
@@ -52,8 +69,12 @@ class ElixirLSTest : BasePlatformTestCase() {
             ExLspSettings.getInstance(project).elixirLSCustomExecutablePath = tempFile.toString()
             assertTrue(elixirLS.checkReady())
         } finally {
-            Files.deleteIfExists(tempFile)
-            Files.deleteIfExists(tempDir)
+            try {
+                tempFile.deleteExisting()
+                tempDir.deleteExisting()
+            } catch (e: Exception) {
+                // Ignore cleanup errors
+            }
         }
     }
 }

@@ -17,7 +17,7 @@ class ExLspSettings : SimplePersistentStateComponent<ExLspSettings.State>(State(
         var codeIntelligenceService by enum(CodeIntelligenceService.EXPERT)
         var expertMode by enum(ExpertMode.AUTOMATIC)
         var expertCustomExecutablePath by string()
-        var elixirLSMode by enum(ElixirLSMode.CUSTOM)
+        var elixirLSMode by enum(ElixirLSMode.AUTOMATIC)
         var elixirLSCustomExecutablePath by string()
     }
 

@@ -7,7 +7,7 @@ import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
 import dev.murek.elixirij.lang.isElixir
 import java.nio.file.Path
 
-class ElixirLsLspServerDescriptor(project: Project, private val executable: Path) :
+class ElixirLSLspServerDescriptor(project: Project, private val executable: Path) :
     ProjectWideLspServerDescriptor(project, "ElixirLS") {
 
     override fun isSupportedFile(file: VirtualFile): Boolean = file.fileType.isElixir

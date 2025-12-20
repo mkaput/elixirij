@@ -9,7 +9,11 @@ import com.intellij.openapi.startup.ProjectActivity
  */
 class ExLspServerStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
-        Expert.getInstance(project).checkUpdates()
-        ElixirLS.getInstance(project).checkUpdates()
+        val settings = ExLspSettings.getInstance(project)
+        when (settings.codeIntelligenceService) {
+            CodeIntelligenceService.EXPERT -> Expert.getInstance(project).checkUpdates()
+            CodeIntelligenceService.ELIXIR_LS -> ElixirLS.getInstance(project).checkUpdates()
+            CodeIntelligenceService.NONE -> {} // No updates needed
+        }
     }
 }
