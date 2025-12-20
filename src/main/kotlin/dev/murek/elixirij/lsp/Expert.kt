@@ -126,11 +126,13 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
 
                             request.saveToFile(destination, indicator)
 
-                            if (!SystemInfo.isWindows) {
-                                destination.toFile().setExecutable(true)
-                            }
-                            if (remoteLastModified != 0L) {
-                                Files.setLastModifiedTime(destination, FileTime.fromMillis(remoteLastModified))
+                            if (destination.exists()) {
+                                if (!SystemInfo.isWindows) {
+                                    destination.toFile().setExecutable(true)
+                                }
+                                if (remoteLastModified != 0L) {
+                                    Files.setLastModifiedTime(destination, FileTime.fromMillis(remoteLastModified))
+                                }
                             }
                         }
                     }
