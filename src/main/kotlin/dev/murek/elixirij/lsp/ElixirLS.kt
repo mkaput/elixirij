@@ -166,7 +166,7 @@ class ElixirLS(private val project: Project, private val cs: CoroutineScope) : E
         return when (OS.CURRENT) {
             OS.Linux -> "elixir-ls-linux-$arch"
             OS.macOS -> "elixir-ls-darwin-$arch"
-            OS.Windows -> "elixir-ls-windows-amd64.exe"
+            OS.Windows -> "elixir-ls-windows-$arch.exe"
             else -> null
         }
     }
