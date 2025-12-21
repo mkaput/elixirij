@@ -22,43 +22,181 @@
     space='regexp:\s+'
     comment='regexp:#[^\r\n]*'
   ]
+  
+  // Expression hierarchy - all expression types extend from expression
+  extends(".*Expr")=expression
+  extends("literal|atom|identifier|alias|list|tuple|map|struct|bitstring|sigil|heredoc|charlistHeredoc|parenExpr")=expression
 }
 
 // Root rule
 root ::= topLevelExpressions
 
-topLevelExpressions ::= expression* {
+topLevelExpressions ::= (eoe? expression (eoe expression)*)? eoe? {
   pin=1
 }
 
-// Expressions (simplified for initial implementation)
-expression ::= primaryExpression
+// End of expression: newlines or semicolons
+private eoe ::= (EX_EOL | EX_SEMICOLON)+
 
-primaryExpression ::= literal
-                    | identifier
-                    | alias
-                    | atom
+// =============================================================================
+// Expression hierarchy - following operator precedence (lowest to highest)
+// The parser will try these in order, producing the correct precedence
+// =============================================================================
+
+// Using fake rule to define expression base type
+expression ::= matchExpr
+
+// Precedence 100: = (right associative)
+matchExpr ::= orExpr (EX_EQ matchExpr)?
+
+// Precedence 120: ||, |||, or (left associative)
+orExpr ::= andExpr (orOp andExpr)*
+private orOp ::= EX_PIPE_PIPE | EX_PIPE_PIPE_PIPE | EX_OR
+
+// Precedence 130: &&, &&&, and (left associative)
+andExpr ::= compExpr (andOp compExpr)*
+private andOp ::= EX_AMP_AMP | EX_AMP_AMP_AMP | EX_AND
+
+// Precedence 140: ==, !=, =~, ===, !== (left associative)
+compExpr ::= relExpr (compOp relExpr)*
+private compOp ::= EX_EQ_EQ | EX_NOT_EQ | EX_EQ_TILDE | EX_EQ_EQ_EQ | EX_NOT_EQ_EQ
+
+// Precedence 150: <, >, <=, >= (left associative)
+relExpr ::= arrowExpr (relOp arrowExpr)*
+private relOp ::= EX_LT_EQ | EX_GT_EQ | EX_LT | EX_GT
+
+// Precedence 160: |>, <<<, >>>, <<~, ~>>, <~, ~>, <~>, <|> (left associative)
+arrowExpr ::= inExpr (arrowOp inExpr)*
+private arrowOp ::= EX_PIPE_GT | EX_LT_LT_LT | EX_GT_GT_GT | EX_LT_LT_TILDE | EX_TILDE_GT_GT | EX_LT_TILDE | EX_TILDE_GT | EX_LT_TILDE_GT | EX_LT_PIPE_GT
+
+// Precedence 170: in, not in (left associative)
+inExpr ::= xorExpr (inOp xorExpr)*
+private inOp ::= EX_NOT EX_IN | EX_IN
+
+// Precedence 190: // (right associative) - ternary/default operator
+xorExpr ::= concatExpr (EX_SLASH_SLASH xorExpr)?
+
+// Precedence 200: ++, --, +++, ---, <>, .. (right associative)
+concatExpr ::= rangeExpr (concatOp concatExpr)?
+private concatOp ::= EX_PLUS_PLUS_PLUS | EX_MINUS_MINUS_MINUS | EX_PLUS_PLUS | EX_MINUS_MINUS | EX_LT_GT
+
+// Range operator: .. and ..// (right associative)
+rangeExpr ::= dualExpr (rangeOp rangeExpr)?
+private rangeOp ::= EX_DOT_DOT_SLASH_SLASH | EX_DOT_DOT
+
+// Precedence 210: +, - binary (left associative)
+dualExpr ::= multExpr (dualOp multExpr)*
+private dualOp ::= EX_PLUS | EX_MINUS
+
+// Precedence 220: *, / (left associative)
+multExpr ::= powerExpr (multOp powerExpr)*
+private multOp ::= EX_STAR | EX_SLASH
+
+// Precedence 230: ** (left associative)
+powerExpr ::= unaryExpr (EX_STAR_STAR unaryExpr)*
+
+// Precedence 300: Unary operators (right associative / prefix)
+unaryExpr ::= unaryOp unaryExpr | captureExpr
+private unaryOp ::= EX_NOT | EX_EXCLAMATION | EX_CARET | EX_TILDE | EX_PLUS | EX_MINUS
+
+// Capture operator: & (for &func/arity and &(&1 + &2))
+captureExpr ::= EX_AMPERSAND captureExpr | atExpr
+
+// @ operator (module attributes)
+atExpr ::= EX_AT atExpr | accessExpr
+
+// Precedence 310: Bracket access (left associative)
+accessExpr ::= primaryExpr bracketAccess*
+bracketAccess ::= EX_LBRACKET expression EX_RBRACKET { pin=1 }
+
+// =============================================================================
+// Primary expressions
+// =============================================================================
+
+private primaryExpr ::= literal
+                      | atom
+                      | identifier
+                      | alias
+                      | list
+                      | tuple
+                      | map
+                      | struct
+                      | bitstring
+                      | sigil
+                      | heredoc
+                      | charlistHeredoc
+                      | parenExpr
+
+// Parenthesized expression
+parenExpr ::= EX_LPAREN expression EX_RPAREN { pin=1 }
+
+// =============================================================================
+// Literals
+// =============================================================================
 
 literal ::= integer
           | float
           | char
           | string
           | charlist
-          | true
-          | false
-          | nil
+          | booleanLiteral
+          | nilLiteral
 
 integer ::= EX_INTEGER
 float ::= EX_FLOAT
 char ::= EX_CHAR
 string ::= EX_STRING
 charlist ::= EX_CHARLIST
-true ::= EX_TRUE
-false ::= EX_FALSE
-nil ::= EX_NIL
+heredoc ::= EX_HEREDOC
+charlistHeredoc ::= EX_CHARLIST_HEREDOC
+sigil ::= EX_SIGIL
+
+booleanLiteral ::= EX_TRUE | EX_FALSE
+nilLiteral ::= EX_NIL
+
+// =============================================================================
+// Identifiers and atoms
+// =============================================================================
 
 identifier ::= EX_IDENTIFIER
 
 alias ::= EX_ALIAS
 
 atom ::= EX_ATOM | EX_ATOM_QUOTED
+
+// =============================================================================
+// Data structures
+// =============================================================================
+
+// List: [1, 2, 3] or [a: 1, b: 2] or [h | t]
+list ::= EX_LBRACKET listContents? EX_RBRACKET { pin=1 }
+private listContents ::= listElement (EX_COMMA listElement)* EX_COMMA? (EX_PIPE expression)?
+                       | expression EX_PIPE expression
+private listElement ::= keywordPair | expression
+
+// Keyword pair: key: value
+keywordPair ::= keywordKey expression
+private keywordKey ::= EX_IDENTIFIER EX_COLON | EX_ATOM_QUOTED EX_COLON
+
+// Tuple: {1, 2, 3}
+tuple ::= EX_LBRACE tupleContents? EX_RBRACE { pin=1 }
+private tupleContents ::= expression (EX_COMMA expression)* EX_COMMA?
+
+// Map: %{key: value} or %{"key" => value}
+map ::= EX_PERCENT_LBRACE mapContents? EX_RBRACE { pin=1 }
+private mapContents ::= mapUpdateContents | mapPairContents
+private mapUpdateContents ::= expression EX_PIPE mapPairContents
+private mapPairContents ::= mapPair (EX_COMMA mapPair)* EX_COMMA?
+private mapPair ::= keywordPair | assocPair
+assocPair ::= expression EX_FAT_ARROW expression
+
+// Struct: %ModuleName{key: value}
+struct ::= EX_PERCENT alias EX_LBRACE mapContents? EX_RBRACE { pin=1 }
+
+// Bitstring: <<1, 2, 3>> or <<x::binary>>
+bitstring ::= EX_LT_LT bitstringContents? EX_GT_GT { pin=1 }
+private bitstringContents ::= bitstringElement (EX_COMMA bitstringElement)* EX_COMMA?
+private bitstringElement ::= expression bitstringType?
+private bitstringType ::= EX_COLON_COLON bitstringTypeSpec (EX_MINUS bitstringTypeSpec)*
+private bitstringTypeSpec ::= bitstringTypeName (EX_LPAREN expression EX_RPAREN)?
+private bitstringTypeName ::= EX_IDENTIFIER | EX_INTEGER
