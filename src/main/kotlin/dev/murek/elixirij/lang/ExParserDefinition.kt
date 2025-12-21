@@ -11,6 +11,8 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
 import dev.murek.elixirij.ExLanguage
+import dev.murek.elixirij.lang.parser.ExParser
+import dev.murek.elixirij.lang.psi.ExTypes
 
 private val FILE = IFileElementType(ExLanguage)
 
@@ -18,18 +20,7 @@ class ExParserDefinition : ParserDefinition {
 
     override fun createLexer(project: Project?): Lexer = ExLexer()
 
-    override fun createParser(project: Project?): PsiParser {
-        // For now, we use a simple parser that doesn't do any parsing
-        // This will be expanded later when we implement the full parser
-        return PsiParser { root, builder ->
-            val marker = builder.mark()
-            while (!builder.eof()) {
-                builder.advanceLexer()
-            }
-            marker.done(root)
-            builder.treeBuilt
-        }
-    }
+    override fun createParser(project: Project?): PsiParser = ExParser()
 
     override fun getFileNodeType(): IFileElementType = FILE
 
@@ -37,9 +28,7 @@ class ExParserDefinition : ParserDefinition {
 
     override fun getStringLiteralElements(): TokenSet = EX_STRINGS
 
-    override fun createElement(node: ASTNode): PsiElement {
-        throw UnsupportedOperationException(node.elementType.toString())
-    }
+    override fun createElement(node: ASTNode): PsiElement = ExTypes.Factory.createElement(node)
 
     override fun createFile(viewProvider: FileViewProvider): PsiFile = ExFile(viewProvider)
 }
