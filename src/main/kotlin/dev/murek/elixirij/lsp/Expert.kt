@@ -17,6 +17,8 @@ import com.intellij.util.io.HttpRequests
 import com.intellij.util.system.CpuArch
 import com.intellij.util.system.OS
 import dev.murek.elixirij.ExBundle
+import dev.murek.elixirij.ExSettings
+import dev.murek.elixirij.ExpertMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.nio.file.Files
@@ -44,7 +46,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
         fun getInstance(project: Project): Expert = project.service()
     }
 
-    private val settings = ExLspSettings.getInstance(project)
+    private val settings = ExSettings.getInstance(project)
 
     private val downloading = AtomicBoolean(false)
     val isDownloading: Boolean get() = downloading.get()
@@ -126,11 +128,13 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
 
                             request.saveToFile(destination, indicator)
 
-                            if (!SystemInfo.isWindows) {
-                                destination.toFile().setExecutable(true)
-                            }
-                            if (remoteLastModified != 0L) {
-                                Files.setLastModifiedTime(destination, FileTime.fromMillis(remoteLastModified))
+                            if (destination.exists()) {
+                                if (!SystemInfo.isWindows) {
+                                    destination.toFile().setExecutable(true)
+                                }
+                                if (remoteLastModified != 0L) {
+                                    Files.setLastModifiedTime(destination, FileTime.fromMillis(remoteLastModified))
+                                }
                             }
                         }
                     }

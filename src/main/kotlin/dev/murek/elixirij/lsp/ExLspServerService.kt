@@ -2,6 +2,8 @@ package dev.murek.elixirij.lsp
 
 import com.intellij.openapi.project.Project
 import com.intellij.platform.lsp.api.LspServerSupportProvider
+import dev.murek.elixirij.CodeIntelligenceService
+import dev.murek.elixirij.ExSettings
 import java.nio.file.Path
 
 interface ExLspServerService {
@@ -30,7 +32,7 @@ interface ExLspServerService {
 
     companion object {
         fun getConfiguredServiceInstance(project: Project): ExLspServerService =
-            when (ExLspSettings.getInstance(project).codeIntelligenceService) {
+            when (ExSettings.getInstance(project).codeIntelligenceService) {
                 CodeIntelligenceService.NONE -> NoCodeIntelligenceService
                 CodeIntelligenceService.EXPERT -> Expert.getInstance(project)
                 CodeIntelligenceService.ELIXIR_LS -> ElixirLS.getInstance(project)

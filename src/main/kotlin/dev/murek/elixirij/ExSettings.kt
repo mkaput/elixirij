@@ -1,4 +1,4 @@
-package dev.murek.elixirij.lsp
+package dev.murek.elixirij
 
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
@@ -10,8 +10,8 @@ enum class ExpertMode { AUTOMATIC, CUSTOM }
 enum class ElixirLSMode { AUTOMATIC, CUSTOM }
 
 @Service(Service.Level.PROJECT)
-@State(name = "ExLspServerSettings")
-class ExLspSettings : SimplePersistentStateComponent<ExLspSettings.State>(State()) {
+@State(name = "Elixir", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
+class ExSettings : SimplePersistentStateComponent<ExSettings.State>(State()) {
 
     class State : BaseState() {
         var codeIntelligenceService by enum(CodeIntelligenceService.EXPERT)
@@ -23,7 +23,7 @@ class ExLspSettings : SimplePersistentStateComponent<ExLspSettings.State>(State(
 
     companion object {
         @JvmStatic
-        fun getInstance(project: Project): ExLspSettings = project.service()
+        fun getInstance(project: Project): ExSettings = project.service()
     }
 
     var codeIntelligenceService: CodeIntelligenceService

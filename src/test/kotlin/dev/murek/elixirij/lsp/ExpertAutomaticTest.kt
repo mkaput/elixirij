@@ -4,6 +4,8 @@ import com.intellij.notification.Notification
 import com.intellij.notification.Notifications
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import dev.murek.elixirij.ExBundle
+import dev.murek.elixirij.ExSettings
+import dev.murek.elixirij.ExpertMode
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.nio.file.Path
@@ -18,7 +20,7 @@ class ExpertAutomaticTest : BasePlatformTestCase() {
 
     override fun setUp() {
         super.setUp()
-        ExLspSettings.getInstance(project).expertMode = ExpertMode.AUTOMATIC
+        ExSettings.getInstance(project).expertMode = ExpertMode.AUTOMATIC
     }
 
     private fun Expert.waitForDownload(deadline: Duration = 60.seconds) = runBlocking {
