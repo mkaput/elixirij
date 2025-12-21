@@ -1,4 +1,6 @@
 .DS_Store
+.elixir_ls
+.expert
 .gradle
 .idea
 .intellijPlatform
@@ -7,4 +9,5 @@
 .qodana
 .refs
 build
+erl_crash.dump
 src/gen
