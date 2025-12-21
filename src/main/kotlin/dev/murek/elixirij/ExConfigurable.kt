@@ -7,10 +7,7 @@ import com.intellij.openapi.ui.DialogPanel
 import com.intellij.platform.lsp.api.LspServerManager
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.listCellRenderer.textListCellRenderer
-import dev.murek.elixirij.lsp.CodeIntelligenceService
-import dev.murek.elixirij.lsp.ElixirLSMode
 import dev.murek.elixirij.lsp.ExLspServerSupportProvider
-import dev.murek.elixirij.lsp.ExpertMode
 
 class ExConfigurable(private val project: Project) : BoundConfigurable(
     ExBundle.message("configurable.elixir.displayName")
