@@ -2,9 +2,12 @@ package dev.murek.elixirij.lsp
 
 import com.intellij.notification.Notification
 import com.intellij.notification.Notifications
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import com.intellij.platform.lsp.api.LspServerDescriptor
+import com.intellij.platform.lsp.api.LspServerSupportProvider
+import com.intellij.testFramework.LightPlatformTestCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.FileTime
 import kotlin.io.path.exists
@@ -14,7 +17,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 
-abstract class BaseLspServiceTestCase : BasePlatformTestCase() {
+abstract class BaseLspServiceTestCase : LightPlatformTestCase() {
     protected abstract val lspServer: ExLspServerService
 
     protected val serverName: String
@@ -60,6 +63,16 @@ abstract class BaseLspServiceTestCase : BasePlatformTestCase() {
         return notifications
     }
 
+    protected fun ExLspServerService.getDescriptor(): LspServerDescriptor {
+        lateinit var captured: LspServerDescriptor
+        ensureServerStarted(object : LspServerSupportProvider.LspServerStarter {
+            override fun ensureServerStarted(descriptor: LspServerDescriptor) {
+                captured = descriptor
+            }
+        })
+        return captured
+    }
+
     fun `test download`() {
         lspServer.deleteCached()
 
@@ -91,5 +104,18 @@ abstract class BaseLspServiceTestCase : BasePlatformTestCase() {
         val path = lspServer.ensureFresh()
         assertNotSame(oldLastModified, path.getLastModifiedTime())
         assertNotEmpty(notifications)
+    }
+
+    fun `test server verification returns server info`() {
+        // Ensure project base path exists (it may have been cleaned up between tests)
+        project.basePath?.let { Files.createDirectories(Path.of(it)) }
+
+        lspServer.ensureFresh()
+        val descriptor = lspServer.getDescriptor()
+        val result = runBlocking {
+            verifyLspServer(descriptor, timeout = 15.seconds)
+        }
+        val serverInfo = result.getOrThrow()
+        println("Server info: $serverInfo")
     }
 }
