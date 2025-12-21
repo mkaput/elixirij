@@ -27,6 +27,10 @@ We target the latest and greatest platform version and modern Elixir language co
 # Run single test
 ./gradlew test --tests "dev.murek.elixirij.lang.ExLexerTest.testIntegerLiterals"
 
+# Regenerate test fixtures
+# Use this to regenerate expected output files for ParsingTestCase and similar tests
+./gradlew test -Didea.tests.overwrite.data=true
+
 # Format code
 # This project uses .editorconfig for code style conventions.
 # Format code using your IDE's auto-format feature (Ctrl+Alt+L in IntelliJ).
