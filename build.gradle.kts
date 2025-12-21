@@ -1,6 +1,7 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
+import org.jetbrains.grammarkit.tasks.GenerateParserTask
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
@@ -146,13 +147,22 @@ val generateElixirLexer = tasks.register<GenerateLexerTask>("generateElixirLexer
     purgeOldFiles.set(true)
 }
 
-// Ensure lexer is generated before compiling
+// Configure Grammar-Kit parser generation
+val generateElixirParser = tasks.register<GenerateParserTask>("generateElixirParser") {
+    sourceFile.set(file("src/main/grammars/Elixir.bnf"))
+    targetRootOutputDir.set(file("src/gen"))
+    pathToParser.set("/dev/murek/elixirij/lang/parser/ExParser.java")
+    pathToPsiRoot.set("/dev/murek/elixirij/lang/psi")
+    purgeOldFiles.set(true)
+}
+
+// Ensure lexer and parser are generated before compiling
 tasks.named("compileKotlin") {
-    dependsOn(generateElixirLexer)
+    dependsOn(generateElixirLexer, generateElixirParser)
 }
 
 tasks.named("compileJava") {
-    dependsOn(generateElixirLexer)
+    dependsOn(generateElixirLexer, generateElixirParser)
 }
 
 // Add generated sources to the source sets
