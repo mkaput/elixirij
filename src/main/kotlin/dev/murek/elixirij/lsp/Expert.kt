@@ -49,7 +49,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
     private val settings = ExSettings.getInstance(project)
 
     private val downloading = AtomicBoolean(false)
-    val isDownloading: Boolean get() = downloading.get()
+    override val isDownloading: Boolean get() = downloading.get()
 
     override fun ensureServerStarted(serverStarter: LspServerSupportProvider.LspServerStarter) {
         val executable = currentExecutable()
@@ -72,10 +72,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
         }
     }
 
-    /**
-     * Deletes the cached Expert executable.
-     */
-    fun deleteCachedExecutable() {
+    override fun deleteCached() {
         Files.deleteIfExists(getDownloadedBinaryPath())
     }
 

@@ -30,6 +30,16 @@ interface ExLspServerService {
      */
     fun checkUpdates()
 
+    /**
+     * Returns `true` if the language server is currently downloading.
+     */
+    val isDownloading: Boolean
+
+    /**
+     * Deletes the cached language server executable.
+     */
+    fun deleteCached()
+
     companion object {
         fun getConfiguredServiceInstance(project: Project): ExLspServerService =
             when (ExSettings.getInstance(project).codeIntelligenceService) {
