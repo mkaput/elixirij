@@ -17,8 +17,6 @@ import com.intellij.util.io.HttpRequests
 import com.intellij.util.system.CpuArch
 import com.intellij.util.system.OS
 import dev.murek.elixirij.ExBundle
-import dev.murek.elixirij.ExSettings
-import dev.murek.elixirij.ExpertMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.nio.file.Files
@@ -34,19 +32,19 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinInstant
 
-private val LOG = logger<Expert>()
+private val LOG = logger<ElixirLS>()
 
 /**
- * The entry-point interface for getting the Expert LS instance for a project.
+ * The entry-point interface for getting the ElixirLS instance for a project.
  */
 @Service(Service.Level.PROJECT)
-class Expert(private val project: Project, private val cs: CoroutineScope) : ExLspServerService {
+class ElixirLS(private val project: Project, private val cs: CoroutineScope) : ExLspServerService {
     companion object {
         @JvmStatic
-        fun getInstance(project: Project): Expert = project.service()
+        fun getInstance(project: Project): ElixirLS = project.service()
     }
 
-    private val settings = ExSettings.getInstance(project)
+    private val settings = ExLspSettings.getInstance(project)
 
     private val downloading = AtomicBoolean(false)
     val isDownloading: Boolean get() = downloading.get()
@@ -54,17 +52,17 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
     override fun ensureServerStarted(serverStarter: LspServerSupportProvider.LspServerStarter) {
         val executable = currentExecutable()
         check(executable != null)
-        LOG.info("Starting Expert from $executable")
-        serverStarter.ensureServerStarted(ExpertLspServerDescriptor(project, executable))
+        LOG.info("Starting ElixirLS from $executable")
+        serverStarter.ensureServerStarted(ElixirLSLspServerDescriptor(project, executable))
     }
 
-    override fun currentExecutable(): Path? = when (settings.expertMode) {
-        ExpertMode.AUTOMATIC -> getDownloadedBinaryPath().takeIf { it.exists() }
-        ExpertMode.CUSTOM -> settings.expertCustomExecutablePath?.let { Path(it) }?.takeIf { it.exists() }
+    override fun currentExecutable(): Path? = when (settings.elixirLSMode) {
+        ElixirLSMode.AUTOMATIC -> getDownloadedBinaryPath().takeIf { it.exists() }
+        ElixirLSMode.CUSTOM -> settings.elixirLSCustomExecutablePath?.let { Path(it) }?.takeIf { it.exists() }
     }
 
     override fun checkUpdates() {
-        if (settings.expertMode == ExpertMode.AUTOMATIC) {
+        if (settings.elixirLSMode == ElixirLSMode.AUTOMATIC) {
             val path = getDownloadedBinaryPath()
             if (isStale(path)) {
                 downloadExecutable()
@@ -73,7 +71,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
     }
 
     /**
-     * Deletes the cached Expert executable.
+     * Deletes the cached ElixirLS executable.
      */
     fun deleteCachedExecutable() {
         Files.deleteIfExists(getDownloadedBinaryPath())
@@ -97,23 +95,23 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
             try {
                 val assetName = getAssetName()
                 if (assetName == null) {
-                    LOG.warn("Expert is unsupported on this platform: ${OS.CURRENT} ${CpuArch.CURRENT}, skipping download")
+                    LOG.warn("ElixirLS is unsupported on this platform: ${OS.CURRENT} ${CpuArch.CURRENT}, skipping download")
 
                     @Suppress("DialogTitleCapitalization") NotificationGroupManager.getInstance()
                         .getNotificationGroup("ElixirIJ").createNotification(
-                            title = ExBundle.message("lsp.expert.download.task.title"),
-                            content = ExBundle.message("lsp.expert.download.unsupported.platform"),
+                            title = ExBundle.message("lsp.elixirls.download.task.title"),
+                            content = ExBundle.message("lsp.elixirls.download.unsupported.platform"),
                             type = NotificationType.ERROR
                         ).notify(project)
 
                     return@launch
                 }
 
-                val url = "https://github.com/elixir-lang/expert/releases/download/nightly/$assetName"
+                val url = "https://github.com/elixir-lsp/elixir-ls/releases/latest/download/$assetName"
                 val destination = getDownloadedBinaryPath()
                 val isUpdate = destination.exists()
 
-                withBackgroundProgress(project, ExBundle.message("lsp.expert.download.task.title")) {
+                withBackgroundProgress(project, ExBundle.message("lsp.elixirls.download.task.title")) {
                     coroutineToIndicator { indicator ->
                         Files.createDirectories(destination.parent)
                         HttpRequests.request(url).connect { request ->
@@ -121,20 +119,18 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
                             if (isUpdate && remoteLastModified != 0L) {
                                 val localLastModified = Files.getLastModifiedTime(destination).toMillis()
                                 if (remoteLastModified == localLastModified) {
-                                    LOG.info("Expert is up to date (timestamp: $remoteLastModified)")
+                                    LOG.info("ElixirLS is up to date (timestamp: $remoteLastModified)")
                                     return@connect
                                 }
                             }
 
                             request.saveToFile(destination, indicator)
 
-                            if (destination.exists()) {
-                                if (!SystemInfo.isWindows) {
-                                    destination.toFile().setExecutable(true)
-                                }
-                                if (remoteLastModified != 0L) {
-                                    Files.setLastModifiedTime(destination, FileTime.fromMillis(remoteLastModified))
-                                }
+                            if (!SystemInfo.isWindows) {
+                                destination.toFile().setExecutable(true)
+                            }
+                            if (remoteLastModified != 0L) {
+                                Files.setLastModifiedTime(destination, FileTime.fromMillis(remoteLastModified))
                             }
                         }
                     }
@@ -142,14 +138,14 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
 
                 @Suppress("DialogTitleCapitalization") NotificationGroupManager.getInstance()
                     .getNotificationGroup("ElixirIJ").createNotification(
-                        title = ExBundle.message("lsp.expert.download.task.title"),
-                        content = ExBundle.message("lsp.expert.download.updated"),
+                        title = ExBundle.message("lsp.elixirls.download.task.title"),
+                        content = ExBundle.message("lsp.elixirls.download.updated"),
                         type = NotificationType.INFORMATION
                     ).notify(project)
 
                 LspServerManager.getInstance(project).stopAndRestartIfNeeded(ExLspServerSupportProvider::class.java)
             } catch (e: Throwable) {
-                thisLogger().error("Failed to download expert", e)
+                thisLogger().error("Failed to download ElixirLS", e)
 
             } finally {
                 downloading.set(false)
@@ -158,7 +154,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
     }
 
     private fun getDownloadedBinaryPath(): Path =
-        PathManager.getSystemDir() / "elixirij" / "expert" / (getAssetName() ?: "expert_unknown_unknown")
+        PathManager.getSystemDir() / "elixirij" / "elixir-ls" / (getAssetName() ?: "elixir-ls-unknown-unknown")
 
     private fun getAssetName(): String? {
         val arch = when (CpuArch.CURRENT) {
@@ -167,11 +163,10 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
             else -> return null
         }
 
-
         return when (OS.CURRENT) {
-            OS.Linux -> "expert_linux_${arch}"
-            OS.macOS -> "expert_darwin_${arch}"
-            OS.Windows -> "expert_windows_amd64.exe"
+            OS.Linux -> "elixir-ls-linux-$arch"
+            OS.macOS -> "elixir-ls-darwin-$arch"
+            OS.Windows -> "elixir-ls-windows-$arch.exe"
             else -> null
         }
     }
