@@ -16,7 +16,9 @@ import com.intellij.platform.lsp.api.LspServerSupportProvider
 import com.intellij.util.io.HttpRequests
 import com.intellij.util.system.CpuArch
 import com.intellij.util.system.OS
+import dev.murek.elixirij.ElixirLSMode
 import dev.murek.elixirij.ExBundle
+import dev.murek.elixirij.ExSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.nio.file.Files
@@ -44,10 +46,10 @@ class ElixirLS(private val project: Project, private val cs: CoroutineScope) : E
         fun getInstance(project: Project): ElixirLS = project.service()
     }
 
-    private val settings = ExLspSettings.getInstance(project)
+    private val settings = ExSettings.getInstance(project)
 
     private val downloading = AtomicBoolean(false)
-    val isDownloading: Boolean get() = downloading.get()
+    override val isDownloading: Boolean get() = downloading.get()
 
     override fun ensureServerStarted(serverStarter: LspServerSupportProvider.LspServerStarter) {
         val executable = currentExecutable()
@@ -70,10 +72,7 @@ class ElixirLS(private val project: Project, private val cs: CoroutineScope) : E
         }
     }
 
-    /**
-     * Deletes the cached ElixirLS executable.
-     */
-    fun deleteCachedExecutable() {
+    override fun deleteCached() {
         Files.deleteIfExists(getDownloadedBinaryPath())
     }
 
