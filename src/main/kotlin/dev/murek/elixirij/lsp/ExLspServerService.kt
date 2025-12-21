@@ -35,6 +35,7 @@ interface ExLspServerService {
             when (ExSettings.getInstance(project).codeIntelligenceService) {
                 CodeIntelligenceService.NONE -> NoCodeIntelligenceService
                 CodeIntelligenceService.EXPERT -> Expert.getInstance(project)
+                CodeIntelligenceService.ELIXIR_LS -> ElixirLS.getInstance(project)
             }
     }
 }
