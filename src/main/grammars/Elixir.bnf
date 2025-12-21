@@ -13,6 +13,10 @@
   
   // Use tokens from ElementTypes.kt
   generate=[tokens="no"]
+  parserImports=[
+    "static dev.murek.elixirij.lang.ElementTypes.*"
+    "static com.intellij.lang.parser.GeneratedParserUtilBase.*"
+  ]
   
   tokens = [
     space='regexp:\s+'

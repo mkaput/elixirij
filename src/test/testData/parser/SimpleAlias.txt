@@ -2,6 +2,5 @@ Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExExpressionImpl(EXPRESSION)
       ExPrimaryExpressionImpl(PRIMARY_EXPRESSION)
-        ExLiteralImpl(LITERAL)
-          ExIntegerImpl(INTEGER)
-            PsiElement(EX_INTEGER)('42')
+        ExAliasImpl(ALIAS)
+          PsiElement(EX_ALIAS)('MyModule')
