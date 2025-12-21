@@ -1,6 +1,0 @@
-Elixir File
-  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExExpressionImpl(EXPRESSION)
-      ExPrimaryExpressionImpl(PRIMARY_EXPRESSION)
-        ExIdentifierImpl(IDENTIFIER)
-          PsiElement(EX_IDENTIFIER)('my_var')

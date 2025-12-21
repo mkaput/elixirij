@@ -1,6 +1,0 @@
-Elixir File
-  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExExpressionImpl(EXPRESSION)
-      ExPrimaryExpressionImpl(PRIMARY_EXPRESSION)
-        ExAtomImpl(ATOM)
-          PsiElement(EX_ATOM)(':atom')
