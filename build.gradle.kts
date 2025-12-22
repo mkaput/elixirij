@@ -2,8 +2,6 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
-import org.jetbrains.grammarkit.tasks.GenerateLexerTask
-import org.jetbrains.grammarkit.tasks.GenerateParserTask
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
@@ -80,9 +78,7 @@ intellijPlatform {
         changeNotes = providers.gradleProperty("pluginVersion").map { pluginVersion ->
             with(changelog) {
                 renderItem(
-                    (getOrNull(pluginVersion) ?: getUnreleased())
-                        .withHeader(false)
-                        .withEmptySections(false),
+                    (getOrNull(pluginVersion) ?: getUnreleased()).withHeader(false).withEmptySections(false),
                     Changelog.OutputType.HTML,
                 )
             }
@@ -153,31 +149,27 @@ tasks {
     publishPlugin {
         dependsOn(patchChangelog)
     }
-}
 
-// Configure JFlex lexer generation
-val generateElixirLexer = tasks.register<GenerateLexerTask>("generateElixirLexer") {
-    sourceFile.set(file("src/main/grammars/Elixir.flex"))
-    targetOutputDir.set(file("src/gen/dev/murek/elixirij/lang"))
-    purgeOldFiles.set(true)
-}
+    generateParser {
+        sourceFile.set(file("src/main/grammars/Elixir.bnf"))
+        targetRootOutputDir.set(file("src/gen"))
+        pathToParser.set("/dev/murek/elixirij/lang/parser/ExParser.java")
+        pathToPsiRoot.set("/dev/murek/elixirij/lang/psi")
+        purgeOldFiles.set(true)
+    }
 
-// Configure Grammar-Kit parser generation
-val generateElixirParser = tasks.register<GenerateParserTask>("generateElixirParser") {
-    sourceFile.set(file("src/main/grammars/Elixir.bnf"))
-    targetRootOutputDir.set(file("src/gen"))
-    pathToParser.set("/dev/murek/elixirij/lang/parser/ExParser.java")
-    pathToPsiRoot.set("/dev/murek/elixirij/lang/psi")
-    purgeOldFiles.set(true)
-}
+    generateLexer {
+        sourceFile.set(file("src/main/grammars/Elixir.flex"))
+        targetOutputDir.set(file("src/gen/dev/murek/elixirij/lang"))
+        purgeOldFiles.set(true)
 
-// Ensure lexer and parser are generated before compiling
-tasks.named("compileKotlin") {
-    dependsOn(generateElixirLexer, generateElixirParser)
-}
+        dependsOn(generateParser)
+    }
 
-tasks.named("compileJava") {
-    dependsOn(generateElixirLexer, generateElixirParser)
+    // Ensure lexer and parser are generated before compiling
+    compileKotlin {
+        dependsOn(generateLexer)
+    }
 }
 
 // Add generated sources to the source sets
