@@ -28,7 +28,7 @@ import dev.murek.elixirij.lang.EX_PARENS
 import dev.murek.elixirij.lang.EX_SEMICOLON
 import dev.murek.elixirij.lang.EX_SIGIL
 import dev.murek.elixirij.lang.EX_STRINGS
-import dev.murek.elixirij.lang.ExLexer
+import dev.murek.elixirij.lang.lexer.ExLexer
 
 class ExSyntaxHighlighter : SyntaxHighlighterBase() {
 

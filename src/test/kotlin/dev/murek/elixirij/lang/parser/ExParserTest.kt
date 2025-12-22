@@ -1,6 +1,7 @@
-package dev.murek.elixirij.lang
+package dev.murek.elixirij.lang.parser
 
 import com.intellij.testFramework.ParsingTestCase
+import dev.murek.elixirij.lang.ExParserDefinition
 
 class ExParserTest : ParsingTestCase(
     "parser",

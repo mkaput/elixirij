@@ -11,6 +11,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
 import dev.murek.elixirij.ExLanguage
+import dev.murek.elixirij.lang.lexer.ExLexer
 import dev.murek.elixirij.lang.parser.ExParser
 import dev.murek.elixirij.lang.psi.ExTypes
 

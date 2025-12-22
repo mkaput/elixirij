@@ -1,4 +1,4 @@
-package dev.murek.elixirij.lang
+package dev.murek.elixirij.lang.lexer
 
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.util.text.StringUtil

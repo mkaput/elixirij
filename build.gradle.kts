@@ -160,7 +160,7 @@ tasks {
 
     generateLexer {
         sourceFile.set(file("src/main/grammars/Elixir.flex"))
-        targetOutputDir.set(file("src/gen/dev/murek/elixirij/lang"))
+        targetOutputDir.set(file("src/gen/dev/murek/elixirij/lang/lexer"))
         purgeOldFiles.set(true)
 
         dependsOn(generateParser)
