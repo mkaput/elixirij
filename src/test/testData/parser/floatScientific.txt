@@ -1,0 +1,5 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExLiteralImpl(LITERAL)
+      ExFloatImpl(FLOAT)
+        PsiElement(FLOAT)('1.0e10')

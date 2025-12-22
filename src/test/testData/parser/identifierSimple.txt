@@ -1,0 +1,4 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExIdentifierImpl(IDENTIFIER)
+      PsiElement(IDENTIFIER)('foo')

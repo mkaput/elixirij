@@ -1,0 +1,12 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExConcatExprImpl(CONCAT_EXPR)
+      ExLiteralImpl(LITERAL)
+        ExStringImpl(STRING)
+          PsiElement(STRING)('"a"')
+      PsiWhiteSpace(' ')
+      PsiElement(<>)('<>')
+      PsiWhiteSpace(' ')
+      ExLiteralImpl(LITERAL)
+        ExStringImpl(STRING)
+          PsiElement(STRING)('"b"')

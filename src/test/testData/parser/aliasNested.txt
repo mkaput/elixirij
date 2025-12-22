@@ -1,0 +1,8 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExAliasImpl(ALIAS)
+      PsiElement(ALIAS)('My')
+      PsiElement(.)('.')
+      PsiElement(ALIAS)('Nested')
+      PsiElement(.)('.')
+      PsiElement(ALIAS)('Module')

@@ -59,6 +59,7 @@ COMMENT=#[^\r\n]*
 
 // Sigil prefixes
 SIGIL_START=\~[a-zA-Z]
+SIGIL_MODIFIERS=[a-zA-Z]*
 
 %%
 
@@ -204,17 +205,17 @@ SIGIL_START=\~[a-zA-Z]
     ":\'" [^\']* "\'"                  { return EX_ATOM_QUOTED; }
 
     // Sigils - heredocs first
-    {SIGIL_START} "\"\"\"" ~"\"\"\""   { return EX_SIGIL; }
-    {SIGIL_START} "\'\'\'" ~"\'\'\'"   { return EX_SIGIL; }
+    {SIGIL_START} "\"\"\"" ~"\"\"\"" {SIGIL_MODIFIERS}   { return EX_SIGIL; }
+    {SIGIL_START} "\'\'\'" ~"\'\'\'" {SIGIL_MODIFIERS}   { return EX_SIGIL; }
     // Sigils - regular delimiters
-    {SIGIL_START} "\"" [^\"]* "\""     { return EX_SIGIL; }
-    {SIGIL_START} "\'" [^\']* "\'"     { return EX_SIGIL; }
-    {SIGIL_START} "/" [^/]* "/"        { return EX_SIGIL; }
-    {SIGIL_START} "|" [^|]* "|"        { return EX_SIGIL; }
-    {SIGIL_START} "(" [^)]* ")"        { return EX_SIGIL; }
-    {SIGIL_START} "[" [^\]]* "]"       { return EX_SIGIL; }
-    {SIGIL_START} "{" [^}]* "}"        { return EX_SIGIL; }
-    {SIGIL_START} "<" [^>]* ">"        { return EX_SIGIL; }
+    {SIGIL_START} "\"" [^\"]* "\"" {SIGIL_MODIFIERS}     { return EX_SIGIL; }
+    {SIGIL_START} "\'" [^\']* "\'" {SIGIL_MODIFIERS}     { return EX_SIGIL; }
+    {SIGIL_START} "/" [^/]* "/" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
+    {SIGIL_START} "|" [^|]* "|" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
+    {SIGIL_START} "(" [^)]* ")" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
+    {SIGIL_START} "[" [^\]]* "]" {SIGIL_MODIFIERS}       { return EX_SIGIL; }
+    {SIGIL_START} "{" [^}]* "}" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
+    {SIGIL_START} "<" [^>]* ">" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
 
     // Strings - heredocs must be before regular strings
     "\"\"\"" ~"\"\"\""                 { return EX_HEREDOC; }

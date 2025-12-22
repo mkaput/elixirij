@@ -1,0 +1,6 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExUnaryExprImpl(UNARY_EXPR)
+      PsiElement(!)('!')
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('x')
