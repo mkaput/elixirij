@@ -141,14 +141,15 @@ class ElixirLS(private val project: Project, private val cs: CoroutineScope) : E
                                 // Extract the ZIP file
                                 ZipUtil.extract(tempZip, extractDir, null)
 
-                                // Make launcher script executable on Unix and set timestamp
-                                if (launcher.exists()) {
-                                    if (!SystemInfo.isWindows) {
-                                        launcher.toFile().setExecutable(true)
-                                    }
-                                    if (remoteLastModified != 0L) {
-                                        Files.setLastModifiedTime(launcher, FileTime.fromMillis(remoteLastModified))
-                                    }
+                                // Make shell scripts executable on Unix
+                                if (!SystemInfo.isWindows) {
+                                    extractDir.toFile().listFiles { file -> file.extension == "sh" }
+                                        ?.forEach { it.setExecutable(true) }
+                                }
+
+                                // Set timestamp on launcher script
+                                if (launcher.exists() && remoteLastModified != 0L) {
+                                    Files.setLastModifiedTime(launcher, FileTime.fromMillis(remoteLastModified))
                                 }
                             } finally {
                                 Files.deleteIfExists(tempZip)
