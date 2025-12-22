@@ -1,0 +1,8 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExStructImpl(STRUCT)
+      PsiElement(%)('%')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('User')
+      PsiElement({)('{')
+      PsiElement(})('}')

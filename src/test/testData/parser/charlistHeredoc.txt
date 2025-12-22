@@ -1,0 +1,4 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExCharlistHeredocImpl(CHARLIST_HEREDOC)
+      PsiElement(CHARLIST_HEREDOC)(''''\nhello\nworld\n'''')
