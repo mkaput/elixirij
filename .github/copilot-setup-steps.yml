@@ -21,3 +21,4 @@ steps:
   # Note: Lexer generation is automatically handled by the build process
   - name: Build Plugin
     run: ./gradlew buildPlugin
+    continue-on-error: true
