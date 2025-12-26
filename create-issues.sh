@@ -1,18 +1,22 @@
-# Feature Implementation Issues
+#!/bin/bash
+set -e
 
-This document contains detailed GitHub issue descriptions for features that can be implemented with the current incomplete parser.
+# Script to create GitHub issues for ElixirIJ features
+# Run this script to create all 5 issues at once
 
----
+echo "Creating GitHub issues for ElixirIJ features..."
+echo ""
 
-## Issue 1: Implement code folding for Elixir structures
-
-### Description
+# Issue 1: Code Folding
+echo "Creating issue 1/5: Code folding..."
+gh issue create --title "Implement code folding for Elixir structures" --body "$(cat <<'EOF'
+## Description
 
 Add code folding support for Elixir data structures and code blocks to improve code readability and navigation in large files.
 
-### Features to Implement
+## Features to Implement
 
-#### Foldable Structures
+### Foldable Structures
 - **Lists**: `[...]`
 - **Maps**: `%{...}`
 - **Tuples**: `{...}`
@@ -21,14 +25,14 @@ Add code folding support for Elixir data structures and code blocks to improve c
 - **Multi-line sigils**: `~r/.../`, `~s/.../`, etc.
 - **Future**: do-blocks when parser supports them
 
-#### User Experience
+### User Experience
 - Placeholders should show structure type (e.g., `[...]`, `%{...}`)
 - Nested structures should fold independently
 - Fold by default for large structures (configurable)
 
-### IntelliJ Platform Extension Points
+## IntelliJ Platform Extension Points
 
-#### 1. `com.intellij.lang.foldingBuilder`
+### 1. `com.intellij.lang.foldingBuilder`
 
 **Implementation**: Create `ExFoldingBuilder` implementing `FoldingBuilder` or `FoldingBuilderEx`
 
@@ -53,7 +57,7 @@ class ExFoldingBuilder : FoldingBuilderEx() {
     implementationClass="dev.murek.elixirij.ide.folding.ExFoldingBuilder"/>
 ```
 
-#### 2. Custom Folding Regions (Optional)
+### 2. Custom Folding Regions (Optional)
 
 Support `# region` / `# endregion` comments for manual folding:
 
@@ -61,16 +65,16 @@ Support `# region` / `# endregion` comments for manual folding:
 class ExCustomFoldingBuilder : CustomFoldingBuilder()
 ```
 
-### Documentation References
+## Documentation References
 
 - [Folding Builder](https://plugins.jetbrains.com/docs/intellij/folding-builder.html) - Official IntelliJ Platform SDK docs
 - [FoldingBuilder API](https://github.com/JetBrains/intellij-community/blob/master/platform/core-api/src/com/intellij/lang/folding/FoldingBuilder.java)
 - [FoldingBuilderEx API](https://github.com/JetBrains/intellij-community/blob/master/platform/core-api/src/com/intellij/lang/folding/FoldingBuilderEx.java)
 - [Code example: SimpleFoldingBuilder](https://github.com/JetBrains/intellij-sdk-code-samples/blob/main/simple_language_plugin/src/main/java/org/intellij/sdk/language/SimpleFoldingBuilder.java)
 
-### Implementation Notes
+## Implementation Notes
 
-#### Token-Based Approach
+### Token-Based Approach
 Since the parser is incomplete, use a **token-based approach** initially:
 
 1. Scan PSI tree for elements with matching delimiters
@@ -83,7 +87,7 @@ Since the parser is incomplete, use a **token-based approach** initially:
 
 3. Create `FoldingDescriptor` for each matching pair
 
-#### Example Implementation
+### Example Implementation
 
 ```kotlin
 override fun buildFoldRegions(root: PsiElement, document: Document, quick: Boolean): Array<FoldingDescriptor> {
@@ -122,7 +126,7 @@ private fun addFoldingDescriptor(
 }
 ```
 
-#### Folding Options
+### Folding Options
 
 Add settings in `ExCodeFoldingOptionsProvider`:
 
@@ -137,7 +141,7 @@ class ExCodeFoldingOptionsProvider : CodeFoldingOptionsProvider {
 }
 ```
 
-### Testing
+## Testing
 
 Create `ExFoldingTest` extending `CodeInsightTestFixture`:
 
@@ -163,7 +167,7 @@ class ExFoldingTest : BasePlatformTestCase() {
 
 Test files in: `src/test/testData/folding/`
 
-### Acceptance Criteria
+## Acceptance Criteria
 
 - [ ] Lists, maps, tuples, bitstrings fold correctly
 - [ ] Heredocs and multi-line sigils fold
@@ -173,21 +177,25 @@ Test files in: `src/test/testData/folding/`
 - [ ] Tests cover all foldable structures
 - [ ] Works with incomplete/invalid code (error recovery)
 
-### Related Issues
+## Related Issues
 
 - Parser completion will enable folding for do-blocks, modules, functions
+EOF
+)" --label "enhancement" --label "editor"
 
----
+echo "✓ Issue 1 created"
+echo ""
 
-## Issue 2: Implement brace matching and auto-pairing for Elixir delimiters
-
-### Description
+# Issue 2: Brace Matching
+echo "Creating issue 2/5: Brace matching and auto-pairing..."
+gh issue create --title "Implement brace matching and auto-pairing for Elixir delimiters" --body "$(cat <<'EOF'
+## Description
 
 Add intelligent brace matching and auto-pairing support for all Elixir delimiter types to improve editing experience and reduce syntax errors.
 
-### Features to Implement
+## Features to Implement
 
-#### Brace Matching
+### Brace Matching
 Highlight matching pairs when cursor is near:
 - Parentheses: `()`
 - Brackets: `[]`
@@ -199,7 +207,7 @@ Highlight matching pairs when cursor is near:
 - Sigil delimiters: `~r/.../`, `~s(...)`, etc.
 - Heredoc delimiters: `"""..."""`, `'''...'''`
 
-#### Auto-Pairing
+### Auto-Pairing
 Automatically insert closing delimiter:
 - Type `(` → inserts `()` with cursor between
 - Type `[` → inserts `[]` with cursor between
@@ -209,15 +217,15 @@ Automatically insert closing delimiter:
 - Smart quote pairing for strings/atoms
 - Context-aware (don't auto-pair inside strings/comments)
 
-#### Smart Behaviors
+### Smart Behaviors
 - **Overtype closing delimiter**: Typing `)` when next char is `)` moves cursor forward
 - **Delete pair**: Backspace on `(` deletes matching `)` if nothing between
 - **Wrap selection**: Select text and type `(` wraps selection in `(...)`
 - **Context awareness**: Don't auto-pair inside strings, comments, or when preceded by escape
 
-### IntelliJ Platform Extension Points
+## IntelliJ Platform Extension Points
 
-#### 1. `com.intellij.lang.braceMatcher`
+### 1. `com.intellij.lang.braceMatcher`
 
 **Implementation**: Create `ExBraceMatcher` implementing `BraceMatcher` or `PairedBraceMatcher`
 
@@ -256,7 +264,7 @@ class ExBraceMatcher : PairedBraceMatcher {
     implementationClass="dev.murek.elixirij.ide.ExBraceMatcher"/>
 ```
 
-#### 2. `com.intellij.lang.quoteHandler`
+### 2. `com.intellij.lang.quoteHandler`
 
 **Implementation**: Create `ExQuoteHandler` for smart quote pairing
 
@@ -289,7 +297,7 @@ class ExQuoteHandler : SimpleTokenSetQuoteHandler(
     implementationClass="dev.murek.elixirij.ide.ExQuoteHandler"/>
 ```
 
-#### 3. `com.intellij.typedHandler` (Optional Advanced)
+### 3. `com.intellij.typedHandler` (Optional Advanced)
 
 For complex auto-pairing logic:
 
@@ -313,7 +321,7 @@ class ExTypedHandler : TypedHandlerDelegate() {
 }
 ```
 
-### Documentation References
+## Documentation References
 
 - [Brace Matcher](https://plugins.jetbrains.com/docs/intellij/brace-matching.html) - Official docs
 - [BraceMatcher API](https://github.com/JetBrains/intellij-community/blob/master/platform/analysis-api/src/com/intellij/lang/BraceMatcher.java)
@@ -321,9 +329,9 @@ class ExTypedHandler : TypedHandlerDelegate() {
 - [QuoteHandler API](https://github.com/JetBrains/intellij-community/blob/master/platform/lang-api/src/com/intellij/codeInsight/editorActions/QuoteHandler.java)
 - [Code example: SimpleBraceMatcher](https://github.com/JetBrains/intellij-sdk-code-samples/blob/main/simple_language_plugin/src/main/java/org/intellij/sdk/language/SimpleBraceMatcher.java)
 
-### Implementation Notes
+## Implementation Notes
 
-#### Basic Brace Pairs
+### Basic Brace Pairs
 
 ```kotlin
 class ExBraceMatcher : PairedBraceMatcher {
@@ -366,9 +374,9 @@ private val OPERATOR_TOKENS = TokenSet.create(
 )
 ```
 
-#### Special Cases
+### Special Cases
 
-##### Map Literals (`%{}`)
+#### Map Literals (`%{}`)
 Map literals need special handling since `%{` is a compound token:
 
 ```kotlin
@@ -382,7 +390,7 @@ override fun charTyped(c: Char, project: Project, editor: Editor, file: PsiFile)
 }
 ```
 
-##### Bitstrings (`<<>>`)
+#### Bitstrings (`<<>>`)
 Similar handling for `<<` sequence:
 
 ```kotlin
@@ -396,7 +404,7 @@ override fun charTyped(c: Char, project: Project, editor: Editor, file: PsiFile)
 }
 ```
 
-### Testing
+## Testing
 
 ```kotlin
 class ExBraceMatcherTest : BasePlatformTestCase() {
@@ -420,7 +428,7 @@ class ExBraceMatcherTest : BasePlatformTestCase() {
 }
 ```
 
-### Acceptance Criteria
+## Acceptance Criteria
 
 - [ ] All delimiter pairs are matched and highlighted
 - [ ] Auto-pairing works for all delimiter types
@@ -431,31 +439,35 @@ class ExBraceMatcherTest : BasePlatformTestCase() {
 - [ ] Quote handling works for strings, charlists, atoms
 - [ ] Tests cover all delimiter types and edge cases
 - [ ] Works with user settings (respects "auto-insert" preferences)
+EOF
+)" --label "enhancement" --label "editor"
 
----
+echo "✓ Issue 2 created"
+echo ""
 
-## Issue 3: Implement smart Enter handler for Elixir
-
-### Description
+# Issue 3: Smart Enter Handler
+echo "Creating issue 3/5: Smart Enter handler..."
+gh issue create --title "Implement smart Enter handler for Elixir" --body "$(cat <<'EOF'
+## Description
 
 Add intelligent Enter key handling to automatically indent code, continue multi-line constructs, and provide context-aware line breaks in Elixir code.
 
-### Features to Implement
+## Features to Implement
 
-#### Auto-Indentation
+### Auto-Indentation
 - Indent after opening delimiters: `(`, `[`, `{`, `<<`, `%{`
 - Maintain indentation level in lists, maps, tuples
 - Un-indent on closing delimiters
 - Future: Indent after `do` keyword (when parser supports it)
 
-#### Smart Line Continuation
+### Smart Line Continuation
 - Continue keyword lists across lines (align values)
 - Continue binary operators (maintain indentation)
 - Continue pipe chains (indent piped calls)
 - Continue strings/charlists with proper quoting
 - Continue multi-line function calls
 
-#### Context-Aware Behaviors
+### Context-Aware Behaviors
 - **Between delimiters**: `[<caret>]` →
   ```elixir
   [
@@ -483,15 +495,15 @@ Add intelligent Enter key handling to automatically indent code, continue multi-
   <caret>
   ```
 
-#### Special Cases
+### Special Cases
 - Split string literals with proper concatenation
 - Handle heredocs (don't break)
 - Comment continuation with `#` prefix
 - Respect `.editorconfig` indentation settings
 
-### IntelliJ Platform Extension Points
+## IntelliJ Platform Extension Points
 
-#### 1. `com.intellij.lang.smartEnterProcessor`
+### 1. `com.intellij.lang.smartEnterProcessor`
 
 **Implementation**: Create `ExSmartEnterProcessor`
 
@@ -517,7 +529,7 @@ class ExSmartEnterProcessor : SmartEnterProcessor() {
     implementationClass="dev.murek.elixirij.ide.ExSmartEnterProcessor"/>
 ```
 
-#### 2. `com.intellij.codeInsight.editorActions.enterHandler`
+### 2. `com.intellij.codeInsight.editorActions.enterHandler`
 
 **Implementation**: Create `ExEnterHandler`
 
@@ -556,7 +568,7 @@ class ExEnterHandler : EnterHandlerDelegateAdapter() {
     order="first"/>
 ```
 
-### Documentation References
+## Documentation References
 
 - [Enter Handler](https://plugins.jetbrains.com/docs/intellij/typing-assistance.html#enter-handler) - Official docs
 - [Smart Enter](https://plugins.jetbrains.com/docs/intellij/typing-assistance.html#smart-enter) - Complete statement feature
@@ -564,7 +576,7 @@ class ExEnterHandler : EnterHandlerDelegateAdapter() {
 - [SmartEnterProcessor API](https://github.com/JetBrains/intellij-community/blob/master/platform/lang-api/src/com/intellij/codeInsight/editorActions/smartEnter/SmartEnterProcessor.java)
 - [Code example: Python EnterHandler](https://github.com/JetBrains/intellij-community/blob/master/python/src/com/jetbrains/python/editor/PyEnterHandler.java)
 
-### Testing
+## Testing
 
 ```kotlin
 class ExEnterHandlerTest : BasePlatformTestCase() {
@@ -588,10 +600,16 @@ class ExEnterHandlerTest : BasePlatformTestCase() {
             ]
         """.trimIndent())
     }
+
+    fun `test enter after pipe operator`() {
+        myFixture.configureByText("test.ex", "x |> foo()<caret>")
+        myFixture.type('\n')
+        myFixture.checkResult("x |> foo()\n  <caret>")
+    }
 }
 ```
 
-### Acceptance Criteria
+## Acceptance Criteria
 
 - [ ] Auto-indent after opening delimiters
 - [ ] Smart split between matching braces
@@ -602,38 +620,59 @@ class ExEnterHandlerTest : BasePlatformTestCase() {
 - [ ] Respects `.editorconfig` indentation settings
 - [ ] Works with nested structures
 - [ ] Tests cover all scenarios
+- [ ] No interference with normal Enter behavior
 
----
+## Future Enhancements
 
-## Issue 4: Implement quote handler for intelligent quote pairing
+Once parser supports more constructs:
+- Indent after `do` keyword
+- Un-indent on `end` keyword
+- Handle `def`, `defp`, `defmodule` blocks
+- Smart indentation in `case`, `cond`, `with` expressions
+- Continue multi-clause functions
+EOF
+)" --label "enhancement" --label "editor"
 
-### Description
+echo "✓ Issue 3 created"
+echo ""
+
+# Issue 4: Quote Handler
+echo "Creating issue 4/5: Quote handler..."
+gh issue create --title "Implement quote handler for intelligent quote pairing" --body "$(cat <<'EOF'
+## Description
 
 Add intelligent quote handling for strings, charlists, and atoms in Elixir to automatically pair quotes, handle escape sequences, and provide context-aware quoting behavior.
 
-### Features to Implement
+## Features to Implement
 
-#### Auto-Pairing Quotes
+### Auto-Pairing Quotes
 - **Strings**: Type `"` → inserts `""` with cursor between
 - **Charlists**: Type `'` → inserts `''` with cursor between
 - **Quoted atoms**: Type `:` then `"` → inserts `:""`
 - **Heredocs**: Type `"""` → inserts `"""\n\n"""` with cursor between
 - **Charlist heredocs**: Type `'''` → inserts `'''\n\n'''` with cursor between
 
-#### Smart Behaviors
+### Smart Behaviors
 - **Overtype closing quote**: Typing `"` when next char is `"` moves cursor forward
 - **Don't pair escaped quotes**: After `\`, typing `"` inserts literal `\"`
 - **Context awareness**: Only pair quotes in code context, not in strings/comments
 - **Selection wrapping**: Select text and type `"` wraps selection in `"..."`
 
-#### Interpolation Support
+### Interpolation Support
 - Inside strings, recognize `#{` for interpolation
 - Don't pair quotes inside interpolation blocks
 - Handle escaped interpolation `\#{`
 
-### IntelliJ Platform Extension Points
+### Special Cases
+- **Empty strings**: `""` should work normally
+- **Adjacent strings**: `"foo" "bar"` should not interfere
+- **String in string**: Don't auto-pair when inside string literal
+- **Sigil strings**: `~s(...)`, `~S{...}` - different delimiters
+- **Mixed quotes**: Charlist inside string, vice versa
 
-#### 1. `com.intellij.lang.quoteHandler`
+## IntelliJ Platform Extension Points
+
+### 1. `com.intellij.lang.quoteHandler`
 
 **Implementation**: Create `ExQuoteHandler`
 
@@ -642,20 +681,56 @@ class ExQuoteHandler : QuoteHandler {
     override fun isOpeningQuote(
         iterator: HighlighterIterator,
         offset: Int
-    ): Boolean
+    ): Boolean {
+        val tokenType = iterator.tokenType
+
+        return when {
+            tokenType == EX_STRING -> isStringOpeningQuote(iterator, offset)
+            tokenType == EX_CHARLIST -> isCharlistOpeningQuote(iterator, offset)
+            tokenType == EX_ATOM_QUOTED -> isAtomOpeningQuote(iterator, offset)
+            else -> false
+        }
+    }
 
     override fun isClosingQuote(
         iterator: HighlighterIterator,
         offset: Int
-    ): Boolean
+    ): Boolean {
+        val tokenType = iterator.tokenType
+
+        return when {
+            tokenType == EX_STRING -> iterator.end == offset + 1
+            tokenType == EX_CHARLIST -> iterator.end == offset + 1
+            tokenType == EX_ATOM_QUOTED -> iterator.end == offset + 1
+            else -> false
+        }
+    }
 
     override fun hasNonClosedLiteral(
         editor: Editor,
         iterator: HighlighterIterator,
         offset: Int
-    ): Boolean
+    ): Boolean {
+        // Check if inside unclosed string
+        val tokenType = iterator.tokenType
+        return (tokenType in STRING_LITERALS &&
+                iterator.end > offset &&
+                !isEscaped(iterator, offset))
+    }
 
-    override fun isInsideLiteral(iterator: HighlighterIterator): Boolean
+    override fun isInsideLiteral(iterator: HighlighterIterator): Boolean {
+        return iterator.tokenType in STRING_LITERALS
+    }
+
+    companion object {
+        private val STRING_LITERALS = TokenSet.create(
+            EX_STRING,
+            EX_CHARLIST,
+            EX_ATOM_QUOTED,
+            EX_HEREDOC,
+            EX_CHARLIST_HEREDOC
+        )
+    }
 }
 ```
 
@@ -666,14 +741,57 @@ class ExQuoteHandler : QuoteHandler {
     implementationClass="dev.murek.elixirij.ide.ExQuoteHandler"/>
 ```
 
-### Documentation References
+### 2. `com.intellij.typedHandler` (For Complex Logic)
+
+For heredocs and special quote handling:
+
+```kotlin
+class ExTypedHandler : TypedHandlerDelegate() {
+    override fun beforeCharTyped(
+        c: Char,
+        project: Project,
+        editor: Editor,
+        file: PsiFile,
+        fileType: FileType
+    ): Result {
+        if (file !is ExFile) return Result.CONTINUE
+        if (c != '"' && c != '\'') return Result.CONTINUE
+
+        val offset = editor.caretModel.offset
+
+        // Check for heredoc pattern: ""<caret>
+        if (c == '"' && isHeredocStart(editor, offset)) {
+            insertHeredoc(editor, offset)
+            return Result.STOP
+        }
+
+        // Check for charlist heredoc: ''<caret>
+        if (c == '\'' && isCharlistHeredocStart(editor, offset)) {
+            insertCharlistHeredoc(editor, offset)
+            return Result.STOP
+        }
+
+        return Result.CONTINUE
+    }
+}
+```
+
+**Register in** `plugin.xml`:
+```xml
+<typedHandler
+    implementation="dev.murek.elixirij.ide.ExTypedHandler"
+    order="first"/>
+```
+
+## Documentation References
 
 - [Quote Handler](https://plugins.jetbrains.com/docs/intellij/typing-assistance.html#quote-handler) - Official docs
 - [QuoteHandler API](https://github.com/JetBrains/intellij-community/blob/master/platform/lang-api/src/com/intellij/codeInsight/editorActions/QuoteHandler.java)
-- [SimpleTokenSetQuoteHandler](https://github.com/JetBrains/intellij-community/blob/master/platform/lang-api/src/com/intellij/codeInsight/editorActions/SimpleTokenSetQuoteHandler.java)
+- [SimpleTokenSetQuoteHandler](https://github.com/JetBrains/intellij-community/blob/master/platform/lang-api/src/com/intellij/codeInsight/editorActions/SimpleTokenSetQuoteHandler.java) - Simple implementation
+- [MultiCharQuoteHandler](https://github.com/JetBrains/intellij-community/blob/master/platform/lang-api/src/com/intellij/codeInsight/editorActions/MultiCharQuoteHandler.java) - For multi-char quotes (heredocs)
 - [Code example: JsonQuoteHandler](https://github.com/JetBrains/intellij-community/blob/master/json/src/com/intellij/json/editor/JsonQuoteHandler.java)
 
-### Testing
+## Testing
 
 ```kotlin
 class ExQuoteHandlerTest : BasePlatformTestCase() {
@@ -683,10 +801,28 @@ class ExQuoteHandlerTest : BasePlatformTestCase() {
         myFixture.checkResult("\"<caret>\"")
     }
 
+    fun `test auto-pair single quotes`() {
+        myFixture.configureByText("test.ex", "<caret>")
+        myFixture.type('\'')
+        myFixture.checkResult("'<caret>'")
+    }
+
     fun `test overtype closing quote`() {
         myFixture.configureByText("test.ex", "\"hello<caret>\"")
         myFixture.type('"')
         myFixture.checkResult("\"hello\"<caret>")
+    }
+
+    fun `test no auto-pair inside string`() {
+        myFixture.configureByText("test.ex", "\"hello <caret> world\"")
+        myFixture.type('"')
+        myFixture.checkResult("\"hello \"<caret> world\"")
+    }
+
+    fun `test escaped quote`() {
+        myFixture.configureByText("test.ex", "\"hello \\<caret>\"")
+        myFixture.type('"')
+        myFixture.checkResult("\"hello \\\"<caret>\"")
     }
 
     fun `test heredoc insertion`() {
@@ -694,33 +830,76 @@ class ExQuoteHandlerTest : BasePlatformTestCase() {
         myFixture.type('"')
         myFixture.checkResult("\"\"\"\n  <caret>\n  \"\"\"")
     }
+
+    fun `test quoted atom`() {
+        myFixture.configureByText("test.ex", ":<caret>")
+        myFixture.type('"')
+        myFixture.checkResult(":\"<caret>\"")
+    }
+
+    fun `test wrap selection in quotes`() {
+        myFixture.configureByText("test.ex", "<selection>hello</selection>")
+        myFixture.type('"')
+        myFixture.checkResult("\"hello\"")
+    }
+
+    fun `test no pair inside interpolation`() {
+        myFixture.configureByText("test.ex", "\"hello #{<caret>}\"")
+        myFixture.type('"')
+        myFixture.checkResult("\"hello #{\"<caret>\"}\"")
+    }
 }
 ```
 
-### Acceptance Criteria
+## Edge Cases to Test
+
+- Consecutive strings: `"foo" "bar"`
+- Empty strings: `""`
+- Quotes inside interpolation: `"#{"}"}"`
+- Escaped interpolation: `"hello \#{foo}"`
+- Multiple escapes: `"hello \\\"world"`
+- Sigil strings: `~s("hello")`
+- Charlist inside string: `"hello 'world'"`
+- String inside charlist: `'hello "world"'`
+- Heredoc edge cases
+- Partial heredocs (recovery)
+
+## Acceptance Criteria
 
 - [ ] Auto-pair `"..."` for strings
 - [ ] Auto-pair `'...'` for charlists
 - [ ] Auto-pair `:"..."` for quoted atoms
 - [ ] Heredoc auto-insertion with `"""`
+- [ ] Charlist heredoc auto-insertion with `'''`
 - [ ] Overtype behavior for closing quotes
-- [ ] Escape sequence handling
-- [ ] Context awareness
+- [ ] Escape sequence handling (don't pair after `\`)
+- [ ] Context awareness (don't pair inside strings)
 - [ ] Interpolation awareness
 - [ ] Selection wrapping
-- [ ] Tests cover all quote types
+- [ ] Tests cover all quote types and edge cases
+- [ ] No interference with existing strings
 
----
+## Future Enhancements
 
-## Issue 5: Configure spell checking for Elixir files
+- Sigil quote handling for various delimiters
+- Smart quote conversion (`` ` `` to `'` in certain contexts)
+- Triple-quote auto-upgrade (typing third `"` creates heredoc)
+EOF
+)" --label "enhancement" --label "editor"
 
-### Description
+echo "✓ Issue 4 created"
+echo ""
+
+# Issue 5: Spell Checking
+echo "Creating issue 5/5: Spell checking configuration..."
+gh issue create --title "Configure spell checking for Elixir files" --body "$(cat <<'EOF'
+## Description
 
 Configure IntelliJ Platform's spell checker to work intelligently with Elixir code, enabling spell checking in appropriate contexts (comments, strings, documentation) while excluding code elements.
 
-### Features to Implement
+## Features to Implement
 
-#### Enable Spell Checking In:
+### Enable Spell Checking In:
 - **Comments**: `# This is a comment`
 - **String literals**: `"hello world"`
 - **Charlist literals**: `'hello world'`
@@ -729,25 +908,32 @@ Configure IntelliJ Platform's spell checker to work intelligently with Elixir co
 - **Function documentation**: `@doc "..."`
 - **Sigil strings**: `~s(hello world)`
 
-#### Disable Spell Checking In:
+### Disable Spell Checking In:
 - **Code identifiers**: Variable names, function names
 - **Atoms**: `:atom`, `:"quoted atom"`
 - **Module aliases**: `MyModule.SubModule`
 - **Keywords**: `def`, `defmodule`, `do`, `end`, etc.
 - **Numbers and operators**
-- **Regex sigils**: `~r/pattern/`
+- **Regex sigils**: `~r/pattern/` (regex patterns)
 - **Code in interpolations**: `"#{variable_name}"`
 
-#### Custom Dictionary:
+### Smart Behaviors:
+- Ignore snake_case identifiers in strings (likely variable names)
+- Ignore PascalCase identifiers (module names)
+- Accept common Elixir/Erlang terms as correct
+- Suggest camelCase → snake_case for Elixir conventions
+- Provide quick fixes for common typos
+
+### Custom Dictionary:
 - Elixir keywords and built-in modules
 - Common Erlang terms (erlang, ets, dets, gen_server, etc.)
 - Phoenix framework terms
 - Ecto terms
 - ExUnit terms
 
-### IntelliJ Platform Extension Points
+## IntelliJ Platform Extension Points
 
-#### 1. `com.intellij.spellchecker.support`
+### 1. `com.intellij.spellchecker.support`
 
 **Implementation**: Create `ExSpellcheckingStrategy`
 
@@ -755,14 +941,34 @@ Configure IntelliJ Platform's spell checker to work intelligently with Elixir co
 class ExSpellcheckingStrategy : SpellcheckingStrategy() {
     override fun getTokenizer(element: PsiElement): Tokenizer<*> {
         return when (element.node?.elementType) {
+            // Enable in comments
             EX_COMMENT -> TEXT_TOKENIZER
-            EX_STRING, EX_CHARLIST, EX_HEREDOC -> StringLiteralTokenizer()
+
+            // Enable in string literals
+            EX_STRING, EX_CHARLIST, EX_HEREDOC, EX_CHARLIST_HEREDOC ->
+                StringLiteralTokenizer()
+
+            // Enable in documentation attributes
+            // Check parent to see if it's @doc or @moduledoc
+            EX_STRING -> if (isDocAttribute(element)) {
+                TEXT_TOKENIZER
+            } else {
+                StringLiteralTokenizer()
+            }
+
+            // Disable in code
             else -> EMPTY_TOKENIZER
         }
     }
 
     override fun isMyContext(element: PsiElement): Boolean {
         return element.containingFile is ExFile
+    }
+
+    private fun isDocAttribute(element: PsiElement): Boolean {
+        val parent = element.parent
+        return parent is ExModuleAttribute &&
+               (parent.name == "doc" || parent.name == "moduledoc")
     }
 }
 ```
@@ -774,28 +980,79 @@ class ExSpellcheckingStrategy : SpellcheckingStrategy() {
     implementationClass="dev.murek.elixirij.ide.spellcheck.ExSpellcheckingStrategy"/>
 ```
 
-#### 2. Custom Dictionary
+### 2. Custom Dictionary
 
-Create `elixir.dic` with common terms and register:
+**Implementation**: Bundle custom dictionary file
 
+Create `elixir.dic` with common terms:
+```
+# Elixir keywords and modules
+defmodule
+defstruct
+defprotocol
+defimpl
+GenServer
+Supervisor
+Application
+Ecto
+Repo
+changeset
+
+# Phoenix
+LiveView
+conn
+endpoint
+router
+
+# ExUnit
+ExUnit
+doctest
+setup
+
+# Erlang
+ets
+dets
+mnesia
+dialyzer
+```
+
+**Register in** `plugin.xml`:
 ```xml
 <spellchecker.dictionary.customDictionaryProvider
     implementation="dev.murek.elixirij.ide.spellcheck.ExCustomDictionaryProvider"/>
 ```
 
-### Documentation References
+```kotlin
+class ExCustomDictionaryProvider : CustomDictionaryProvider {
+    override fun getDictionaries(): Array<Dictionary> {
+        val stream = javaClass.getResourceAsStream("/dictionaries/elixir.dic")
+        return arrayOf(PlainTextDictionary(stream, "Elixir"))
+    }
+}
+```
+
+## Documentation References
 
 - [Spell Checking](https://plugins.jetbrains.com/docs/intellij/spell-checking.html) - Official docs
 - [SpellcheckingStrategy API](https://github.com/JetBrains/intellij-community/blob/master/spellchecker/src/com/intellij/spellchecker/tokenizer/SpellcheckingStrategy.java)
+- [Tokenizer API](https://github.com/JetBrains/intellij-community/blob/master/spellchecker/src/com/intellij/spellchecker/tokenizer/Tokenizer.java)
 - [Custom Dictionary Guide](https://plugins.jetbrains.com/docs/intellij/spell-checking.html#custom-dictionaries)
 - [Code example: Properties SpellcheckingStrategy](https://github.com/JetBrains/intellij-community/blob/master/plugins/properties/properties-psi-impl/src/com/intellij/lang/properties/spellchecker/PropertiesSpellcheckingStrategy.java)
 
-### Testing
+## Testing
 
 ```kotlin
 class ExSpellcheckingTest : BasePlatformTestCase() {
     fun `test spell check in comment`() {
         myFixture.configureByText("test.ex", "# This is a commnet")
+        val highlights = myFixture.doHighlighting()
+        val typos = highlights.filter { it.severity == HighlightSeverity.TYPO }
+        assertEquals(1, typos.size)
+        assertEquals("commnet", typos[0].text)
+    }
+
+    fun `test spell check in string`() {
+        myFixture.configureByText("test.ex", "\"Hello wrold\"")
         val typos = myFixture.doHighlighting()
             .filter { it.severity == HighlightSeverity.TYPO }
         assertEquals(1, typos.size)
@@ -805,20 +1062,79 @@ class ExSpellcheckingTest : BasePlatformTestCase() {
         myFixture.configureByText("test.ex", "defmodule MyModul do\nend")
         val typos = myFixture.doHighlighting()
             .filter { it.severity == HighlightSeverity.TYPO }
+        assertEquals(0, typos.size) // "MyModul" is code, not checked
+    }
+
+    fun `test skip interpolation`() {
+        myFixture.configureByText("test.ex", "\"Hello #{some_variabel}\"")
+        val typos = myFixture.doHighlighting()
+            .filter { it.severity == HighlightSeverity.TYPO }
+        assertEquals(0, typos.size) // Interpolation skipped
+    }
+
+    fun `test elixir keywords not flagged`() {
+        myFixture.configureByText("test.ex", "# defmodule is a keyword")
+        val typos = myFixture.doHighlighting()
+            .filter { it.severity == HighlightSeverity.TYPO }
         assertEquals(0, typos.size)
     }
 }
 ```
 
-### Acceptance Criteria
+## Acceptance Criteria
 
 - [ ] Spell checking works in comments
 - [ ] Spell checking works in string literals
 - [ ] Spell checking works in heredocs
 - [ ] Spell checking works in `@doc` and `@moduledoc`
 - [ ] No spell checking in code identifiers
+- [ ] No spell checking in atoms
 - [ ] Interpolations are skipped in strings
 - [ ] Custom dictionary includes common Elixir/Erlang terms
 - [ ] snake_case identifiers are not flagged
+- [ ] PascalCase identifiers are not flagged
 - [ ] Tests cover all scenarios
 - [ ] User can add custom words to dictionary
+
+## Configuration
+
+Add settings in `ExSpellCheckingConfigurable`:
+```kotlin
+class ExSpellCheckingConfigurable : Configurable {
+    override fun createComponent(): JComponent {
+        return panel {
+            row("Enable spell checking in:") {
+                checkBox("Comments")
+                checkBox("String literals")
+                checkBox("Documentation attributes")
+            }
+        }
+    }
+}
+```
+
+## Future Enhancements
+
+- Quick fix to convert camelCase to snake_case
+- Suggest Elixir-specific naming conventions
+- Integration with hex.pm for module name validation
+- Recognize @typedoc and @spec documentation
+- Custom dictionary updates from project dependencies
+EOF
+)" --label "enhancement" --label "editor"
+
+echo "✓ Issue 5 created"
+echo ""
+
+echo "=========================================="
+echo "✅ All 5 GitHub issues created successfully!"
+echo "=========================================="
+echo ""
+echo "Issues created:"
+echo "  1. Code folding for Elixir structures"
+echo "  2. Brace matching and auto-pairing"
+echo "  3. Smart Enter handler"
+echo "  4. Quote handler for intelligent quote pairing"
+echo "  5. Spell checking configuration"
+echo ""
+echo "View all issues at: https://github.com/mkaput/elixirij/issues"
