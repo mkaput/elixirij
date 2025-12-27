@@ -26,6 +26,13 @@
   // Expression hierarchy - all expression types extend from expression
   extends(".*Expr")=expression
   extends("literal|atom|identifier|alias|list|tuple|map|struct|bitstring|sigil|heredoc|charlistHeredoc|parenExpr")=expression
+  
+  // Named rules for binary operators (for better PSI structure)
+  name("stabExpr")="stab expression"
+  name("inMatchExpr")="in-match expression"
+  name("whenExpr")="when expression"
+  name("typeExpr")="type expression"
+  name("pipeExpr")="pipe expression"
 }
 
 // Root rule
@@ -44,7 +51,27 @@ private eoe ::= (EX_EOL | EX_SEMICOLON)+
 // =============================================================================
 
 // Using fake rule to define expression base type
-expression ::= matchExpr
+expression ::= stabExpr
+
+// Container expression: used inside lists, maps, tuples, bitstrings where | and :: have special meaning
+// Starts from matchExpr to skip stab, inMatch, when, type, and pipe operators
+private containerExpr ::= matchExpr
+
+// Precedence 10: -> (right associative) - stab operator
+stabExpr ::= inMatchExpr (EX_ARROW stabExpr)?
+
+// Precedence 40: <-, \\ (left associative) - in-match operators
+inMatchExpr ::= whenExpr (inMatchOp whenExpr)*
+private inMatchOp ::= EX_LEFT_ARROW | EX_BACK_SLASH_BACK_SLASH
+
+// Precedence 50: when (right associative)
+whenExpr ::= typeExpr (EX_WHEN whenExpr)?
+
+// Precedence 60: :: (right associative) - type operator
+typeExpr ::= pipeExpr (EX_COLON_COLON typeExpr)?
+
+// Precedence 70: | (right associative) - pipe operator for patterns
+pipeExpr ::= matchExpr (EX_PIPE pipeExpr)?
 
 // Precedence 100: = (right associative)
 matchExpr ::= orExpr (EX_EQ matchExpr)?
@@ -107,7 +134,7 @@ atExpr ::= EX_AT atExpr | accessExpr
 
 // Precedence 310: Bracket access (left associative)
 accessExpr ::= primaryExpr bracketAccess*
-bracketAccess ::= EX_LBRACKET expression EX_RBRACKET { pin=1 }
+bracketAccess ::= EX_LBRACKET containerExpr EX_RBRACKET { pin=1 }
 
 // =============================================================================
 // Primary expressions
@@ -170,25 +197,25 @@ atom ::= EX_ATOM | EX_ATOM_QUOTED
 
 // List: [1, 2, 3] or [a: 1, b: 2] or [h | t]
 list ::= EX_LBRACKET listContents? EX_RBRACKET { pin=1 }
-private listContents ::= listElement (EX_COMMA listElement)* EX_COMMA? (EX_PIPE expression)?
-                       | expression EX_PIPE expression
-private listElement ::= keywordPair | expression
+private listContents ::= listElement (EX_COMMA listElement)* EX_COMMA? (EX_PIPE containerExpr)?
+                       | containerExpr EX_PIPE containerExpr
+private listElement ::= keywordPair | containerExpr
 
 // Keyword pair: key: value
-keywordPair ::= keywordKey expression
+keywordPair ::= keywordKey containerExpr
 private keywordKey ::= EX_IDENTIFIER EX_COLON | EX_ATOM_QUOTED EX_COLON
 
 // Tuple: {1, 2, 3}
 tuple ::= EX_LBRACE tupleContents? EX_RBRACE { pin=1 }
-private tupleContents ::= expression (EX_COMMA expression)* EX_COMMA?
+private tupleContents ::= containerExpr (EX_COMMA containerExpr)* EX_COMMA?
 
 // Map: %{key: value} or %{"key" => value}
 map ::= EX_PERCENT_LBRACE mapContents? EX_RBRACE { pin=1 }
 private mapContents ::= mapUpdateContents | mapPairContents
-private mapUpdateContents ::= expression EX_PIPE mapPairContents
+private mapUpdateContents ::= containerExpr EX_PIPE mapPairContents
 private mapPairContents ::= mapPair (EX_COMMA mapPair)* EX_COMMA?
 private mapPair ::= keywordPair | assocPair
-assocPair ::= expression EX_FAT_ARROW expression
+assocPair ::= containerExpr EX_FAT_ARROW containerExpr
 
 // Struct: %ModuleName{key: value}
 struct ::= EX_PERCENT alias EX_LBRACE mapContents? EX_RBRACE { pin=1 }
@@ -196,7 +223,7 @@ struct ::= EX_PERCENT alias EX_LBRACE mapContents? EX_RBRACE { pin=1 }
 // Bitstring: <<1, 2, 3>> or <<x::binary>>
 bitstring ::= EX_LT_LT bitstringContents? EX_GT_GT { pin=1 }
 private bitstringContents ::= bitstringElement (EX_COMMA bitstringElement)* EX_COMMA?
-private bitstringElement ::= expression bitstringType?
+private bitstringElement ::= containerExpr bitstringType?
 private bitstringType ::= EX_COLON_COLON bitstringTypeSpec (EX_MINUS bitstringTypeSpec)*
-private bitstringTypeSpec ::= bitstringTypeName (EX_LPAREN expression EX_RPAREN)?
+private bitstringTypeSpec ::= bitstringTypeName (EX_LPAREN containerExpr EX_RPAREN)?
 private bitstringTypeName ::= EX_IDENTIFIER | EX_INTEGER

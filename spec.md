@@ -657,7 +657,7 @@ The parser should produce a partial PSI tree with error nodes rather than failin
 
 ---
 
-### Phase 2: Missing Operators
+### Phase 2: Missing Operators ✅ DONE
 
 Add operators not yet implemented in the expression hierarchy.
 
