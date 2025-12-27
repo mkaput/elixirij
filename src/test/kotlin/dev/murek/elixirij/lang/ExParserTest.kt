@@ -73,6 +73,12 @@ class ExParserTest : ParsingTestCase(
     fun testOpPin() = doTest()
     fun testOpUnary() = doTest()
     fun testOpAt() = doTest()
+    
+    // Phase 2: Missing Operators
+    fun testOpType() = doTest()
+    fun testOpWhen() = doTest()
+    fun testOpStab() = doTest()
+    fun testOpInMatch() = doTest()
 
     // =============================================================================
     // 5. Data Structures
