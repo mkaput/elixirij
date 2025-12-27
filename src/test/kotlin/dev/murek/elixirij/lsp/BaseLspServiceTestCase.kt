@@ -7,6 +7,7 @@ import com.intellij.platform.lsp.api.LspServerSupportProvider
 import com.intellij.testFramework.LightPlatformTestCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import java.nio.file.Path
 import java.nio.file.attribute.FileTime
 import kotlin.io.path.exists
 import kotlin.io.path.getLastModifiedTime

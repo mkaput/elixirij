@@ -132,9 +132,20 @@ captureExpr ::= EX_AMPERSAND captureExpr | atExpr
 // @ operator (module attributes)
 atExpr ::= EX_AT atExpr | accessExpr
 
-// Precedence 310: Bracket access (left associative)
-accessExpr ::= primaryExpr bracketAccess*
+// Precedence 310: Dot access and calls (left associative)
+// Access expression includes primary expressions, dot access, bracket access, and function calls
+accessExpr ::= primaryExpr accessSuffix*
+private accessSuffix ::= dotAccess | bracketAccess | parenCall
+
+// Dot access: expr.field or Mod.Func
+dotAccess ::= EX_DOT dotTarget { pin=1 }
+private dotTarget ::= identifier | alias
+
+// Bracket access: expr[key]
 bracketAccess ::= EX_LBRACKET containerExpr EX_RBRACKET { pin=1 }
+
+// Parenthesized function call: func(args)
+parenCall ::= EX_LPAREN callArgs? EX_RPAREN { pin=1 }
 
 // =============================================================================
 // Primary expressions
@@ -227,3 +238,12 @@ private bitstringElement ::= containerExpr bitstringType?
 private bitstringType ::= EX_COLON_COLON bitstringTypeSpec (EX_MINUS bitstringTypeSpec)*
 private bitstringTypeSpec ::= bitstringTypeName (EX_LPAREN containerExpr EX_RPAREN)?
 private bitstringTypeName ::= EX_IDENTIFIER | EX_INTEGER
+
+// =============================================================================
+// Function call arguments
+// =============================================================================
+
+// Call arguments: comma-separated expressions
+// TODO(Phase 3.5): Add keyword argument support using lexer-level EX_KW_IDENTIFIER token.
+// See spec.md Phase 3.5 for implementation plan.
+private callArgs ::= containerExpr (EX_COMMA containerExpr)* EX_COMMA?

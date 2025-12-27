@@ -648,6 +648,8 @@ The parser should produce a partial PSI tree with error nodes rather than failin
 
 ## Implementation Plan
 
+**Note:** Completed phases are marked with ✅ DONE in their heading.
+
 ### Phase 1: Core Grammar (Basic Expressions) ✅ DONE
 
 1. Extend `Elixir.bnf` with complete expression grammar
@@ -672,18 +674,43 @@ Add operators not yet implemented in the expression hierarchy.
 
 ---
 
-### Phase 3: Parenthesized Function Calls
+### Phase 3: Parenthesized Function Calls (Positional Arguments) ✅ DONE
 
-Implement function calls with parentheses.
+Implement function calls with parentheses, supporting positional arguments only.
 
 **Grammar additions:**
-- `parenCall ::= callTarget EX_LPAREN arguments? EX_RPAREN`
-- `callTarget ::= identifier | alias dotAccess?`
+- `parenCall ::= EX_LPAREN callArgs? EX_RPAREN`
 - `dotAccess ::= EX_DOT (identifier | alias)`
-- `arguments ::= argElement (EX_COMMA argElement)* EX_COMMA?`
-- `argElement ::= keywordPair | expression`
+- `accessExpr ::= primaryExpr (dotAccess | bracketAccess | parenCall)*`
+- `callArgs ::= containerExpr (EX_COMMA containerExpr)* EX_COMMA?`
 
-**Tests:** `testCallParen`, `testCallNoArgs`, `testCallKeyword`, `testCallMixed`, `testCallNested`, `testCallQualified`, `testCallQualifiedNested`, `testCallRemote`
+**Tests:** `testCallParen`, `testCallNoArgs`, `testCallNested`, `testCallQualified`, `testCallQualifiedNested`, `testCallRemote`
+
+**Note:** Keyword arguments (`testCallKeyword`, `testCallMixed`) are deferred to Phase 3.5.
+
+---
+
+### Phase 3.5: Keyword Arguments in Function Calls
+
+Implement keyword argument support in function calls using lexer-level tokens.
+
+**Problem:** Grammar-Kit's PEG parser cannot distinguish `a` (identifier expression) from `a:` (keyword key start) without lookahead at the parser level. Both `keywordPair | containerExpr` alternatives match `EX_IDENTIFIER`, causing the parser to commit to the wrong path.
+
+**Solution:** Follow Expert's approach with lexer-level whitespace-sensitive tokens:
+- Emit `kw_identifier` token (instead of regular `identifier`) when tokenizer sees `identifier: <space>`
+- This makes keyword pairs unambiguous at the token level
+- Elixir language rule: keyword syntax requires space after colon (`a: 1` is valid, `a:1` is not)
+
+**Lexer additions (Elixir.flex):**
+- Add state management for tracking context after identifiers
+- Emit `EX_KW_IDENTIFIER` token when pattern `IDENTIFIER ':' SPACE` is matched
+- Regular `EX_IDENTIFIER` for all other cases
+
+**Grammar updates:**
+- `keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON`
+- Update `callArgs` to support mixed positional and keyword arguments
+
+**Tests:** `testCallKeyword`, `testCallMixed`
 
 ---
 
