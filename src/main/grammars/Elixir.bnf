@@ -244,6 +244,8 @@ private bitstringTypeName ::= EX_IDENTIFIER | EX_INTEGER
 // =============================================================================
 
 // Call arguments: comma-separated expressions
-// TODO: Add proper support for keyword arguments (a: 1, b: 2)
-// For now, we only support positional arguments
+// TODO: Keyword arguments (a: 1, b: 2) are not yet supported due to Grammar-Kit PEG parser
+// limitations. The parser cannot distinguish between `a` (identifier expression) and `a:`
+// (keyword key) without more lookahead. This will require either lexer-level support
+// or external predicates to resolve.
 private callArgs ::= containerExpr (EX_COMMA containerExpr)* EX_COMMA?
