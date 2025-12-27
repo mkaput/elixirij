@@ -648,6 +648,8 @@ The parser should produce a partial PSI tree with error nodes rather than failin
 
 ## Implementation Plan
 
+**Note:** Completed phases are marked with ✅ DONE in their heading.
+
 ### Phase 1: Core Grammar (Basic Expressions) ✅ DONE
 
 1. Extend `Elixir.bnf` with complete expression grammar
@@ -672,7 +674,7 @@ Add operators not yet implemented in the expression hierarchy.
 
 ---
 
-### Phase 3: Parenthesized Function Calls (Positional Arguments)
+### Phase 3: Parenthesized Function Calls (Positional Arguments) ✅ DONE
 
 Implement function calls with parentheses, supporting positional arguments only.
 
