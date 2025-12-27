@@ -648,45 +648,391 @@ The parser should produce a partial PSI tree with error nodes rather than failin
 
 ## Implementation Plan
 
-### Phase 1: Core Grammar (Basic Expressions)
+### Phase 1: Core Grammar (Basic Expressions) ✅ DONE
 
 1. Extend `Elixir.bnf` with complete expression grammar
 2. Handle operator precedence correctly
 3. Implement all literal types
 4. Add data structure parsing (list, tuple, map, struct, bitstring)
 
-### Phase 2: Function Calls and Blocks
+---
 
-1. Implement function call variants (paren, no-paren, qualified)
-2. Add do-block parsing
-3. Implement anonymous functions
-4. Handle keyword arguments
+### Phase 2: Missing Operators
 
-### Phase 3: Control Flow and Modules
+Add operators not yet implemented in the expression hierarchy.
 
-1. Add control flow constructs (if, case, cond, with, try)
-2. Implement module definitions
-3. Add module attributes
-4. Handle import/alias/require/use
+**Grammar additions:**
+- Type operator `::` (precedence 60, right associative)
+- Pipe operator `|` for patterns (precedence 70, right associative)
+- When operator `when` (precedence 50, right associative)
+- Stab operator `->` (precedence 10, right associative)
+- In-match operators `<-`, `\\` (precedence 40, left associative)
 
-### Phase 4: Advanced Features
+**Tests:** `testOpType`, `testOpWhen`, `testOpStab`, `testOpInMatch`
 
-1. Implement comprehensions
-2. Add special forms (quote, unquote)
-3. Handle pattern matching edge cases
+---
 
-### Phase 5: Testing and Refinement
+### Phase 3: Parenthesized Function Calls
 
-1. Port all test cases from Expert (sections 1-16)
-2. Add additional edge case tests
+Implement function calls with parentheses.
+
+**Grammar additions:**
+- `parenCall ::= callTarget EX_LPAREN arguments? EX_RPAREN`
+- `callTarget ::= identifier | alias dotAccess?`
+- `dotAccess ::= EX_DOT (identifier | alias)`
+- `arguments ::= argElement (EX_COMMA argElement)* EX_COMMA?`
+- `argElement ::= keywordPair | expression`
+
+**Tests:** `testCallParen`, `testCallNoArgs`, `testCallKeyword`, `testCallMixed`, `testCallNested`, `testCallQualified`, `testCallQualifiedNested`, `testCallRemote`
+
+---
+
+### Phase 4: Anonymous Calls
+
+Implement anonymous function invocation.
+
+**Grammar additions:**
+- `anonymousCall ::= accessExpr EX_DOT EX_LPAREN arguments? EX_RPAREN`
+- Update `accessExpr` to handle chained `.()` calls
+
+**Tests:** `testCallAnonymous`
+
+---
+
+### Phase 5: Anonymous Functions (fn)
+
+Implement `fn -> end` expressions.
+
+**Grammar additions:**
+- `fnExpr ::= EX_FN stabClause+ EX_END`
+- `stabClause ::= stabArgs? EX_ARROW stabBody`
+- `stabArgs ::= stabArg (EX_COMMA stabArg)* whenClause?`
+- `stabArg ::= expression`
+- `stabBody ::= expression (eoe expression)*`
+- `whenClause ::= EX_WHEN expression`
+
+**Tests:** `testFnSimple`, `testFnOneArg`, `testFnMultiArg`, `testFnMultiClause`, `testFnPattern`, `testFnGuard`
+
+---
+
+### Phase 6: Capture Expressions
+
+Enhance capture operator for named and anonymous captures.
+
+**Grammar additions:**
+- `captureNamed ::= EX_AMPERSAND callTarget EX_SLASH EX_INTEGER`
+- `captureAnonymous ::= EX_AMPERSAND parenExpr` (using &1, &2 placeholders)
+- Capture placeholder: `EX_AMPERSAND EX_INTEGER`
+
+**Tests:** `testCaptureNamed`, `testCaptureAnonymous`, `testCaptureQualified`, `testOpCapture` (enhance)
+
+---
+
+### Phase 7: Do-Blocks (Basic)
+
+Implement basic do-end blocks.
+
+**Grammar additions:**
+- `doBlock ::= EX_DO doContents EX_END`
+- `doContents ::= (eoe? expression (eoe expression)*)? eoe?`
+- Inline variant: `doInline ::= EX_COMMA? EX_DO_COLON expression`
+
+**Tests:** `testDoBlockSimple`, `testDoBlockMultiExpr`
+
+---
+
+### Phase 8: Do-Block Clauses
+
+Add else/after/catch/rescue clauses to do-blocks.
+
+**Grammar additions:**
+- `blockClause ::= elseClause | afterClause | catchClause | rescueClause`
+- `elseClause ::= EX_ELSE doContents`
+- `afterClause ::= EX_AFTER doContents`
+- `catchClause ::= EX_CATCH stabClause+`
+- `rescueClause ::= EX_RESCUE stabClause+`
+
+**Tests:** `testIfElse` (partial), `testTryCatch`, `testTryAfter`, `testTryRescue`
+
+---
+
+### Phase 9: No-Parens Function Calls
+
+Implement function calls without parentheses.
+
+**Grammar additions:**
+- `noParensCall ::= callTarget noParensArgs`
+- `noParensArgs ::= expression (EX_COMMA expression)* keywordTail?`
+- `keywordTail ::= EX_COMMA keywordPair (EX_COMMA keywordPair)*`
+- Handle ambiguous parsing with lookahead
+
+**Tests:** `testCallNoParen`, `testAmbiguousCall`
+
+---
+
+### Phase 10: Calls with Do-Blocks
+
+Integrate do-blocks with function calls.
+
+**Grammar additions:**
+- Update `parenCall` and `noParensCall` to accept optional `doBlock`
+- Handle `func(args) do ... end` and `func args do ... end` patterns
+
+**Tests:** `testIfSimple`, `testIfOneLiner`, `testUnless`
+
+---
+
+### Phase 11: Control Flow - case
+
+Implement case expressions.
+
+**Grammar additions:**
+- `caseExpr ::= EX_CASE expression EX_DO caseClause+ EX_END`
+- `caseClause ::= stabClause` (pattern -> body)
+- Guards in patterns: `pattern when guard -> body`
+
+**Tests:** `testCase`, `testCaseMulti`, `testCaseGuard`
+
+---
+
+### Phase 12: Control Flow - cond
+
+Implement cond expressions.
+
+**Grammar additions:**
+- `condExpr ::= EX_COND EX_DO condClause+ EX_END`
+- `condClause ::= expression EX_ARROW expression eoe?`
+
+**Tests:** `testCond`
+
+---
+
+### Phase 13: Control Flow - with
+
+Implement with expressions.
+
+**Grammar additions:**
+- `withExpr ::= EX_WITH withClause (EX_COMMA withClause)* doBlock`
+- `withClause ::= expression EX_LEFT_ARROW expression`
+- Support `else` clause for with
+
+**Tests:** `testWith`, `testWithElse`
+
+---
+
+### Phase 14: Control Flow - try/rescue/catch/after
+
+Implement try expressions.
+
+**Grammar additions:**
+- `tryExpr ::= EX_TRY EX_DO tryContents EX_END`
+- `tryContents ::= doContents rescueClause* catchClause* afterClause?`
+- Rescue patterns: `rescue e in Exception -> ...`
+
+**Tests:** `testTry`, `testTryCatch`, `testTryAfter`
+
+---
+
+### Phase 15: Control Flow - receive
+
+Implement receive expressions.
+
+**Grammar additions:**
+- `receiveExpr ::= EX_RECEIVE EX_DO receiveClause+ afterClause? EX_END`
+- `receiveClause ::= stabClause`
+
+**Tests:** `testReceive`, `testReceiveAfter`
+
+---
+
+### Phase 16: Module Definitions (defmodule)
+
+Implement module definitions.
+
+**Grammar additions:**
+- `defmoduleExpr ::= EX_DEFMODULE alias doBlock`
+- Module body contains definitions and expressions
+
+**Tests:** `testDefmodule`, `testDefmoduleNested`
+
+---
+
+### Phase 17: Function Definitions (def/defp)
+
+Implement function definitions.
+
+**Grammar additions:**
+- `defExpr ::= (EX_DEF | EX_DEFP) defHead defBody`
+- `defHead ::= identifier defArgs? whenClause?`
+- `defArgs ::= EX_LPAREN argList? EX_RPAREN`
+- `defBody ::= doBlock | doInline`
+
+**Tests:** `testDef`, `testDefMultiClause`, `testDefp`
+
+---
+
+### Phase 18: Macro Definitions (defmacro/defmacrop)
+
+Implement macro definitions.
+
+**Grammar additions:**
+- `defmacroExpr ::= (EX_DEFMACRO | EX_DEFMACROP) defHead defBody`
+- Reuse `defHead` and `defBody` from Phase 17
+
+**Tests:** `testDefmacro`, `testDefmacrop`
+
+---
+
+### Phase 19: Guard Definitions (defguard)
+
+Implement guard definitions.
+
+**Grammar additions:**
+- `defguardExpr ::= (EX_DEFGUARD | EX_DEFGUARDP) identifier defArgs? whenClause`
+
+**Tests:** `testDefguard`
+
+---
+
+### Phase 20: Struct and Exception Definitions
+
+Implement defstruct and defexception.
+
+**Grammar additions:**
+- `defstructExpr ::= EX_DEFSTRUCT (list | keywordList)`
+- `defexceptionExpr ::= EX_DEFEXCEPTION (list | keywordList)`
+
+**Tests:** `testDefstruct`, `testDefexception`
+
+---
+
+### Phase 21: Protocol Definitions
+
+Implement defprotocol and defimpl.
+
+**Grammar additions:**
+- `defprotocolExpr ::= EX_DEFPROTOCOL alias doBlock`
+- `defimplExpr ::= EX_DEFIMPL alias EX_COMMA EX_FOR_COLON alias doBlock`
+
+**Tests:** `testDefprotocol`, `testDefimpl`
+
+---
+
+### Phase 22: Module Attributes
+
+Implement module attributes.
+
+**Grammar additions:**
+- `moduleAttr ::= EX_AT identifier attrValue?`
+- `attrValue ::= expression`
+- Special handling for `@spec`, `@type`, `@doc`, etc.
+
+**Tests:** `testModuleAttr`, `testModuleDoc`, `testDoc`, `testSpec`, `testType`, `testOpaque`, `testCallback`, `testBehaviour`
+
+---
+
+### Phase 23: Import/Require/Use
+
+Implement import, require, and use.
+
+**Grammar additions:**
+- `importExpr ::= EX_IMPORT alias importOpts?`
+- `importOpts ::= EX_COMMA keywordList`
+- `requireExpr ::= EX_REQUIRE alias`
+- `useExpr ::= EX_USE alias useOpts?`
+
+**Tests:** `testImport`, `testImportOnly`, `testImportExcept`, `testRequire`, `testUse`, `testUseOpts`
+
+---
+
+### Phase 24: Alias Directive
+
+Implement alias directive (not to be confused with alias literals).
+
+**Grammar additions:**
+- `aliasDirective ::= EX_ALIAS alias aliasOpts?`
+- `aliasOpts ::= EX_COMMA EX_AS_COLON alias`
+- Multi-alias: `EX_ALIAS alias EX_DOT EX_LBRACE alias (EX_COMMA alias)* EX_RBRACE`
+
+**Tests:** `testAlias`, `testAliasAs`, `testAliasMulti`
+
+---
+
+### Phase 25: Comprehensions (for)
+
+Implement for comprehensions.
+
+**Grammar additions:**
+- `forExpr ::= EX_FOR forClause (EX_COMMA forClause)* forOpts? doBlock`
+- `forClause ::= forGenerator | forFilter`
+- `forGenerator ::= expression EX_LEFT_ARROW expression`
+- `forFilter ::= expression`
+- `forOpts ::= EX_COMMA (EX_INTO_COLON | EX_UNIQ_COLON | EX_REDUCE_COLON) expression`
+
+**Tests:** `testForSimple`, `testForFilter`, `testForMultiGen`, `testForInto`, `testForUniq`, `testForBitstring`
+
+---
+
+### Phase 26: Quote and Unquote
+
+Implement quote special form.
+
+**Grammar additions:**
+- `quoteExpr ::= EX_QUOTE quoteOpts? doBlock`
+- `quoteOpts ::= EX_COMMA keywordList`
+- `unquoteExpr ::= EX_UNQUOTE EX_LPAREN expression EX_RPAREN`
+- `unquoteSplicingExpr ::= EX_UNQUOTE_SPLICING EX_LPAREN expression EX_RPAREN`
+
+**Tests:** `testQuote`, `testQuoteUnquote`, `testQuoteSplice`, `testQuoteBind`
+
+---
+
+### Phase 27: Raise, Throw, and Send
+
+Implement remaining special forms.
+
+**Grammar additions:**
+- `raiseExpr ::= EX_RAISE expression (EX_COMMA expression)?`
+- `throwExpr ::= EX_THROW expression`
+- `sendExpr ::= EX_SEND expression EX_COMMA expression`
+- `superExpr ::= EX_SUPER arguments?`
+
+**Tests:** `testRaise`, `testRaiseException`, `testThrow`, `testSend`, `testSuper`
+
+---
+
+### Phase 28: Edge Cases and Validation
+
+Handle remaining edge cases.
+
+**Grammar refinements:**
+- Trailing commas in all containers
+- Newlines within expressions
+- Multiple semicolon-separated statements
+- Nested do-blocks
+- Operator atoms (`:+`, `:-`, etc.)
+
+**Tests:** All tests from section 16 (Edge Cases and Valid Syntax)
+
+---
+
+### Phase 29: Testing and Refinement
+
+Port remaining test cases and validate complete grammar.
+
+**Tasks:**
+1. Ensure all tests from sections 1-16 pass
+2. Add additional edge case tests as discovered
 3. Verify PSI structure matches expected output
-4. Performance optimization
+4. Profile parser performance on large files
 
-### Phase 6: Partial Parsing and Error Recovery
+---
+
+### Phase 30: Partial Parsing and Error Recovery
 
 This phase is critical for IDE functionality. Users constantly work with incomplete code, and the parser must handle this gracefully.
 
-#### 6.1 Grammar-Kit Error Recovery Mechanisms
+#### 30.1 Grammar-Kit Error Recovery Mechanisms
 
 1. **Pin markers**: Use `pin` to mark tokens that commit to a rule, enabling better error messages and recovery
    ```bnf
@@ -701,7 +1047,7 @@ This phase is critical for IDE functionality. Users constantly work with incompl
 
 3. **Extending rules**: Use `extends` for better error node hierarchy
 
-#### 6.2 Implementation Tasks
+#### 30.2 Implementation Tasks
 
 1. Add `pin` markers to all delimiter-based rules:
    - Lists: pin on `[`
@@ -730,14 +1076,14 @@ This phase is critical for IDE functionality. Users constantly work with incompl
    - Ensure error elements contain recoverable content
    - Preserve as much valid PSI structure as possible
 
-#### 6.3 Testing Strategy
+#### 30.3 Testing Strategy
 
 1. **Unit tests**: Each partial parsing test case from section 17
 2. **Property-based tests**: Generate random incomplete code fragments
 3. **Real-world tests**: Use actual incomplete code from Expert's test fixtures
 4. **IDE integration tests**: Verify completion/navigation works with incomplete code
 
-#### 6.4 Success Criteria
+#### 30.4 Success Criteria
 
 - Parser never crashes or hangs on any input
 - Valid portions of code produce correct PSI structure
