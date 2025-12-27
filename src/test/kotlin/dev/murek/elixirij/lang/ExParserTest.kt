@@ -79,6 +79,7 @@ class ExParserTest : ParsingTestCase(
     fun testOpWhen() = doTest()
     fun testOpStab() = doTest()
     fun testOpInMatch() = doTest()
+    fun testPipeInContainers() = doTest()
 
     // =============================================================================
     // 5. Data Structures
