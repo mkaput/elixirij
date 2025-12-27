@@ -244,8 +244,6 @@ private bitstringTypeName ::= EX_IDENTIFIER | EX_INTEGER
 // =============================================================================
 
 // Call arguments: comma-separated expressions
-// TODO: Keyword arguments (a: 1, b: 2) are not yet supported due to Grammar-Kit PEG parser
-// limitations. The parser cannot distinguish between `a` (identifier expression) and `a:`
-// (keyword key) without more lookahead. This will require either lexer-level support
-// or external predicates to resolve.
+// TODO(Phase 3.5): Add keyword argument support using lexer-level EX_KW_IDENTIFIER token.
+// See spec.md Phase 3.5 for implementation plan.
 private callArgs ::= containerExpr (EX_COMMA containerExpr)* EX_COMMA?
