@@ -121,7 +121,20 @@ class ExParserTest : ParsingTestCase(
     fun testParenNested() = doTest()
 
     // =============================================================================
-    // 8. Edge Cases
+    // 8. Function Calls (Phase 3)
+    // =============================================================================
+
+    fun testCallParen() = doTest()
+    fun testCallNoArgs() = doTest()
+    fun testCallKeyword() = doTest()
+    fun testCallMixed() = doTest()
+    fun testCallNested() = doTest()
+    fun testCallQualified() = doTest()
+    fun testCallQualifiedNested() = doTest()
+    fun testCallRemote() = doTest()
+
+    // =============================================================================
+    // 9. Edge Cases
     // =============================================================================
 
     fun testEmptyFile() = doTest()
