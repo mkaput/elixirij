@@ -127,7 +127,11 @@ unaryExpr ::= unaryOp unaryExpr | captureExpr
 private unaryOp ::= EX_NOT | EX_EXCLAMATION | EX_CARET | EX_TILDE | EX_PLUS | EX_MINUS
 
 // Capture operator: & (for &func/arity and &(&1 + &2))
-captureExpr ::= EX_AMPERSAND captureExpr | atExpr
+captureExpr ::= captureNamedExpr | captureAnonymousExpr | capturePlaceholderExpr | atExpr
+captureNamedExpr ::= EX_AMPERSAND captureTarget EX_SLASH EX_INTEGER
+captureAnonymousExpr ::= EX_AMPERSAND parenExpr
+capturePlaceholderExpr ::= EX_AMPERSAND EX_INTEGER
+private captureTarget ::= (atom | alias | identifier) (EX_DOT identifier)*
 
 // @ operator (module attributes)
 atExpr ::= EX_AT atExpr | accessExpr
