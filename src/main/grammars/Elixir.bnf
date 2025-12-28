@@ -167,13 +167,15 @@ private primaryExpr ::= literal
                       | parenExpr
 
 // Parenthesized expression
-parenExpr ::= EX_LPAREN expression EX_RPAREN { pin=1 }
+parenExpr ::= EX_LPAREN expression? EX_RPAREN { pin=1 }
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }
-stabClause ::= stabArgs? EX_ARROW stabBody
-private stabArgs ::= stabArg (EX_COMMA stabArg)* whenClause?
-private stabArg ::= typeExpr
+stabClause ::= EX_LPAREN EX_RPAREN EX_ARROW stabBody { pin=1 }
+            | stabArgs? EX_ARROW stabBody
+private stabArgs ::= stabArgList whenClause?
+private stabArgList ::= stabArg (EX_COMMA stabArg)*
+private stabArg ::= matchExpr
 private stabBody ::= matchExpr (eoe matchExpr !EX_ARROW)*
 private whenClause ::= EX_WHEN matchExpr
 

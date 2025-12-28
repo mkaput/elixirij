@@ -12,6 +12,7 @@ class ExParserTest : ParsingTestCase(
     override fun getTestDataPath(): String = "src/test/testData"
 
     private fun doTest() = doTest(true, true)
+    private fun doTestAllowErrors() = doTest(true, false)
 
     // =============================================================================
     // 1. Literals
@@ -149,8 +150,10 @@ class ExParserTest : ParsingTestCase(
     fun testFnMultiArg() = doTest()
     fun testFnMultiClause() = doTest()
     fun testFnMultiClauseNewline() = doTest()
+    fun testFnEmptyArgs() = doTest()
     fun testFnPattern() = doTest()
     fun testFnGuard() = doTest()
+    fun testFnTypeArgInvalid() = doTestAllowErrors()
 
     // =============================================================================
     // 10. Edge Cases
