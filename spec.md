@@ -714,7 +714,7 @@ Implement keyword argument support in function calls using lexer-level tokens.
 
 ---
 
-### Phase 4: Anonymous Calls
+### Phase 4: Anonymous Calls ✅ DONE
 
 Implement anonymous function invocation.
 
