@@ -44,9 +44,9 @@ class ExSyntaxHighlighter : SyntaxHighlighterBase() {
         in EX_KEYWORDS -> pack(ExTextAttributes.KEYWORD)
         in EX_STRINGS -> pack(ExTextAttributes.STRING)
         in EX_NUMBERS -> pack(ExTextAttributes.NUMBER)
-        EX_ATOM, EX_ATOM_QUOTED -> pack(ExTextAttributes.ATOM)
+        EX_ATOM, EX_ATOM_QUOTED, EX_KW_IDENTIFIER -> pack(ExTextAttributes.ATOM)
         EX_ALIAS -> pack(ExTextAttributes.MODULE)
-        EX_IDENTIFIER, EX_KW_IDENTIFIER -> pack(ExTextAttributes.IDENTIFIER)
+        EX_IDENTIFIER -> pack(ExTextAttributes.IDENTIFIER)
         EX_SIGIL -> pack(ExTextAttributes.SIGIL)
         // Handle EX_AT before EX_OPERATORS since @ is used for module attributes in Elixir
         EX_AT -> pack(ExTextAttributes.MODULE_ATTRIBUTE)
