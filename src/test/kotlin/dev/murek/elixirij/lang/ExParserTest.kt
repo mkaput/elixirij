@@ -141,7 +141,18 @@ class ExParserTest : ParsingTestCase(
     fun testCallRemote() = doTest()
 
     // =============================================================================
-    // 9. Edge Cases
+    // 9. Anonymous Functions (Phase 5)
+    // =============================================================================
+
+    fun testFnSimple() = doTest()
+    fun testFnOneArg() = doTest()
+    fun testFnMultiArg() = doTest()
+    fun testFnMultiClause() = doTest()
+    fun testFnPattern() = doTest()
+    fun testFnGuard() = doTest()
+
+    // =============================================================================
+    // 10. Edge Cases
     // =============================================================================
 
     fun testEmptyFile() = doTest()

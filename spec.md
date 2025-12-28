@@ -726,7 +726,7 @@ Implement anonymous function invocation.
 
 ---
 
-### Phase 5: Anonymous Functions (fn)
+### Phase 5: Anonymous Functions (fn) ✅ DONE
 
 Implement `fn -> end` expressions.
 
