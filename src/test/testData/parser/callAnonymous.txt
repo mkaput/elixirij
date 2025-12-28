@@ -1,0 +1,9 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExAccessExprImpl(ACCESS_EXPR)
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('func')
+      ExAnonymousCallImpl(ANONYMOUS_CALL)
+        PsiElement(.)('.')
+        PsiElement(()('(')
+        PsiElement())(')')

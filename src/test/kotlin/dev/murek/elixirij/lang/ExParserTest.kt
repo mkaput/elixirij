@@ -139,6 +139,7 @@ class ExParserTest : ParsingTestCase(
     fun testCallQualified() = doTest()
     fun testCallQualifiedNested() = doTest()
     fun testCallRemote() = doTest()
+    fun testCallAnonymous() = doTest()
 
     // =============================================================================
     // 9. Edge Cases
