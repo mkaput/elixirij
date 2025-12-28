@@ -690,7 +690,7 @@ Implement function calls with parentheses, supporting positional arguments only.
 
 ---
 
-### Phase 3.5: Keyword Arguments in Function Calls
+### Phase 3.5: Keyword Arguments in Function Calls ✅ DONE
 
 Implement keyword argument support in function calls using lexer-level tokens.
 

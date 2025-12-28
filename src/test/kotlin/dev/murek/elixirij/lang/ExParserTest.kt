@@ -128,12 +128,8 @@ class ExParserTest : ParsingTestCase(
     fun testCallNoArgs() = doTest()
     
     // Phase 3.5: Keyword arguments - requires lexer-level kw_identifier token
-    // TODO(Phase 3.5): Implement keyword argument support with lexer-level tokens
-    // @Ignore("Phase 3.5: Requires lexer-level whitespace-sensitive kw_identifier token")
-    // fun testCallKeyword() = doTest()
-    
-    // @Ignore("Phase 3.5: Requires lexer-level whitespace-sensitive kw_identifier token")
-    // fun testCallMixed() = doTest()
+    fun testCallKeyword() = doTest()
+    fun testCallMixed() = doTest()
     
     fun testCallNested() = doTest()
     fun testCallQualified() = doTest()
