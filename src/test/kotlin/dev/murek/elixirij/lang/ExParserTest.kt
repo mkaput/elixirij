@@ -148,6 +148,7 @@ class ExParserTest : ParsingTestCase(
     fun testFnOneArg() = doTest()
     fun testFnMultiArg() = doTest()
     fun testFnMultiClause() = doTest()
+    fun testFnMultiClauseNewline() = doTest()
     fun testFnPattern() = doTest()
     fun testFnGuard() = doTest()
 
