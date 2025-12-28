@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
@@ -133,6 +135,19 @@ kover {
 tasks {
     wrapper {
         gradleVersion = providers.gradleProperty("gradleVersion").get()
+    }
+
+    withType<Test>().configureEach {
+        testLogging {
+            events = setOf(
+                TestLogEvent.SKIPPED,
+                TestLogEvent.FAILED,
+            )
+            exceptionFormat = TestExceptionFormat.FULL
+            showCauses = true
+            showExceptions = true
+            showStackTraces = false
+        }
     }
 
     publishPlugin {
