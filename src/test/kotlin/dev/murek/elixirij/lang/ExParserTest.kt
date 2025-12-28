@@ -138,7 +138,15 @@ class ExParserTest : ParsingTestCase(
     fun testCallAnonymous() = doTest()
 
     // =============================================================================
-    // 9. Edge Cases
+    // 9. Capture Expressions (Phase 6)
+    // =============================================================================
+
+    fun testCaptureNamed() = doTest()
+    fun testCaptureAnonymous() = doTest()
+    fun testCaptureQualified() = doTest()
+
+    // =============================================================================
+    // 10. Edge Cases
     // =============================================================================
 
     fun testEmptyFile() = doTest()
