@@ -742,7 +742,7 @@ Implement `fn -> end` expressions.
 
 ---
 
-### Phase 6: Capture Expressions
+### Phase 6: Capture Expressions ✅ DONE
 
 Enhance capture operator for named and anonymous captures.
 

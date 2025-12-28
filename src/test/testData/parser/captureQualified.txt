@@ -1,0 +1,11 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExCaptureNamedExprImpl(CAPTURE_NAMED_EXPR)
+      PsiElement(&)('&')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('Mod')
+      PsiElement(.)('.')
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('func')
+      PsiElement(/)('/')
+      PsiElement(INTEGER)('2')
