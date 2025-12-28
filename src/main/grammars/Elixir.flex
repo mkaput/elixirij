@@ -226,6 +226,7 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "\'" ([^\\\'] | "\\" .)* "\'"      { return EX_CHARLIST; }
 
     // Identifiers and aliases
+    {IDENTIFIER} ":" / {HORIZONTAL_SPACE} { return EX_KW_IDENTIFIER; }
     {ALIAS}                            { return EX_ALIAS; }
     {IDENTIFIER}                       { return EX_IDENTIFIER; }
 
