@@ -12,8 +12,18 @@ class ExParserTest : ParsingTestCase(
     override fun getTestDataPath(): String = "src/test/testData"
 
     private fun doTest() = doTest(true, true)
-    private fun doTestAllowErrors() = doTest(true, false)
+    private fun doPartialTest() = doTest(true, false)
 
+    // =============================================================================
+    // A. Edge Cases
+    // =============================================================================
+
+    fun testEmptyFile() = doTest()
+    fun testMultipleExpressions() = doTest()
+    fun testTrailingCommaList() = doTest()
+    fun testTrailingCommaTuple() = doTest()
+    fun testTrailingCommaMap() = doTest()
+    
     // =============================================================================
     // 1. Literals
     // =============================================================================
@@ -129,17 +139,14 @@ class ExParserTest : ParsingTestCase(
     fun testCallNoArgs() = doTest()
     
     // Phase 3.5: Keyword arguments - requires lexer-level kw_identifier token
-    // TODO(Phase 3.5): Implement keyword argument support with lexer-level tokens
-    // @Ignore("Phase 3.5: Requires lexer-level whitespace-sensitive kw_identifier token")
-    // fun testCallKeyword() = doTest()
-    
-    // @Ignore("Phase 3.5: Requires lexer-level whitespace-sensitive kw_identifier token")
-    // fun testCallMixed() = doTest()
+    fun testCallKeyword() = doTest()
+    fun testCallMixed() = doTest()
     
     fun testCallNested() = doTest()
     fun testCallQualified() = doTest()
     fun testCallQualifiedNested() = doTest()
     fun testCallRemote() = doTest()
+    fun testCallAnonymous() = doTest()
 
     // =============================================================================
     // 9. Anonymous Functions (Phase 5)
@@ -153,15 +160,13 @@ class ExParserTest : ParsingTestCase(
     fun testFnEmptyArgs() = doTest()
     fun testFnPattern() = doTest()
     fun testFnGuard() = doTest()
-    fun testFnTypeArgInvalid() = doTestAllowErrors()
+    fun testFnTypeArgInvalid() = doPartialTest()
 
     // =============================================================================
-    // 10. Edge Cases
+    // 10. Capture Expressions (Phase 6)
     // =============================================================================
 
-    fun testEmptyFile() = doTest()
-    fun testMultipleExpressions() = doTest()
-    fun testTrailingCommaList() = doTest()
-    fun testTrailingCommaTuple() = doTest()
-    fun testTrailingCommaMap() = doTest()
+    fun testCaptureNamed() = doTest()
+    fun testCaptureAnonymous() = doTest()
+    fun testCaptureQualified() = doTest()
 }

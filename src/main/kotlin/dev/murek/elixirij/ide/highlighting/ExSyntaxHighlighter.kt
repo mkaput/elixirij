@@ -21,6 +21,7 @@ import dev.murek.elixirij.lang.EX_COMMENTS
 import dev.murek.elixirij.lang.EX_DOT
 import dev.murek.elixirij.lang.EX_IDENTIFIER
 import dev.murek.elixirij.lang.EX_KEYWORDS
+import dev.murek.elixirij.lang.EX_KW_IDENTIFIER
 import dev.murek.elixirij.lang.EX_NUMBERS
 import dev.murek.elixirij.lang.EX_OPERATORS
 import dev.murek.elixirij.lang.EX_PARENS
@@ -43,7 +44,7 @@ class ExSyntaxHighlighter : SyntaxHighlighterBase() {
         in EX_KEYWORDS -> pack(ExTextAttributes.KEYWORD)
         in EX_STRINGS -> pack(ExTextAttributes.STRING)
         in EX_NUMBERS -> pack(ExTextAttributes.NUMBER)
-        EX_ATOM, EX_ATOM_QUOTED -> pack(ExTextAttributes.ATOM)
+        EX_ATOM, EX_ATOM_QUOTED, EX_KW_IDENTIFIER -> pack(ExTextAttributes.ATOM)
         EX_ALIAS -> pack(ExTextAttributes.MODULE)
         EX_IDENTIFIER -> pack(ExTextAttributes.IDENTIFIER)
         EX_SIGIL -> pack(ExTextAttributes.SIGIL)

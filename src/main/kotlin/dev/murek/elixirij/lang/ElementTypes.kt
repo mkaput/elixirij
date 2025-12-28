@@ -62,6 +62,9 @@ val EX_ATOM_QUOTED = ExTokenType("ATOM_QUOTED")
 val EX_IDENTIFIER = ExTokenType("IDENTIFIER")
 
 @JvmField
+val EX_KW_IDENTIFIER = ExTokenType("KW_IDENTIFIER")
+
+@JvmField
 val EX_ALIAS = ExTokenType("ALIAS")
 
 // Keywords

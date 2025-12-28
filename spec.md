@@ -690,7 +690,7 @@ Implement function calls with parentheses, supporting positional arguments only.
 
 ---
 
-### Phase 3.5: Keyword Arguments in Function Calls
+### Phase 3.5: Keyword Arguments in Function Calls ✅ DONE
 
 Implement keyword argument support in function calls using lexer-level tokens.
 
@@ -714,7 +714,7 @@ Implement keyword argument support in function calls using lexer-level tokens.
 
 ---
 
-### Phase 4: Anonymous Calls
+### Phase 4: Anonymous Calls ✅ DONE
 
 Implement anonymous function invocation.
 
@@ -742,7 +742,7 @@ Implement `fn -> end` expressions.
 
 ---
 
-### Phase 6: Capture Expressions
+### Phase 6: Capture Expressions ✅ DONE
 
 Enhance capture operator for named and anonymous captures.
 

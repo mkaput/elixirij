@@ -127,7 +127,12 @@ unaryExpr ::= unaryOp unaryExpr | captureExpr
 private unaryOp ::= EX_NOT | EX_EXCLAMATION | EX_CARET | EX_TILDE | EX_PLUS | EX_MINUS
 
 // Capture operator: & (for &func/arity and &(&1 + &2))
-captureExpr ::= EX_AMPERSAND captureExpr | atExpr
+captureExpr ::= captureNamedExpr | captureAnonymousExpr | capturePlaceholderExpr | captureBareExpr | atExpr
+captureNamedExpr ::= EX_AMPERSAND captureTarget EX_SLASH EX_INTEGER
+captureAnonymousExpr ::= EX_AMPERSAND parenExpr
+capturePlaceholderExpr ::= EX_AMPERSAND EX_INTEGER
+private captureBareExpr ::= EX_AMPERSAND captureTarget
+private captureTarget ::= (atom | alias | identifier) (EX_DOT identifier)*
 
 // @ operator (module attributes)
 atExpr ::= EX_AT atExpr | accessExpr
@@ -135,11 +140,14 @@ atExpr ::= EX_AT atExpr | accessExpr
 // Precedence 310: Dot access and calls (left associative)
 // Access expression includes primary expressions, dot access, bracket access, and function calls
 accessExpr ::= primaryExpr accessSuffix*
-private accessSuffix ::= dotAccess | bracketAccess | parenCall
+private accessSuffix ::= anonymousCall | dotAccess | bracketAccess | parenCall
 
 // Dot access: expr.field or Mod.Func
 dotAccess ::= EX_DOT dotTarget { pin=1 }
 private dotTarget ::= identifier | alias
+
+// Anonymous call: func.()
+anonymousCall ::= EX_DOT EX_LPAREN callArgs? EX_RPAREN { pin=1 }
 
 // Bracket access: expr[key]
 bracketAccess ::= EX_LBRACKET containerExpr EX_RBRACKET { pin=1 }
@@ -225,7 +233,7 @@ private listElement ::= keywordPair | containerExpr
 
 // Keyword pair: key: value
 keywordPair ::= keywordKey containerExpr
-private keywordKey ::= EX_IDENTIFIER EX_COLON | EX_ATOM_QUOTED EX_COLON
+private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON
 
 // Tuple: {1, 2, 3}
 tuple ::= EX_LBRACE tupleContents? EX_RBRACE { pin=1 }
@@ -254,7 +262,6 @@ private bitstringTypeName ::= EX_IDENTIFIER | EX_INTEGER
 // Function call arguments
 // =============================================================================
 
-// Call arguments: comma-separated expressions
-// TODO(Phase 3.5): Add keyword argument support using lexer-level EX_KW_IDENTIFIER token.
-// See spec.md Phase 3.5 for implementation plan.
-private callArgs ::= containerExpr (EX_COMMA containerExpr)* EX_COMMA?
+// Call arguments: comma-separated expressions or keyword pairs
+private callArgs ::= callArg (EX_COMMA callArg)* EX_COMMA?
+private callArg ::= keywordPair | containerExpr
