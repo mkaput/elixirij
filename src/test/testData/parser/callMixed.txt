@@ -10,11 +10,10 @@ Elixir File
             PsiElement(INTEGER)('1')
         PsiElement(,)(',')
         PsiWhiteSpace(' ')
-        ExIdentifierImpl(IDENTIFIER)
-          PsiElement(IDENTIFIER)('a')
-        PsiErrorElement:'!=', '!==', '&&', '&&&', '(', ')', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '.', '..', '..//', '/', '//', <, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', '[', and, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected, got ':'
-          <empty list>
-  PsiElement(:)(':')
-  PsiWhiteSpace(' ')
-  PsiElement(INTEGER)('2')
-  PsiElement())(')')
+        ExKeywordPairImpl(KEYWORD_PAIR)
+          PsiElement(KW_IDENTIFIER)('a:')
+          PsiWhiteSpace(' ')
+          ExLiteralImpl(LITERAL)
+            ExIntegerImpl(INTEGER)
+              PsiElement(INTEGER)('2')
+        PsiElement())(')')

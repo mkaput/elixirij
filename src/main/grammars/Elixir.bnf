@@ -217,7 +217,7 @@ private listElement ::= keywordPair | containerExpr
 
 // Keyword pair: key: value
 keywordPair ::= keywordKey containerExpr
-private keywordKey ::= EX_IDENTIFIER EX_COLON | EX_ATOM_QUOTED EX_COLON
+private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON
 
 // Tuple: {1, 2, 3}
 tuple ::= EX_LBRACE tupleContents? EX_RBRACE { pin=1 }
@@ -246,7 +246,6 @@ private bitstringTypeName ::= EX_IDENTIFIER | EX_INTEGER
 // Function call arguments
 // =============================================================================
 
-// Call arguments: comma-separated expressions
-// TODO(Phase 3.5): Add keyword argument support using lexer-level EX_KW_IDENTIFIER token.
-// See spec.md Phase 3.5 for implementation plan.
-private callArgs ::= containerExpr (EX_COMMA containerExpr)* EX_COMMA?
+// Call arguments: comma-separated expressions or keyword pairs
+private callArgs ::= callArg (EX_COMMA callArg)* EX_COMMA?
+private callArg ::= keywordPair | containerExpr
