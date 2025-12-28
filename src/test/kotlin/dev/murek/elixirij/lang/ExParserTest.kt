@@ -12,7 +12,18 @@ class ExParserTest : ParsingTestCase(
     override fun getTestDataPath(): String = "src/test/testData"
 
     private fun doTest() = doTest(true, true)
+    private fun doPartialTest() = doTest(true, false)
 
+    // =============================================================================
+    // A. Edge Cases
+    // =============================================================================
+
+    fun testEmptyFile() = doTest()
+    fun testMultipleExpressions() = doTest()
+    fun testTrailingCommaList() = doTest()
+    fun testTrailingCommaTuple() = doTest()
+    fun testTrailingCommaMap() = doTest()
+    
     // =============================================================================
     // 1. Literals
     // =============================================================================
@@ -138,20 +149,24 @@ class ExParserTest : ParsingTestCase(
     fun testCallAnonymous() = doTest()
 
     // =============================================================================
-    // 9. Capture Expressions (Phase 6)
+    // 9. Anonymous Functions (Phase 5)
+    // =============================================================================
+
+    fun testFnSimple() = doTest()
+    fun testFnOneArg() = doTest()
+    fun testFnMultiArg() = doTest()
+    fun testFnMultiClause() = doTest()
+    fun testFnMultiClauseNewline() = doTest()
+    fun testFnEmptyArgs() = doTest()
+    fun testFnPattern() = doTest()
+    fun testFnGuard() = doTest()
+    fun testFnTypeArgInvalid() = doPartialTest()
+
+    // =============================================================================
+    // 10. Capture Expressions (Phase 6)
     // =============================================================================
 
     fun testCaptureNamed() = doTest()
     fun testCaptureAnonymous() = doTest()
     fun testCaptureQualified() = doTest()
-
-    // =============================================================================
-    // 10. Edge Cases
-    // =============================================================================
-
-    fun testEmptyFile() = doTest()
-    fun testMultipleExpressions() = doTest()
-    fun testTrailingCommaList() = doTest()
-    fun testTrailingCommaTuple() = doTest()
-    fun testTrailingCommaMap() = doTest()
 }
