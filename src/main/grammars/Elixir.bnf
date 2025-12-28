@@ -135,11 +135,14 @@ atExpr ::= EX_AT atExpr | accessExpr
 // Precedence 310: Dot access and calls (left associative)
 // Access expression includes primary expressions, dot access, bracket access, and function calls
 accessExpr ::= primaryExpr accessSuffix*
-private accessSuffix ::= dotAccess | bracketAccess | parenCall
+private accessSuffix ::= anonymousCall | dotAccess | bracketAccess | parenCall
 
 // Dot access: expr.field or Mod.Func
 dotAccess ::= EX_DOT dotTarget { pin=1 }
 private dotTarget ::= identifier | alias
+
+// Anonymous call: func.()
+anonymousCall ::= EX_DOT EX_LPAREN callArgs? EX_RPAREN { pin=1 }
 
 // Bracket access: expr[key]
 bracketAccess ::= EX_LBRACKET containerExpr EX_RBRACKET { pin=1 }
