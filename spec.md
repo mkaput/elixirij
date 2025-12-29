@@ -972,7 +972,7 @@ Implement import, require, and use.
 
 ---
 
-### Phase 24: Alias Directive
+### Phase 24: Alias Directive ✅ DONE
 
 Implement alias directive (not to be confused with alias literals).
 

@@ -195,6 +195,7 @@ private primaryExpr ::= literal
                       | importExpr
                       | requireExpr
                       | useExpr
+                      | aliasDirective
                       | fnExpr
                       | caseExpr
                       | condExpr
@@ -237,6 +238,11 @@ private importOpts ::= EX_COMMA keywordList
 requireExpr ::= EX_REQUIRE alias { pin=1 }
 useExpr ::= EX_USE alias useOpts? { pin=1 }
 private useOpts ::= EX_COMMA keywordList
+
+// Alias directive
+aliasDirective ::= EX_ALIAS_KW alias (aliasMultiTail | aliasOpts)? { pin=1 }
+private aliasMultiTail ::= EX_DOT EX_LBRACE alias (EX_COMMA alias)* EX_RBRACE
+private aliasOpts ::= EX_COMMA EX_AS_COLON alias
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }
@@ -338,7 +344,7 @@ private listElement ::= keywordPair | containerExpr
 
 // Keyword pair: key: value
 keywordPair ::= keywordKey containerExpr
-private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON
+private keywordKey ::= EX_KW_IDENTIFIER | EX_FOR_COLON | EX_AS_COLON | EX_ATOM_QUOTED EX_COLON
 
 // Tuple: {1, 2, 3}
 tuple ::= EX_LBRACE tupleContents? EX_RBRACE { pin=1 }

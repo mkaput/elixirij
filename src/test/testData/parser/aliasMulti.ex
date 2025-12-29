@@ -1,0 +1,1 @@
+alias Foo.{Bar, Baz}

@@ -249,4 +249,9 @@ class ExParserTest : ParsingTestCase(
     fun testRequire() = doTest()
     fun testUse() = doTest()
     fun testUseOpts() = doTest()
+
+    // Phase 24: Alias Directive
+    fun testAlias() = doTest()
+    fun testAliasAs() = doTest()
+    fun testAliasMulti() = doTest()
 }

@@ -147,6 +147,12 @@ val EX_REQUIRE = ExTokenType("require")
 val EX_USE = ExTokenType("use")
 
 @JvmField
+val EX_ALIAS_KW = ExTokenType("alias")
+
+@JvmField
+val EX_AS_COLON = ExTokenType("as:")
+
+@JvmField
 val EX_AFTER = ExTokenType("after")
 
 @JvmField
@@ -407,6 +413,8 @@ val EX_KEYWORDS = TokenSet.create(
     EX_IMPORT,
     EX_REQUIRE,
     EX_USE,
+    EX_ALIAS_KW,
+    EX_AS_COLON,
     EX_AFTER,
     EX_ELSE,
     EX_CATCH,

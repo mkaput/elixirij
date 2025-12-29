@@ -98,6 +98,8 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "import"                           { return EX_IMPORT; }
     "require"                          { return EX_REQUIRE; }
     "use"                              { return EX_USE; }
+    "alias"                            { return EX_ALIAS_KW; }
+    "as" ":" / {HORIZONTAL_SPACE}      { return EX_AS_COLON; }
     "after"                            { return EX_AFTER; }
     "else"                             { return EX_ELSE; }
     "catch"                            { return EX_CATCH; }
