@@ -100,6 +100,10 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "use"                              { return EX_USE; }
     "alias"                            { return EX_ALIAS_KW; }
     "as" ":" / {HORIZONTAL_SPACE}      { return EX_AS_COLON; }
+    "for"                              { return EX_FOR; }
+    "into" ":" / {HORIZONTAL_SPACE}    { return EX_INTO_COLON; }
+    "uniq" ":" / {HORIZONTAL_SPACE}    { return EX_UNIQ_COLON; }
+    "reduce" ":" / {HORIZONTAL_SPACE}  { return EX_REDUCE_COLON; }
     "after"                            { return EX_AFTER; }
     "else"                             { return EX_ELSE; }
     "catch"                            { return EX_CATCH; }

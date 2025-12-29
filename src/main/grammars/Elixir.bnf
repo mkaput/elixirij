@@ -196,6 +196,7 @@ private primaryExpr ::= literal
                       | requireExpr
                       | useExpr
                       | aliasDirective
+                      | forExpr
                       | fnExpr
                       | caseExpr
                       | condExpr
@@ -243,6 +244,13 @@ private useOpts ::= EX_COMMA keywordList
 aliasDirective ::= EX_ALIAS_KW alias (aliasMultiTail | aliasOpts)? { pin=1 }
 private aliasMultiTail ::= EX_DOT EX_LBRACE alias (EX_COMMA alias)* EX_RBRACE
 private aliasOpts ::= EX_COMMA EX_AS_COLON alias
+
+// Comprehensions
+forExpr ::= EX_FOR forClause (EX_COMMA forClause)* forOpts? doBlock { pin=1 }
+private forClause ::= forGenerator | forFilter
+private forGenerator ::= expression EX_LEFT_ARROW expression
+private forFilter ::= expression
+private forOpts ::= EX_COMMA (EX_INTO_COLON | EX_UNIQ_COLON | EX_REDUCE_COLON) expression
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }

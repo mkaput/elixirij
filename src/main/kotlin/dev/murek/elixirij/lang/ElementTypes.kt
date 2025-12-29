@@ -153,6 +153,18 @@ val EX_ALIAS_KW = ExTokenType("alias")
 val EX_AS_COLON = ExTokenType("as:")
 
 @JvmField
+val EX_FOR = ExTokenType("for")
+
+@JvmField
+val EX_INTO_COLON = ExTokenType("into:")
+
+@JvmField
+val EX_UNIQ_COLON = ExTokenType("uniq:")
+
+@JvmField
+val EX_REDUCE_COLON = ExTokenType("reduce:")
+
+@JvmField
 val EX_AFTER = ExTokenType("after")
 
 @JvmField
@@ -415,6 +427,10 @@ val EX_KEYWORDS = TokenSet.create(
     EX_USE,
     EX_ALIAS_KW,
     EX_AS_COLON,
+    EX_FOR,
+    EX_INTO_COLON,
+    EX_UNIQ_COLON,
+    EX_REDUCE_COLON,
     EX_AFTER,
     EX_ELSE,
     EX_CATCH,

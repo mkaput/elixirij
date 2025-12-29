@@ -985,7 +985,7 @@ Implement alias directive (not to be confused with alias literals).
 
 ---
 
-### Phase 25: Comprehensions (for)
+### Phase 25: Comprehensions (for) ✅ DONE
 
 Implement for comprehensions.
 

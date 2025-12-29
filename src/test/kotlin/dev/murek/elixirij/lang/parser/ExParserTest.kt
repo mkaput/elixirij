@@ -254,4 +254,12 @@ class ExParserTest : ParsingTestCase(
     fun testAlias() = doTest()
     fun testAliasAs() = doTest()
     fun testAliasMulti() = doTest()
+
+    // Phase 25: Comprehensions
+    fun testForSimple() = doTest()
+    fun testForFilter() = doTest()
+    fun testForMultiGen() = doTest()
+    fun testForInto() = doTest()
+    fun testForUniq() = doTest()
+    fun testForBitstring() = doTest()
 }
