@@ -54,4 +54,8 @@ JAVA_TOOL_OPTIONS="-Didea.tests.overwrite.data=true" ./gradlew test --tests "dev
 # Clone IntelliJ-Elixir source repository
 # Use this when you need to read through IntelliJ-Elixir source code
 ./bin/intellij-elixir-src
+
+# Clone IntelliJ Plugins source repository
+# Use this when you need to read through IntelliJ Plugins source code
+./bin/intellij-plugins-src
 ```

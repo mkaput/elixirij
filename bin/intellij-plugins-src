@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# IntelliJ Plugins Source Cloner
+# Clones JetBrains/intellij-plugins repository to .refs/intellij-plugins
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+OUTPUT_DIR="$PROJECT_ROOT/.refs/intellij-plugins"
+REPO_URL="https://github.com/JetBrains/intellij-plugins.git"
+
+# If already cloned then just print the output and quit.
+if [ -d "$OUTPUT_DIR" ]; then
+    # Print the absolute path to stdout (this is the main output)
+    echo "$OUTPUT_DIR"
+    exit 0
+fi
+
+echo "Cloning IntelliJ Plugins source repository..." >&2
+
+# Create .refs directory if it doesn't exist
+mkdir -p "$(dirname "$OUTPUT_DIR")"
+
+# Clone the repository
+if ! git clone "$REPO_URL" "$OUTPUT_DIR" 2>&1 | sed 's/^/  /' >&2; then
+    echo "Error: Failed to clone IntelliJ Plugins repository" >&2
+    exit 1
+fi
+
+echo "Successfully cloned IntelliJ Plugins source repository" >&2
+
+# Print the absolute path to stdout (this is the main output)
+echo "$OUTPUT_DIR"
