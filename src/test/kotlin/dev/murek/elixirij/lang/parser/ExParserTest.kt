@@ -211,4 +211,9 @@ class ExParserTest : ParsingTestCase(
     // Phase 16: Module Definitions
     fun testDefmodule() = doTest()
     fun testDefmoduleNested() = doTest()
+
+    // Phase 17: Function Definitions
+    fun testDef() = doTest()
+    fun testDefMultiClause() = doTest()
+    fun testDefp() = doTest()
 }

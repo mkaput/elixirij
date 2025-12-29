@@ -1,4 +1,4 @@
-IDENTIFIER ('def')
+def ('def')
 WHITE_SPACE (' ')
 IDENTIFIER ('hello')
 ( ('(')

@@ -105,6 +105,12 @@ val EX_RECEIVE = ExTokenType("receive")
 val EX_DEFMODULE = ExTokenType("defmodule")
 
 @JvmField
+val EX_DEF = ExTokenType("def")
+
+@JvmField
+val EX_DEFP = ExTokenType("defp")
+
+@JvmField
 val EX_AFTER = ExTokenType("after")
 
 @JvmField
@@ -351,6 +357,8 @@ val EX_KEYWORDS = TokenSet.create(
     EX_TRY,
     EX_RECEIVE,
     EX_DEFMODULE,
+    EX_DEF,
+    EX_DEFP,
     EX_AFTER,
     EX_ELSE,
     EX_CATCH,

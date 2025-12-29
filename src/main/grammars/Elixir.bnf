@@ -181,6 +181,7 @@ private primaryExpr ::= literal
                       | heredoc
                       | charlistHeredoc
                       | defmoduleExpr
+                      | defExpr
                       | fnExpr
                       | caseExpr
                       | condExpr
@@ -195,6 +196,13 @@ parenExpr ::= EX_LPAREN expression? EX_RPAREN { pin=1 }
 
 // Module definitions: defmodule MyApp.Module do ... end
 defmoduleExpr ::= EX_DEFMODULE alias doBlock { pin=1 }
+
+// Function definitions: def/defp
+defExpr ::= (EX_DEF | EX_DEFP) defHead defBody { pin=1 }
+private defHead ::= identifier defArgs? whenClause?
+private defArgs ::= EX_LPAREN argList? EX_RPAREN
+private defBody ::= doBlock | doInline
+private doInline ::= EX_COMMA keywordList
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }
@@ -328,3 +336,9 @@ private bitstringTypeName ::= EX_IDENTIFIER | EX_INTEGER
 // Call arguments: comma-separated expressions or keyword pairs
 private callArgs ::= callArg (EX_COMMA callArg)* EX_COMMA?
 private callArg ::= keywordPair | containerExpr
+
+// Argument list: used in function heads and guards
+private argList ::= matchExpr (EX_COMMA matchExpr)* EX_COMMA?
+
+// Keyword list: comma-separated keyword pairs
+private keywordList ::= keywordPair (EX_COMMA keywordPair)* EX_COMMA?
