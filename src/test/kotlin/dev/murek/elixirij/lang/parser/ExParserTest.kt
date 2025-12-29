@@ -20,6 +20,13 @@ class ExParserTest : ParsingTestCase(
     // =============================================================================
 
     fun testEmptyFile() = doTest()
+    fun testOnlyWhitespace() = doTest()
+    fun testOnlyComments() = doTest()
+    fun testTrailingComma() = doTest()
+    fun testNewlinesInExpr() = doTest()
+    fun testMultipleStatements() = doTest()
+    fun testNestedDoBlocks() = doTest()
+    fun testOperatorAsAtom() = doTest()
     fun testMultipleExpressions() = doTest()
     fun testTrailingCommaList() = doTest()
     fun testTrailingCommaTuple() = doTest()

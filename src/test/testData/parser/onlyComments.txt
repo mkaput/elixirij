@@ -1,0 +1,4 @@
+Elixir File
+  PsiComment(COMMENT)('# comment')
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    <empty list>

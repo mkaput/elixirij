@@ -1,0 +1,12 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExIdentifierImpl(IDENTIFIER)
+      PsiElement(IDENTIFIER)('a')
+    PsiElement(;)(';')
+    PsiWhiteSpace(' ')
+    ExIdentifierImpl(IDENTIFIER)
+      PsiElement(IDENTIFIER)('b')
+    PsiElement(;)(';')
+    PsiWhiteSpace(' ')
+    ExIdentifierImpl(IDENTIFIER)
+      PsiElement(IDENTIFIER)('c')

@@ -44,6 +44,7 @@ topLevelExpressions ::= (eoe? expression (eoe expression)*)? eoe? {
 
 // End of expression: newlines or semicolons
 private eoe ::= (EX_EOL | EX_SEMICOLON)+
+private opSep ::= EX_EOL*
 
 // =============================================================================
 // Expression hierarchy - following operator precedence (lowest to highest)
@@ -58,69 +59,69 @@ expression ::= stabExpr
 private containerExpr ::= matchExpr
 
 // Precedence 10: -> (right associative) - stab operator
-stabExpr ::= inMatchExpr (EX_ARROW stabExpr)?
+stabExpr ::= inMatchExpr (opSep EX_ARROW opSep stabExpr)?
 
 // Precedence 40: <-, \\ (left associative) - in-match operators
-inMatchExpr ::= whenExpr (inMatchOp whenExpr)*
+inMatchExpr ::= whenExpr (opSep inMatchOp opSep whenExpr)*
 private inMatchOp ::= EX_LEFT_ARROW | EX_BACK_SLASH_BACK_SLASH
 
 // Precedence 50: when (right associative)
-whenExpr ::= typeExpr (EX_WHEN whenExpr)?
+whenExpr ::= typeExpr (opSep EX_WHEN opSep whenExpr)?
 
 // Precedence 60: :: (right associative) - type operator
-typeExpr ::= pipeExpr (EX_COLON_COLON typeExpr)?
+typeExpr ::= pipeExpr (opSep EX_COLON_COLON opSep typeExpr)?
 
 // Precedence 70: | (right associative) - pipe operator for patterns
-pipeExpr ::= matchExpr (EX_PIPE pipeExpr)?
+pipeExpr ::= matchExpr (opSep EX_PIPE opSep pipeExpr)?
 
 // Precedence 100: = (right associative)
-matchExpr ::= orExpr (EX_EQ matchExpr)?
+matchExpr ::= orExpr (opSep EX_EQ opSep matchExpr)?
 
 // Precedence 120: ||, |||, or (left associative)
-orExpr ::= andExpr (orOp andExpr)*
+orExpr ::= andExpr (opSep orOp opSep andExpr)*
 private orOp ::= EX_PIPE_PIPE | EX_PIPE_PIPE_PIPE | EX_OR
 
 // Precedence 130: &&, &&&, and (left associative)
-andExpr ::= compExpr (andOp compExpr)*
+andExpr ::= compExpr (opSep andOp opSep compExpr)*
 private andOp ::= EX_AMP_AMP | EX_AMP_AMP_AMP | EX_AND
 
 // Precedence 140: ==, !=, =~, ===, !== (left associative)
-compExpr ::= relExpr (compOp relExpr)*
+compExpr ::= relExpr (opSep compOp opSep relExpr)*
 private compOp ::= EX_EQ_EQ | EX_NOT_EQ | EX_EQ_TILDE | EX_EQ_EQ_EQ | EX_NOT_EQ_EQ
 
 // Precedence 150: <, >, <=, >= (left associative)
-relExpr ::= arrowExpr (relOp arrowExpr)*
+relExpr ::= arrowExpr (opSep relOp opSep arrowExpr)*
 private relOp ::= EX_LT_EQ | EX_GT_EQ | EX_LT | EX_GT
 
 // Precedence 160: |>, <<<, >>>, <<~, ~>>, <~, ~>, <~>, <|> (left associative)
-arrowExpr ::= inExpr (arrowOp inExpr)*
+arrowExpr ::= inExpr (opSep arrowOp opSep inExpr)*
 private arrowOp ::= EX_PIPE_GT | EX_LT_LT_LT | EX_GT_GT_GT | EX_LT_LT_TILDE | EX_TILDE_GT_GT | EX_LT_TILDE | EX_TILDE_GT | EX_LT_TILDE_GT | EX_LT_PIPE_GT
 
 // Precedence 170: in, not in (left associative)
-inExpr ::= xorExpr (inOp xorExpr)*
+inExpr ::= xorExpr (opSep inOp opSep xorExpr)*
 private inOp ::= EX_NOT EX_IN | EX_IN
 
 // Precedence 190: // (right associative) - ternary/default operator
-xorExpr ::= concatExpr (EX_SLASH_SLASH xorExpr)?
+xorExpr ::= concatExpr (opSep EX_SLASH_SLASH opSep xorExpr)?
 
 // Precedence 200: ++, --, +++, ---, <>, .. (right associative)
-concatExpr ::= rangeExpr (concatOp concatExpr)?
+concatExpr ::= rangeExpr (opSep concatOp opSep concatExpr)?
 private concatOp ::= EX_PLUS_PLUS_PLUS | EX_MINUS_MINUS_MINUS | EX_PLUS_PLUS | EX_MINUS_MINUS | EX_LT_GT
 
 // Range operator: .. and ..// (right associative)
-rangeExpr ::= dualExpr (rangeOp rangeExpr)?
+rangeExpr ::= dualExpr (opSep rangeOp opSep rangeExpr)?
 private rangeOp ::= EX_DOT_DOT_SLASH_SLASH | EX_DOT_DOT
 
 // Precedence 210: +, - binary (left associative)
-dualExpr ::= multExpr (dualOp multExpr)*
+dualExpr ::= multExpr (opSep dualOp opSep multExpr)*
 private dualOp ::= EX_PLUS | EX_MINUS
 
 // Precedence 220: *, / (left associative)
-multExpr ::= powerExpr (multOp powerExpr)*
+multExpr ::= powerExpr (opSep multOp opSep powerExpr)*
 private multOp ::= EX_STAR | EX_SLASH
 
 // Precedence 230: ** (left associative)
-powerExpr ::= unaryExpr (EX_STAR_STAR unaryExpr)*
+powerExpr ::= unaryExpr (opSep EX_STAR_STAR opSep unaryExpr)*
 
 // Precedence 300: Unary operators (right associative / prefix)
 unaryExpr ::= unaryOp unaryExpr | captureExpr
