@@ -193,4 +193,7 @@ class ExParserTest : ParsingTestCase(
     fun testCase() = doTest()
     fun testCaseMulti() = doTest()
     fun testCaseGuard() = doTest()
+
+    // Phase 12: Control Flow - cond
+    fun testCond() = doTest()
 }

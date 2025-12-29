@@ -79,6 +79,7 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "end"                              { return EX_END; }
     "fn"                               { return EX_FN; }
     "case"                             { return EX_CASE; }
+    "cond"                             { return EX_COND; }
     "after"                            { return EX_AFTER; }
     "else"                             { return EX_ELSE; }
     "catch"                            { return EX_CATCH; }

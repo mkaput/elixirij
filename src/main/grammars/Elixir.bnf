@@ -182,6 +182,7 @@ private primaryExpr ::= literal
                       | charlistHeredoc
                       | fnExpr
                       | caseExpr
+                      | condExpr
                       | doBlock
                       | parenExpr
 
@@ -205,6 +206,11 @@ caseExpr ::= EX_CASE caseSubject EX_DO caseClauseList EX_END { pin=1 }
 private caseSubject ::= expression &EX_DO
 private caseClauseList ::= eoe? caseClause (eoe caseClause)* eoe?
 private caseClause ::= stabClause
+
+// Cond expression: cond do ... end
+condExpr ::= EX_COND EX_DO condClauseList EX_END { pin=1 }
+private condClauseList ::= eoe? condClause (eoe condClause)* eoe?
+private condClause ::= matchExpr EX_ARROW matchExpr
 
 // Do blocks: do ... end (with optional clauses)
 doBlock ::= EX_DO doContents doBlockSuffix EX_END { pin=1 }
