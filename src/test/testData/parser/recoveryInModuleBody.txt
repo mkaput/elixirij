@@ -1,14 +1,14 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExDefmoduleExprImpl(DEFMODULE_EXPR)
-      PsiElement(defmodule)('defmodule')
+      PsiElement(IDENTIFIER)('defmodule')
       PsiWhiteSpace(' ')
       ExAliasImpl(ALIAS)
         PsiElement(ALIAS)('F')
       PsiWhiteSpace(' ')
       PsiElement(do)('do')
       PsiElement(EOL)('\n')
-      PsiErrorElement:'!', '&', '(', '+', '-', '.', ';', <access expr>, '@', EOL, '[', '^', end, not or '~' expected, got '@'
+      PsiErrorElement:'!', '&', '(', '+', '-', '.', ';', <access expr>, '@', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', '^', end, not or '~' expected, got '@'
         <empty list>
     PsiWhiteSpace('  ')
     PsiElement(@)('@')
@@ -16,7 +16,7 @@ Elixir File
     PsiElement(EOL)('\n')
     PsiWhiteSpace('  ')
     ExDefExprImpl(DEF_EXPR)
-      PsiElement(def)('def')
+      PsiElement(IDENTIFIER)('def')
       PsiWhiteSpace(' ')
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('f')

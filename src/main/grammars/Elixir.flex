@@ -78,35 +78,6 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "do"                               { return EX_DO; }
     "end"                              { return EX_END; }
     "fn"                               { return EX_FN; }
-    "case"                             { return EX_CASE; }
-    "cond"                             { return EX_COND; }
-    "with"                             { return EX_WITH; }
-    "try"                              { return EX_TRY; }
-    "receive"                          { return EX_RECEIVE; }
-    "defmodule"                        { return EX_DEFMODULE; }
-    "def"                              { return EX_DEF; }
-    "defp"                             { return EX_DEFP; }
-    "defmacro"                         { return EX_DEFMACRO; }
-    "defmacrop"                        { return EX_DEFMACROP; }
-    "defguard"                         { return EX_DEFGUARD; }
-    "defguardp"                        { return EX_DEFGUARDP; }
-    "defstruct"                        { return EX_DEFSTRUCT; }
-    "defexception"                     { return EX_DEFEXCEPTION; }
-    "defprotocol"                      { return EX_DEFPROTOCOL; }
-    "defimpl"                          { return EX_DEFIMPL; }
-    "for" ":" / {HORIZONTAL_SPACE}     { return EX_FOR_COLON; }
-    "import"                           { return EX_IMPORT; }
-    "require"                          { return EX_REQUIRE; }
-    "use"                              { return EX_USE; }
-    "alias"                            { return EX_ALIAS_KW; }
-    "as" ":" / {HORIZONTAL_SPACE}      { return EX_AS_COLON; }
-    "for"                              { return EX_FOR; }
-    "into" ":" / {HORIZONTAL_SPACE}    { return EX_INTO_COLON; }
-    "uniq" ":" / {HORIZONTAL_SPACE}    { return EX_UNIQ_COLON; }
-    "reduce" ":" / {HORIZONTAL_SPACE}  { return EX_REDUCE_COLON; }
-    "quote"                            { return EX_QUOTE; }
-    "unquote_splicing"                 { return EX_UNQUOTE_SPLICING; }
-    "unquote"                          { return EX_UNQUOTE; }
     "raise"                            { return EX_RAISE; }
     "throw"                            { return EX_THROW; }
     "send"                             { return EX_SEND; }

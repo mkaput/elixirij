@@ -13,7 +13,7 @@ Elixir File
           PsiElement(EOL)('\n')
           PsiWhiteSpace('  ')
           ExCaseExprImpl(CASE_EXPR)
-            PsiElement(case)('case')
+            PsiElement(IDENTIFIER)('case')
             PsiWhiteSpace(' ')
             ExIdentifierImpl(IDENTIFIER)
               PsiElement(IDENTIFIER)('b')
@@ -26,5 +26,5 @@ Elixir File
                 PsiElement(ATOM)(':c')
               PsiWhiteSpace(' ')
               PsiElement(->)('->')
-              PsiErrorElement:<unary expr> expected
+              PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', ';', <, <-, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', '\\', and, end, in, not, or, when, '|' and ... expected
                 <empty list>

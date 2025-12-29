@@ -11,5 +11,5 @@ Elixir File
         PsiWhiteSpace(' ')
         ExIdentifierImpl(IDENTIFIER)
           PsiElement(IDENTIFIER)('x')
-      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', ';', <, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', and, as:, end, for:, in, not, or, '|>', '||', '|||' and ... expected
+      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', ';', <, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', and, end, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected
         <empty list>

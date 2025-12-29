@@ -1,7 +1,7 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExReceiveExprImpl(RECEIVE_EXPR)
-      PsiElement(receive)('receive')
+      PsiElement(IDENTIFIER)('receive')
       PsiWhiteSpace(' ')
       PsiElement(do)('do')
       PsiElement(EOL)('\n')
@@ -21,5 +21,5 @@ Elixir File
         PsiWhiteSpace(' ')
         ExIdentifierImpl(IDENTIFIER)
           PsiElement(IDENTIFIER)('x')
-      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', ';', <, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', after, and, as:, end, for:, in, not, or, '|>', '||' and ... expected
+      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', ';', <, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', after, and, end, in, not, or, '|>', '||', '|||', '~>', '~>>' expected
         <empty list>

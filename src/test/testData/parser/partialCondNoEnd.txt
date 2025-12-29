@@ -1,7 +1,7 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExCondExprImpl(COND_EXPR)
-      PsiElement(cond)('cond')
+      PsiElement(IDENTIFIER)('cond')
       PsiWhiteSpace(' ')
       PsiElement(do)('do')
       PsiElement(EOL)('\n')
@@ -14,5 +14,5 @@ Elixir File
       PsiWhiteSpace(' ')
       ExAtomImpl(ATOM)
         PsiElement(ATOM)(':ok')
-      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', ';', <, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', and, as:, end, for:, in, not, or, '|>', '||', '|||' and ... expected
+      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', ';', <, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', and, end, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected
         <empty list>

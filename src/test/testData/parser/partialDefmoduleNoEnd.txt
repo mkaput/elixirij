@@ -1,11 +1,11 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExDefmoduleExprImpl(DEFMODULE_EXPR)
-      PsiElement(defmodule)('defmodule')
+      PsiElement(IDENTIFIER)('defmodule')
       PsiWhiteSpace(' ')
       ExAliasImpl(ALIAS)
         PsiElement(ALIAS)('Foo')
       PsiWhiteSpace(' ')
       PsiElement(do)('do')
-      PsiErrorElement:'(', '.', ';', <keyword pair>, <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', as:, end or for: expected
+      PsiErrorElement:'(', '.', ';', <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, '[' or end expected
         <empty list>

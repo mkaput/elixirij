@@ -1,17 +1,17 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExDefimplExprImpl(DEFIMPL_EXPR)
-      PsiElement(defimpl)('defimpl')
+      PsiElement(IDENTIFIER)('defimpl')
       PsiWhiteSpace(' ')
       ExAliasImpl(ALIAS)
         PsiElement(ALIAS)('P')
       PsiElement(,)(',')
       PsiWhiteSpace(' ')
-      PsiElement(for:)('for:')
+      PsiElement(KW_IDENTIFIER)('for:')
       PsiWhiteSpace(' ')
       ExAliasImpl(ALIAS)
         PsiElement(ALIAS)('T')
       PsiWhiteSpace(' ')
       PsiElement(do)('do')
-      PsiErrorElement:'(', '.', ';', <keyword pair>, <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', as:, end or for: expected
+      PsiErrorElement:'(', '.', ';', <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, '[' or end expected
         <empty list>

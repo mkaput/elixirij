@@ -15,7 +15,7 @@ Elixir File
         PsiElement(,)(',')
         PsiWhiteSpace(' ')
         ExDefExprImpl(DEF_EXPR)
-          PsiElement(def)('def')
+          PsiElement(IDENTIFIER)('def')
           PsiWhiteSpace(' ')
           ExIdentifierImpl(IDENTIFIER)
             PsiElement(IDENTIFIER)('foo')
@@ -24,5 +24,5 @@ Elixir File
             PsiElement(do)('do')
             ExDoContentsImpl(DO_CONTENTS)
               <empty list>
-            PsiErrorElement:'(', '.', ';', <keyword pair>, <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', after, as:, catch, else, end, for: or rescue expected
+            PsiErrorElement:'(', '.', ';', <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', after, catch, else, end or rescue expected
               <empty list>

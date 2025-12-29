@@ -12,5 +12,5 @@ Elixir File
               <empty list>
           ExIdentifierImpl(IDENTIFIER)
             PsiElement(IDENTIFIER)('a')
-        PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', '[', '\\', and, do, in, not, or, when, '|', '|>', '||', '|||' and ... expected, got ':'
+        PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, KW_IDENTIFIER, '[', '\\', and, do, in, not, or, when, '|', '|>' and ... expected, got ':'
           PsiElement(:)(':')

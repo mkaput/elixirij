@@ -1,7 +1,7 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExDefmoduleExprImpl(DEFMODULE_EXPR)
-      PsiElement(defmodule)('defmodule')
+      PsiElement(IDENTIFIER)('defmodule')
       PsiWhiteSpace(' ')
       ExAliasImpl(ALIAS)
         PsiElement(ALIAS)('Foo')
@@ -11,7 +11,7 @@ Elixir File
       PsiWhiteSpace('  ')
       ExAccessExprImpl(ACCESS_EXPR)
         ExDefExprImpl(DEF_EXPR)
-          PsiElement(def)('def')
+          PsiElement(IDENTIFIER)('def')
           PsiWhiteSpace(' ')
           ExIdentifierImpl(IDENTIFIER)
             PsiElement(IDENTIFIER)('bar')
@@ -19,5 +19,5 @@ Elixir File
             <empty list>
         ExParenCallImpl(PAREN_CALL)
           PsiElement(()('(')
-          PsiErrorElement:'!=', '!==', '&&', '&&&', '(', ')', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', ';', <, <-, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', '\\', and, as:, do, end, for: and ... expected
+          PsiErrorElement:'!=', '!==', '&&', '&&&', '(', ')', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', ';', <, <-, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', '\\', and, do, end, in, not, or and ... expected
             <empty list>

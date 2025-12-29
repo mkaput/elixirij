@@ -1,7 +1,7 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExDefmoduleExprImpl(DEFMODULE_EXPR)
-      PsiElement(defmodule)('defmodule')
+      PsiElement(IDENTIFIER)('defmodule')
       PsiWhiteSpace(' ')
       ExAliasImpl(ALIAS)
         PsiElement(ALIAS)('Foo')
@@ -12,7 +12,7 @@ Elixir File
       PsiElement(EOL)('\n')
       PsiWhiteSpace('  ')
       ExDefmoduleExprImpl(DEFMODULE_EXPR)
-        PsiElement(defmodule)('defmodule')
+        PsiElement(IDENTIFIER)('defmodule')
         PsiWhiteSpace(' ')
         ExAliasImpl(ALIAS)
           PsiElement(ALIAS)('Baz')

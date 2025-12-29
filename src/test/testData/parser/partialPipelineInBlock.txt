@@ -1,7 +1,7 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExDefExprImpl(DEF_EXPR)
-      PsiElement(def)('def')
+      PsiElement(IDENTIFIER)('def')
       PsiWhiteSpace(' ')
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('foo')
@@ -15,5 +15,5 @@ Elixir File
             PsiElement(IDENTIFIER)('x')
           PsiWhiteSpace(' ')
           PsiElement(|>)('|>')
-          PsiErrorElement:<unary expr> or EOL expected
+          PsiErrorElement:'(', '.', ';', <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', after, catch, else, end or rescue expected
             <empty list>

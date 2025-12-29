@@ -1,7 +1,7 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExWithExprImpl(WITH_EXPR)
-      PsiElement(with)('with')
+      PsiElement(IDENTIFIER)('with')
       PsiWhiteSpace(' ')
       ExTupleImpl(TUPLE)
         PsiElement({)('{')

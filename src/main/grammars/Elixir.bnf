@@ -48,7 +48,7 @@ private eoe ::= (EX_EOL | EX_SEMICOLON)+
 private opSep ::= EX_EOL*
 private topLevelRecovery ::= !(EX_EOL | EX_SEMICOLON)
 private doRecovery ::= !(EX_ELSE | EX_AFTER | EX_CATCH | EX_RESCUE | EX_END | EX_EOL)
-private moduleRecovery ::= !(EX_DEF | EX_DEFP | EX_DEFMACRO | EX_DEFMACROP | EX_END | EX_EOL)
+private moduleRecovery ::= !(defKeyword | defpKeyword | defmacroKeyword | defmacropKeyword | EX_END | EX_EOL)
 private listRecovery ::= !(EX_COMMA | EX_RBRACKET | EX_PIPE)
 private tupleRecovery ::= !(EX_COMMA | EX_RBRACE)
 private mapRecovery ::= !(EX_COMMA | EX_RBRACE)
@@ -185,7 +185,6 @@ parenCall ::= EX_LPAREN callArgs? EX_RPAREN doBlock? { pin=1 }
 
 private primaryExpr ::= literal
                       | atom
-                      | identifier
                       | alias
                       | list
                       | tuple
@@ -221,6 +220,7 @@ private primaryExpr ::= literal
                       | withExpr
                       | tryExpr
                       | receiveExpr
+                      | identifier
                       | doBlock
                       | parenExpr
 
@@ -228,53 +228,53 @@ private primaryExpr ::= literal
 parenExpr ::= EX_LPAREN expression? EX_RPAREN { pin=1 }
 
 // Module definitions: defmodule MyApp.Module do ... end
-defmoduleExpr ::= EX_DEFMODULE alias moduleBlock { pin=1 }
+defmoduleExpr ::= defmoduleKeyword alias moduleBlock { pin=1 }
 
 // Function definitions: def/defp
-defExpr ::= (EX_DEF | EX_DEFP) defHead defBody { pin=1 }
+defExpr ::= (defKeyword | defpKeyword) defHead defBody { pin=1 }
 private defHead ::= identifier defArgs? whenClause?
 private defArgs ::= EX_LPAREN argList? EX_RPAREN
 private defBody ::= doBlock | doInline
 private doInline ::= EX_COMMA keywordList
 
 // Macro definitions: defmacro/defmacrop
-defmacroExpr ::= (EX_DEFMACRO | EX_DEFMACROP) defHead defBody { pin=1 }
+defmacroExpr ::= (defmacroKeyword | defmacropKeyword) defHead defBody { pin=1 }
 
 // Guard definitions: defguard/defguardp
-defguardExpr ::= (EX_DEFGUARD | EX_DEFGUARDP) identifier defArgs? whenClause { pin=1 }
+defguardExpr ::= (defguardKeyword | defguardpKeyword) identifier defArgs? whenClause { pin=1 }
 
 // Struct and exception definitions
-defstructExpr ::= EX_DEFSTRUCT (list | keywordList) { pin=1 }
-defexceptionExpr ::= EX_DEFEXCEPTION (list | keywordList) { pin=1 }
+defstructExpr ::= defstructKeyword (list | keywordList) { pin=1 }
+defexceptionExpr ::= defexceptionKeyword (list | keywordList) { pin=1 }
 
 // Protocol definitions
-defprotocolExpr ::= EX_DEFPROTOCOL alias moduleBlock { pin=1 }
-defimplExpr ::= EX_DEFIMPL alias EX_COMMA EX_FOR_COLON alias moduleBlock { pin=1 }
+defprotocolExpr ::= defprotocolKeyword alias moduleBlock { pin=1 }
+defimplExpr ::= defimplKeyword alias EX_COMMA keywordKey alias moduleBlock { pin=1 }
 
 // Import/require/use
-importExpr ::= EX_IMPORT alias importOpts? { pin=1 }
+importExpr ::= importKeyword alias importOpts? { pin=1 }
 private importOpts ::= EX_COMMA keywordList
-requireExpr ::= EX_REQUIRE alias { pin=1 }
-useExpr ::= EX_USE alias useOpts? { pin=1 }
+requireExpr ::= requireKeyword alias { pin=1 }
+useExpr ::= useKeyword alias useOpts? { pin=1 }
 private useOpts ::= EX_COMMA keywordList
 
 // Alias directive
-aliasDirective ::= EX_ALIAS_KW alias (aliasMultiTail | aliasOpts)? { pin=1 }
+aliasDirective ::= aliasKeyword alias (aliasMultiTail | aliasOpts)? { pin=1 }
 private aliasMultiTail ::= EX_DOT EX_LBRACE alias (EX_COMMA alias)* EX_RBRACE
-private aliasOpts ::= EX_COMMA EX_AS_COLON alias
+private aliasOpts ::= EX_COMMA keywordKey alias
 
 // Comprehensions
-forExpr ::= EX_FOR forClause (EX_COMMA forClause)* forOpts? doBlock { pin=1 }
+forExpr ::= forKeyword forClause (EX_COMMA forClause)* forOpts? doBlock { pin=1 }
 private forClause ::= forGenerator | forFilter
 private forGenerator ::= expression EX_LEFT_ARROW expression
 private forFilter ::= expression
-private forOpts ::= EX_COMMA (EX_INTO_COLON | EX_UNIQ_COLON | EX_REDUCE_COLON) expression
+private forOpts ::= EX_COMMA keywordKey expression
 
 // Quote and unquote
-quoteExpr ::= EX_QUOTE quoteOpts? doBlock { pin=1 }
+quoteExpr ::= quoteKeyword quoteOpts? doBlock { pin=1 }
 private quoteOpts ::= EX_COMMA keywordList
-unquoteExpr ::= EX_UNQUOTE EX_LPAREN expression EX_RPAREN { pin=1 }
-unquoteSplicingExpr ::= EX_UNQUOTE_SPLICING EX_LPAREN expression EX_RPAREN { pin=1 }
+unquoteExpr ::= unquoteKeyword EX_LPAREN expression EX_RPAREN { pin=1 }
+unquoteSplicingExpr ::= unquoteSplicingKeyword EX_LPAREN expression EX_RPAREN { pin=1 }
 
 // Raise, throw, send, super
 raiseExpr ::= EX_RAISE expression (EX_COMMA expression)? { pin=1 }
@@ -296,30 +296,30 @@ private stabBody ::= matchExpr (eoe matchExpr !EX_ARROW)*
 private whenClause ::= EX_WHEN matchExpr
 
 // Case expression: case expr do ... end
-caseExpr ::= EX_CASE caseSubject EX_DO caseClauseList EX_END { pin=1 }
+caseExpr ::= caseKeyword caseSubject EX_DO caseClauseList EX_END { pin=1 }
 private caseSubject ::= expression &EX_DO
 private caseClauseList ::= eoe? caseClause (eoe caseClause)* eoe?
 private caseClause ::= stabClause
 
 // Cond expression: cond do ... end
-condExpr ::= EX_COND EX_DO condClauseList EX_END { pin=1 }
+condExpr ::= condKeyword EX_DO condClauseList EX_END { pin=1 }
 private condClauseList ::= eoe? condClause (eoe condClause)* eoe?
 private condClause ::= matchExpr EX_ARROW matchExpr
 
 // With expression: with ... do ... end
-withExpr ::= EX_WITH withClause (EX_COMMA withClause)* doBlock { pin=1 }
+withExpr ::= withKeyword withClause (EX_COMMA withClause)* doBlock { pin=1 }
 private withClause ::= matchExpr EX_LEFT_ARROW withAccessExpr
 private withAccessExpr ::= primaryExpr withAccessSuffix*
 private withAccessSuffix ::= dotAccess | anonymousCall | bracketAccess | withParenCall
 private withParenCall ::= EX_LPAREN callArgs? EX_RPAREN { pin=1 }
 
 // Try expression: try do ... rescue/catch/after ... end
-tryExpr ::= EX_TRY EX_DO tryContents EX_END { pin=1 }
+tryExpr ::= tryKeyword EX_DO tryContents EX_END { pin=1 }
 private tryContents ::= doContents tryClauses
 private tryClauses ::= eoe* rescueClause* eoe* catchClause* eoe* afterClause? eoe*
 
 // Receive expression: receive do ... after ... end
-receiveExpr ::= EX_RECEIVE EX_DO receiveClauseList receiveAfterClause? EX_END { pin=1 }
+receiveExpr ::= receiveKeyword EX_DO receiveClauseList receiveAfterClause? EX_END { pin=1 }
 private receiveClauseList ::= eoe? receiveClause (eoe receiveClause)* eoe?
 private receiveClause ::= stabClause
 private receiveAfterClause ::= eoe* afterClause eoe*
@@ -373,6 +373,31 @@ nilLiteral ::= EX_NIL
 
 identifier ::= EX_IDENTIFIER
 
+private defmoduleKeyword ::= "defmodule"
+private defKeyword ::= "def"
+private defpKeyword ::= "defp"
+private defmacroKeyword ::= "defmacro"
+private defmacropKeyword ::= "defmacrop"
+private defguardKeyword ::= "defguard"
+private defguardpKeyword ::= "defguardp"
+private defstructKeyword ::= "defstruct"
+private defexceptionKeyword ::= "defexception"
+private defprotocolKeyword ::= "defprotocol"
+private defimplKeyword ::= "defimpl"
+private importKeyword ::= "import"
+private requireKeyword ::= "require"
+private useKeyword ::= "use"
+private aliasKeyword ::= "alias"
+private forKeyword ::= "for"
+private quoteKeyword ::= "quote"
+private unquoteKeyword ::= "unquote"
+private unquoteSplicingKeyword ::= "unquote_splicing"
+private caseKeyword ::= "case"
+private condKeyword ::= "cond"
+private withKeyword ::= "with"
+private tryKeyword ::= "try"
+private receiveKeyword ::= "receive"
+
 alias ::= EX_ALIAS (EX_DOT EX_ALIAS)*
 
 atom ::= EX_ATOM | EX_ATOM_QUOTED
@@ -391,7 +416,7 @@ private listElement ::= (keywordPairItem | containerExpr) { recoverWhile=listRec
 keywordPair ::= keywordKey containerExpr
 private keywordPairIncomplete ::= keywordKey { recoverWhile=keywordPairRecovery }
 private keywordPairItem ::= keywordPair | keywordPairIncomplete
-private keywordKey ::= EX_KW_IDENTIFIER | EX_FOR_COLON | EX_AS_COLON | EX_ATOM_QUOTED EX_COLON
+private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON
 
 // Tuple: {1, 2, 3}
 tuple ::= EX_LBRACE tupleContents? EX_RBRACE { pin=1 }

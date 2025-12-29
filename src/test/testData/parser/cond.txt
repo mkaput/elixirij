@@ -1,7 +1,7 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExCondExprImpl(COND_EXPR)
-      PsiElement(cond)('cond')
+      PsiElement(IDENTIFIER)('cond')
       PsiWhiteSpace(' ')
       PsiElement(do)('do')
       PsiElement(EOL)('\n')

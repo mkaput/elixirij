@@ -87,93 +87,6 @@ val EX_END = ExTokenType("end")
 val EX_FN = ExTokenType("fn")
 
 @JvmField
-val EX_CASE = ExTokenType("case")
-
-@JvmField
-val EX_COND = ExTokenType("cond")
-
-@JvmField
-val EX_WITH = ExTokenType("with")
-
-@JvmField
-val EX_TRY = ExTokenType("try")
-
-@JvmField
-val EX_RECEIVE = ExTokenType("receive")
-
-@JvmField
-val EX_DEFMODULE = ExTokenType("defmodule")
-
-@JvmField
-val EX_DEF = ExTokenType("def")
-
-@JvmField
-val EX_DEFP = ExTokenType("defp")
-
-@JvmField
-val EX_DEFMACRO = ExTokenType("defmacro")
-
-@JvmField
-val EX_DEFMACROP = ExTokenType("defmacrop")
-
-@JvmField
-val EX_DEFGUARD = ExTokenType("defguard")
-
-@JvmField
-val EX_DEFGUARDP = ExTokenType("defguardp")
-
-@JvmField
-val EX_DEFSTRUCT = ExTokenType("defstruct")
-
-@JvmField
-val EX_DEFEXCEPTION = ExTokenType("defexception")
-
-@JvmField
-val EX_DEFPROTOCOL = ExTokenType("defprotocol")
-
-@JvmField
-val EX_DEFIMPL = ExTokenType("defimpl")
-
-@JvmField
-val EX_FOR_COLON = ExTokenType("for:")
-
-@JvmField
-val EX_IMPORT = ExTokenType("import")
-
-@JvmField
-val EX_REQUIRE = ExTokenType("require")
-
-@JvmField
-val EX_USE = ExTokenType("use")
-
-@JvmField
-val EX_ALIAS_KW = ExTokenType("alias")
-
-@JvmField
-val EX_AS_COLON = ExTokenType("as:")
-
-@JvmField
-val EX_FOR = ExTokenType("for")
-
-@JvmField
-val EX_INTO_COLON = ExTokenType("into:")
-
-@JvmField
-val EX_UNIQ_COLON = ExTokenType("uniq:")
-
-@JvmField
-val EX_REDUCE_COLON = ExTokenType("reduce:")
-
-@JvmField
-val EX_QUOTE = ExTokenType("quote")
-
-@JvmField
-val EX_UNQUOTE = ExTokenType("unquote")
-
-@JvmField
-val EX_UNQUOTE_SPLICING = ExTokenType("unquote_splicing")
-
-@JvmField
 val EX_RAISE = ExTokenType("raise")
 
 @JvmField
@@ -426,35 +339,6 @@ val EX_KEYWORDS = TokenSet.create(
     EX_DO,
     EX_END,
     EX_FN,
-    EX_CASE,
-    EX_COND,
-    EX_WITH,
-    EX_TRY,
-    EX_RECEIVE,
-    EX_DEFMODULE,
-    EX_DEF,
-    EX_DEFP,
-    EX_DEFMACRO,
-    EX_DEFMACROP,
-    EX_DEFGUARD,
-    EX_DEFGUARDP,
-    EX_DEFSTRUCT,
-    EX_DEFEXCEPTION,
-    EX_DEFPROTOCOL,
-    EX_DEFIMPL,
-    EX_FOR_COLON,
-    EX_IMPORT,
-    EX_REQUIRE,
-    EX_USE,
-    EX_ALIAS_KW,
-    EX_AS_COLON,
-    EX_FOR,
-    EX_INTO_COLON,
-    EX_UNIQ_COLON,
-    EX_REDUCE_COLON,
-    EX_QUOTE,
-    EX_UNQUOTE,
-    EX_UNQUOTE_SPLICING,
     EX_RAISE,
     EX_THROW,
     EX_SEND,

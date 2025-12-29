@@ -1,7 +1,7 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExTryExprImpl(TRY_EXPR)
-      PsiElement(try)('try')
+      PsiElement(IDENTIFIER)('try')
       PsiWhiteSpace(' ')
       PsiElement(do)('do')
       ExDoContentsImpl(DO_CONTENTS)

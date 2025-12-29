@@ -1,7 +1,7 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExCaseExprImpl(CASE_EXPR)
-      PsiElement(case)('case')
+      PsiElement(IDENTIFIER)('case')
       PsiWhiteSpace(' ')
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('x')

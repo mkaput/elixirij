@@ -2,7 +2,7 @@ Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExAccessExprImpl(ACCESS_EXPR)
       ExDefExprImpl(DEF_EXPR)
-        PsiElement(def)('def')
+        PsiElement(IDENTIFIER)('def')
         PsiWhiteSpace(' ')
         ExIdentifierImpl(IDENTIFIER)
           PsiElement(IDENTIFIER)('foo')
@@ -13,5 +13,5 @@ Elixir File
         ExIdentifierImpl(IDENTIFIER)
           PsiElement(IDENTIFIER)('a')
         PsiElement(,)(',')
-        PsiErrorElement:')', <keyword pair>, <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, as: or for: expected
+        PsiErrorElement:')', <unary expr>, ATOM_QUOTED or KW_IDENTIFIER expected
           <empty list>

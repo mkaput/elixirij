@@ -1,7 +1,7 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExDefExprImpl(DEF_EXPR)
-      PsiElement(defp)('defp')
+      PsiElement(IDENTIFIER)('defp')
       PsiWhiteSpace(' ')
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('bar')
