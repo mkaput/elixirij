@@ -145,7 +145,7 @@ private accessSuffix ::= dotAccess | anonymousCall | bracketAccess | parenCall
 // No-parens function call: func arg1, arg2
 noParensCall ::= !literal callTarget &noParensArgStart noParensArgs doBlock?
 private callTarget ::= accessExpr
-private noParensArgStart ::= keywordPair | expression
+private noParensArgStart ::= !EX_DO (keywordPair | expression)
 private noParensArgs ::= noParensKeywordArgs | noParensPositionalArgs
 private noParensKeywordArgs ::= keywordPair (EX_COMMA keywordPair)*
 private noParensPositionalArgs ::= expression (EX_COMMA expression)* keywordTail?
@@ -181,6 +181,7 @@ private primaryExpr ::= literal
                       | heredoc
                       | charlistHeredoc
                       | fnExpr
+                      | caseExpr
                       | doBlock
                       | parenExpr
 
@@ -198,6 +199,12 @@ private stabArgList ::= stabArg (EX_COMMA stabArg)*
 private stabArg ::= matchExpr
 private stabBody ::= matchExpr (eoe matchExpr !EX_ARROW)*
 private whenClause ::= EX_WHEN matchExpr
+
+// Case expression: case expr do ... end
+caseExpr ::= EX_CASE caseSubject EX_DO caseClauseList EX_END { pin=1 }
+private caseSubject ::= expression &EX_DO
+private caseClauseList ::= eoe? caseClause (eoe caseClause)* eoe?
+private caseClause ::= stabClause
 
 // Do blocks: do ... end (with optional clauses)
 doBlock ::= EX_DO doContents doBlockSuffix EX_END { pin=1 }

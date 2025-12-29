@@ -188,4 +188,9 @@ class ExParserTest : ParsingTestCase(
     fun testIfSimple() = doTest()
     fun testIfOneLiner() = doTest()
     fun testUnless() = doTest()
+
+    // Phase 11: Control Flow - case
+    fun testCase() = doTest()
+    fun testCaseMulti() = doTest()
+    fun testCaseGuard() = doTest()
 }

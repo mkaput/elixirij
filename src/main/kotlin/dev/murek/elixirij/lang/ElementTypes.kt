@@ -87,6 +87,9 @@ val EX_END = ExTokenType("end")
 val EX_FN = ExTokenType("fn")
 
 @JvmField
+val EX_CASE = ExTokenType("case")
+
+@JvmField
 val EX_AFTER = ExTokenType("after")
 
 @JvmField
@@ -327,6 +330,7 @@ val EX_KEYWORDS = TokenSet.create(
     EX_DO,
     EX_END,
     EX_FN,
+    EX_CASE,
     EX_AFTER,
     EX_ELSE,
     EX_CATCH,

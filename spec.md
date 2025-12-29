@@ -809,7 +809,7 @@ Integrate do-blocks with function calls.
 
 ---
 
-### Phase 11: Control Flow - case
+### Phase 11: Control Flow - case ✅ DONE
 
 Implement case expressions.
 
