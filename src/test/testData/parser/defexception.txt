@@ -1,0 +1,11 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExDefexceptionExprImpl(DEFEXCEPTION_EXPR)
+      PsiElement(defexception)('defexception')
+      PsiWhiteSpace(' ')
+      ExKeywordPairImpl(KEYWORD_PAIR)
+        PsiElement(KW_IDENTIFIER)('message:')
+        PsiWhiteSpace(' ')
+        ExLiteralImpl(LITERAL)
+          ExStringImpl(STRING)
+            PsiElement(STRING)('"oops"')

@@ -223,4 +223,8 @@ class ExParserTest : ParsingTestCase(
 
     // Phase 19: Guard Definitions
     fun testDefguard() = doTest()
+
+    // Phase 20: Struct and Exception Definitions
+    fun testDefstruct() = doTest()
+    fun testDefexception() = doTest()
 }

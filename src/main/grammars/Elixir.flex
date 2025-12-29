@@ -90,6 +90,8 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "defmacrop"                        { return EX_DEFMACROP; }
     "defguard"                         { return EX_DEFGUARD; }
     "defguardp"                        { return EX_DEFGUARDP; }
+    "defstruct"                        { return EX_DEFSTRUCT; }
+    "defexception"                     { return EX_DEFEXCEPTION; }
     "after"                            { return EX_AFTER; }
     "else"                             { return EX_ELSE; }
     "catch"                            { return EX_CATCH; }

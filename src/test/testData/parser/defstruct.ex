@@ -1,0 +1,1 @@
+defstruct [:name, :age]

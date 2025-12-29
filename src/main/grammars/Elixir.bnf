@@ -184,6 +184,8 @@ private primaryExpr ::= literal
                       | defExpr
                       | defmacroExpr
                       | defguardExpr
+                      | defstructExpr
+                      | defexceptionExpr
                       | fnExpr
                       | caseExpr
                       | condExpr
@@ -211,6 +213,10 @@ defmacroExpr ::= (EX_DEFMACRO | EX_DEFMACROP) defHead defBody { pin=1 }
 
 // Guard definitions: defguard/defguardp
 defguardExpr ::= (EX_DEFGUARD | EX_DEFGUARDP) identifier defArgs? whenClause { pin=1 }
+
+// Struct and exception definitions
+defstructExpr ::= EX_DEFSTRUCT (list | keywordList) { pin=1 }
+defexceptionExpr ::= EX_DEFEXCEPTION (list | keywordList) { pin=1 }
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }
