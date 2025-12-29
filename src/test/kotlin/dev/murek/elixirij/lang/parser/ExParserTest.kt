@@ -32,7 +32,13 @@ class ExParserTest : ParsingTestCase(
     fun testTrailingCommaList() = doTest()
     fun testTrailingCommaTuple() = doTest()
     fun testTrailingCommaMap() = doTest()
-    
+
+    // =============================================================================
+    // B. Past Bugs
+    // =============================================================================
+
+    fun testUseKeywordListAllowsNewlines() = doTest()
+
     // =============================================================================
     // 1. Literals
     // =============================================================================
@@ -93,7 +99,7 @@ class ExParserTest : ParsingTestCase(
     fun testOpPin() = doTest()
     fun testOpUnary() = doTest()
     fun testOpAt() = doTest()
-    
+
     // Phase 2: Missing Operators
     fun testOpType() = doTest()
     fun testOpWhen() = doTest()
@@ -146,11 +152,11 @@ class ExParserTest : ParsingTestCase(
 
     fun testCallParen() = doTest()
     fun testCallNoArgs() = doTest()
-    
+
     // Phase 3.5: Keyword arguments - requires lexer-level kw_identifier token
     fun testCallKeyword() = doTest()
     fun testCallMixed() = doTest()
-    
+
     fun testCallNested() = doTest()
     fun testCallQualified() = doTest()
     fun testCallQualifiedNested() = doTest()

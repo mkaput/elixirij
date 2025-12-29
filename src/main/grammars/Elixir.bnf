@@ -253,10 +253,10 @@ defimplExpr ::= defimplKeyword alias EX_COMMA keywordKey alias moduleBlock { pin
 
 // Import/require/use
 importExpr ::= importKeyword alias importOpts? { pin=1 }
-private importOpts ::= EX_COMMA keywordList
+private importOpts ::= EX_COMMA eoe* keywordList
 requireExpr ::= requireKeyword alias { pin=1 }
 useExpr ::= useKeyword alias useOpts? { pin=1 }
-private useOpts ::= EX_COMMA keywordList
+private useOpts ::= EX_COMMA eoe* keywordList
 
 // Alias directive
 aliasDirective ::= aliasKeyword alias (aliasMultiTail | aliasOpts)? { pin=1 }
@@ -455,4 +455,4 @@ private argList ::= argListElement (EX_COMMA argListElement)* EX_COMMA?
 private argListElement ::= matchExpr { recoverWhile=callArgRecovery }
 
 // Keyword list: comma-separated keyword pairs
-private keywordList ::= keywordPairItem (EX_COMMA keywordPairItem)* EX_COMMA?
+private keywordList ::= keywordPairItem (EX_COMMA eoe* keywordPairItem)* (EX_COMMA eoe*)?
