@@ -185,6 +185,7 @@ private primaryExpr ::= literal
                       | condExpr
                       | withExpr
                       | tryExpr
+                      | receiveExpr
                       | doBlock
                       | parenExpr
 
@@ -225,6 +226,12 @@ private withParenCall ::= EX_LPAREN callArgs? EX_RPAREN { pin=1 }
 tryExpr ::= EX_TRY EX_DO tryContents EX_END { pin=1 }
 private tryContents ::= doContents tryClauses
 private tryClauses ::= eoe* rescueClause* eoe* catchClause* eoe* afterClause? eoe*
+
+// Receive expression: receive do ... after ... end
+receiveExpr ::= EX_RECEIVE EX_DO receiveClauseList receiveAfterClause? EX_END { pin=1 }
+private receiveClauseList ::= eoe? receiveClause (eoe receiveClause)* eoe?
+private receiveClause ::= stabClause
+private receiveAfterClause ::= eoe* afterClause eoe*
 
 // Do blocks: do ... end (with optional clauses)
 doBlock ::= EX_DO doContents doBlockSuffix EX_END { pin=1 }

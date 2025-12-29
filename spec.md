@@ -860,7 +860,7 @@ Implement try expressions.
 
 ---
 
-### Phase 15: Control Flow - receive
+### Phase 15: Control Flow - receive ✅ DONE
 
 Implement receive expressions.
 

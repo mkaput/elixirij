@@ -82,6 +82,7 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "cond"                             { return EX_COND; }
     "with"                             { return EX_WITH; }
     "try"                              { return EX_TRY; }
+    "receive"                          { return EX_RECEIVE; }
     "after"                            { return EX_AFTER; }
     "else"                             { return EX_ELSE; }
     "catch"                            { return EX_CATCH; }

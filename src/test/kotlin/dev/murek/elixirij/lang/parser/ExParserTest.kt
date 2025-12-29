@@ -203,4 +203,8 @@ class ExParserTest : ParsingTestCase(
 
     // Phase 14: Control Flow - try
     fun testTry() = doTest()
+
+    // Phase 15: Control Flow - receive
+    fun testReceive() = doTest()
+    fun testReceiveAfter() = doTest()
 }
