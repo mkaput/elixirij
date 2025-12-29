@@ -138,6 +138,15 @@ val EX_DEFIMPL = ExTokenType("defimpl")
 val EX_FOR_COLON = ExTokenType("for:")
 
 @JvmField
+val EX_IMPORT = ExTokenType("import")
+
+@JvmField
+val EX_REQUIRE = ExTokenType("require")
+
+@JvmField
+val EX_USE = ExTokenType("use")
+
+@JvmField
 val EX_AFTER = ExTokenType("after")
 
 @JvmField
@@ -395,6 +404,9 @@ val EX_KEYWORDS = TokenSet.create(
     EX_DEFPROTOCOL,
     EX_DEFIMPL,
     EX_FOR_COLON,
+    EX_IMPORT,
+    EX_REQUIRE,
+    EX_USE,
     EX_AFTER,
     EX_ELSE,
     EX_CATCH,

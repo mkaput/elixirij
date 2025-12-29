@@ -1,0 +1,7 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExImportExprImpl(IMPORT_EXPR)
+      PsiElement(import)('import')
+      PsiWhiteSpace(' ')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('Foo')

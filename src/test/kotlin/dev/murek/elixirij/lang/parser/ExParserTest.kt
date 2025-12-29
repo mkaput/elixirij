@@ -241,4 +241,12 @@ class ExParserTest : ParsingTestCase(
     fun testOpaque() = doTest()
     fun testCallback() = doTest()
     fun testBehaviour() = doTest()
+
+    // Phase 23: Import/Require/Use
+    fun testImport() = doTest()
+    fun testImportOnly() = doTest()
+    fun testImportExcept() = doTest()
+    fun testRequire() = doTest()
+    fun testUse() = doTest()
+    fun testUseOpts() = doTest()
 }

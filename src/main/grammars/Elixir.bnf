@@ -192,6 +192,9 @@ private primaryExpr ::= literal
                       | defexceptionExpr
                       | defprotocolExpr
                       | defimplExpr
+                      | importExpr
+                      | requireExpr
+                      | useExpr
                       | fnExpr
                       | caseExpr
                       | condExpr
@@ -227,6 +230,13 @@ defexceptionExpr ::= EX_DEFEXCEPTION (list | keywordList) { pin=1 }
 // Protocol definitions
 defprotocolExpr ::= EX_DEFPROTOCOL alias doBlock { pin=1 }
 defimplExpr ::= EX_DEFIMPL alias EX_COMMA EX_FOR_COLON alias doBlock { pin=1 }
+
+// Import/require/use
+importExpr ::= EX_IMPORT alias importOpts? { pin=1 }
+private importOpts ::= EX_COMMA keywordList
+requireExpr ::= EX_REQUIRE alias { pin=1 }
+useExpr ::= EX_USE alias useOpts? { pin=1 }
+private useOpts ::= EX_COMMA keywordList
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }

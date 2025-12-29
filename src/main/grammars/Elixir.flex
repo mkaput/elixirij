@@ -95,6 +95,9 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "defprotocol"                      { return EX_DEFPROTOCOL; }
     "defimpl"                          { return EX_DEFIMPL; }
     "for" ":" / {HORIZONTAL_SPACE}     { return EX_FOR_COLON; }
+    "import"                           { return EX_IMPORT; }
+    "require"                          { return EX_REQUIRE; }
+    "use"                              { return EX_USE; }
     "after"                            { return EX_AFTER; }
     "else"                             { return EX_ELSE; }
     "catch"                            { return EX_CATCH; }
