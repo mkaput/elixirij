@@ -129,6 +129,15 @@ val EX_DEFSTRUCT = ExTokenType("defstruct")
 val EX_DEFEXCEPTION = ExTokenType("defexception")
 
 @JvmField
+val EX_DEFPROTOCOL = ExTokenType("defprotocol")
+
+@JvmField
+val EX_DEFIMPL = ExTokenType("defimpl")
+
+@JvmField
+val EX_FOR_COLON = ExTokenType("for:")
+
+@JvmField
 val EX_AFTER = ExTokenType("after")
 
 @JvmField
@@ -383,6 +392,9 @@ val EX_KEYWORDS = TokenSet.create(
     EX_DEFGUARDP,
     EX_DEFSTRUCT,
     EX_DEFEXCEPTION,
+    EX_DEFPROTOCOL,
+    EX_DEFIMPL,
+    EX_FOR_COLON,
     EX_AFTER,
     EX_ELSE,
     EX_CATCH,

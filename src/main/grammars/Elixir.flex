@@ -92,6 +92,9 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "defguardp"                        { return EX_DEFGUARDP; }
     "defstruct"                        { return EX_DEFSTRUCT; }
     "defexception"                     { return EX_DEFEXCEPTION; }
+    "defprotocol"                      { return EX_DEFPROTOCOL; }
+    "defimpl"                          { return EX_DEFIMPL; }
+    "for" ":" / {HORIZONTAL_SPACE}     { return EX_FOR_COLON; }
     "after"                            { return EX_AFTER; }
     "else"                             { return EX_ELSE; }
     "catch"                            { return EX_CATCH; }

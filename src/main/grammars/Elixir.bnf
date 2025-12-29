@@ -186,6 +186,8 @@ private primaryExpr ::= literal
                       | defguardExpr
                       | defstructExpr
                       | defexceptionExpr
+                      | defprotocolExpr
+                      | defimplExpr
                       | fnExpr
                       | caseExpr
                       | condExpr
@@ -217,6 +219,10 @@ defguardExpr ::= (EX_DEFGUARD | EX_DEFGUARDP) identifier defArgs? whenClause { p
 // Struct and exception definitions
 defstructExpr ::= EX_DEFSTRUCT (list | keywordList) { pin=1 }
 defexceptionExpr ::= EX_DEFEXCEPTION (list | keywordList) { pin=1 }
+
+// Protocol definitions
+defprotocolExpr ::= EX_DEFPROTOCOL alias doBlock { pin=1 }
+defimplExpr ::= EX_DEFIMPL alias EX_COMMA EX_FOR_COLON alias doBlock { pin=1 }
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }

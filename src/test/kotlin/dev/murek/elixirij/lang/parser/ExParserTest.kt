@@ -227,4 +227,8 @@ class ExParserTest : ParsingTestCase(
     // Phase 20: Struct and Exception Definitions
     fun testDefstruct() = doTest()
     fun testDefexception() = doTest()
+
+    // Phase 21: Protocol Definitions
+    fun testDefprotocol() = doTest()
+    fun testDefimpl() = doTest()
 }
