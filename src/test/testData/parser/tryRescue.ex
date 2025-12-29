@@ -1,5 +1,5 @@
-do
-  :ok
+try do
+  f()
 rescue
   :error -> :error
 end

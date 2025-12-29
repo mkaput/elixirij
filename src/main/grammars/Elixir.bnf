@@ -184,6 +184,7 @@ private primaryExpr ::= literal
                       | caseExpr
                       | condExpr
                       | withExpr
+                      | tryExpr
                       | doBlock
                       | parenExpr
 
@@ -219,6 +220,11 @@ private withClause ::= matchExpr EX_LEFT_ARROW withAccessExpr
 private withAccessExpr ::= primaryExpr withAccessSuffix*
 private withAccessSuffix ::= dotAccess | anonymousCall | bracketAccess | withParenCall
 private withParenCall ::= EX_LPAREN callArgs? EX_RPAREN { pin=1 }
+
+// Try expression: try do ... rescue/catch/after ... end
+tryExpr ::= EX_TRY EX_DO tryContents EX_END { pin=1 }
+private tryContents ::= doContents tryClauses
+private tryClauses ::= eoe* rescueClause* eoe* catchClause* eoe* afterClause? eoe*
 
 // Do blocks: do ... end (with optional clauses)
 doBlock ::= EX_DO doContents doBlockSuffix EX_END { pin=1 }

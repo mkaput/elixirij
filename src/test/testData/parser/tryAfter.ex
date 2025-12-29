@@ -1,5 +1,5 @@
-do
-  :ok
+try do
+  f()
 after
-  :cleanup
+  cleanup()
 end
