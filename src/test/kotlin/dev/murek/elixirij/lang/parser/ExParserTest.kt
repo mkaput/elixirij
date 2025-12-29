@@ -220,4 +220,7 @@ class ExParserTest : ParsingTestCase(
     // Phase 18: Macro Definitions
     fun testDefmacro() = doTest()
     fun testDefmacrop() = doTest()
+
+    // Phase 19: Guard Definitions
+    fun testDefguard() = doTest()
 }

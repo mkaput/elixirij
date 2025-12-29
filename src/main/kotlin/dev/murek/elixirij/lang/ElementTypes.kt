@@ -117,6 +117,12 @@ val EX_DEFMACRO = ExTokenType("defmacro")
 val EX_DEFMACROP = ExTokenType("defmacrop")
 
 @JvmField
+val EX_DEFGUARD = ExTokenType("defguard")
+
+@JvmField
+val EX_DEFGUARDP = ExTokenType("defguardp")
+
+@JvmField
 val EX_AFTER = ExTokenType("after")
 
 @JvmField
@@ -367,6 +373,8 @@ val EX_KEYWORDS = TokenSet.create(
     EX_DEFP,
     EX_DEFMACRO,
     EX_DEFMACROP,
+    EX_DEFGUARD,
+    EX_DEFGUARDP,
     EX_AFTER,
     EX_ELSE,
     EX_CATCH,

@@ -88,6 +88,8 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "defp"                             { return EX_DEFP; }
     "defmacro"                         { return EX_DEFMACRO; }
     "defmacrop"                        { return EX_DEFMACROP; }
+    "defguard"                         { return EX_DEFGUARD; }
+    "defguardp"                        { return EX_DEFGUARDP; }
     "after"                            { return EX_AFTER; }
     "else"                             { return EX_ELSE; }
     "catch"                            { return EX_CATCH; }

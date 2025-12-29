@@ -183,6 +183,7 @@ private primaryExpr ::= literal
                       | defmoduleExpr
                       | defExpr
                       | defmacroExpr
+                      | defguardExpr
                       | fnExpr
                       | caseExpr
                       | condExpr
@@ -207,6 +208,9 @@ private doInline ::= EX_COMMA keywordList
 
 // Macro definitions: defmacro/defmacrop
 defmacroExpr ::= (EX_DEFMACRO | EX_DEFMACROP) defHead defBody { pin=1 }
+
+// Guard definitions: defguard/defguardp
+defguardExpr ::= (EX_DEFGUARD | EX_DEFGUARDP) identifier defArgs? whenClause { pin=1 }
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }
