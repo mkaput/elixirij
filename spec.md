@@ -1000,7 +1000,7 @@ Implement for comprehensions.
 
 ---
 
-### Phase 26: Quote and Unquote
+### Phase 26: Quote and Unquote ✅ DONE
 
 Implement quote special form.
 
@@ -1117,6 +1117,80 @@ This phase is critical for IDE functionality. Users constantly work with incompl
 - Error nodes are localized (don't consume valid following code)
 - IDE features (completion, highlighting) work in files with errors
 - Error recovery is consistent and predictable
+
+---
+
+### Phase 31: Identifier-First Keywords (Expert Alignment)
+
+Align lexer/parser behavior with Expert and IntelliJ Elixir: treat special-form and Kernel-macro names as identifiers
+at the lexer level, and recognize them in the parser/semantic layers by text and resolution instead of keyword tokens.
+
+#### 31.1 Lexer Policy
+
+1. Collapse all non-lexical “reserved” names (special forms, Kernel macros) into `IDENTIFIER_TOKEN`.
+2. Keep only true lexical tokens as dedicated types:
+   - Block delimiters
+   - Operators
+   - Built-in literal atoms (e.g., booleans/nil)
+3. Ensure keyword-pair detection is based on `identifier + colon` rather than per-keyword tokens.
+
+#### 31.2 Code Fragments to Eliminate (Concrete Cleanups)
+
+These are the *explicit* fragments in the current codebase that must be removed or rewritten to achieve the
+identifier-first model. This list is intentionally concrete, so we can grep and delete/replace without guessing.
+
+1. **Lexer keyword block** in `src/main/grammars/Elixir.flex`:
+   - Remove the entire “Keywords (must come before identifiers)” block for non-lexical identifiers.
+   - Keep only lexical keywords and operator-words (block delimiters and word operators).
+   - In practice this means: delete the explicit keyword-return rules for special forms and Kernel macros
+     (module/function/macro definitions, control-flow special forms, import/alias/require/use, quote/unquote,
+     and comprehension entry words). The identifiers should fall through to `{IDENTIFIER}` and become `EX_IDENTIFIER`.
+
+2. **Token type declarations** in `src/main/kotlin/dev/murek/elixirij/lang/ElementTypes.kt`:
+   - Remove the `EX_*` token constants that represent non-lexical keywords (special forms and Kernel macros).
+   - Remove those same tokens from `EX_KEYWORDS`.
+   - Keep lexical tokens such as `EX_DO`, `EX_END`, `EX_FN`, `EX_AFTER`, `EX_ELSE`, `EX_CATCH`, `EX_RESCUE`,
+     and literal atoms (`EX_TRUE`, `EX_FALSE`, `EX_NIL`), plus word-operators (`EX_IN`, `EX_NOT`, `EX_AND`, `EX_OR`,
+     `EX_WHEN`) if they remain treated as operators.
+
+3. **Grammar rules that rely on keyword tokens** in `src/main/grammars/Elixir.bnf`:
+   - Replace every rule that starts with an `EX_*` keyword token for a special form or Kernel macro with an
+     identifier-text matcher (see 31.3).
+   - This includes (but is not limited to) the rules for: module/macro/def-family declarations, control-flow
+     special forms, quote/unquote, and any top-level “directive” constructs.
+   - Do **not** remove these grammar productions; rewrite their heads to match identifiers by text instead of
+     keyword tokens.
+
+4. **Syntax highlighting keyword set**:
+   - In `src/main/kotlin/dev/murek/elixirij/ide/highlighting/ExSyntaxHighlighter.kt`, make sure we only treat
+     *lexical* tokens as `KEYWORD`, not identifiers that should remain `EX_IDENTIFIER`.
+   - This is mostly driven by trimming `EX_KEYWORDS` in `ElementTypes.kt`.
+
+#### 31.3 Parser Strategy
+
+1. Add a helper rule or custom predicate to match “identifier with expected text”.
+2. Use that helper in grammar productions that are spelled as identifiers (special forms/macros).
+3. Avoid token remapping at the parser level; keep the token stream stable and resolve via text checks.
+
+#### 31.4 Parser Implementation Notes (Identifier-Text Matching)
+
+Define a reusable helper in the grammar layer, for example:
+- `private keywordLike ::= identifier &{pinText("defmodule")}`
+- or a small BNF `identifierNamed("defmodule")` wrapper using a parser util.
+
+Goal: keep the token stream stable (`EX_IDENTIFIER`) and branch by text only where grammar structure requires it.
+
+#### 31.5 Semantic Resolution & Highlighting
+
+1. Classify predefined calls by resolution to `Kernel` / `Kernel.SpecialForms`, not by keyword tokens.
+2. Allow shadowing for `Kernel` macros and imported functions; do not hardwire them as keywords.
+3. Treat true special forms as non-overridable during resolution, but still lexed as identifiers.
+
+#### 31.6 Tests
+
+1. Lexer tests: special-form and Kernel-macro names are `IDENTIFIER_TOKEN`.
+2. Parser tests: identifier-text matching drives the correct grammar productions without keyword tokens.
+3. Resolution tests: local/imported definitions shadow Kernel macros; special forms remain recognized.
 
 ## File Structure
 

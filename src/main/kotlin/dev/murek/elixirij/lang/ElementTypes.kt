@@ -165,6 +165,15 @@ val EX_UNIQ_COLON = ExTokenType("uniq:")
 val EX_REDUCE_COLON = ExTokenType("reduce:")
 
 @JvmField
+val EX_QUOTE = ExTokenType("quote")
+
+@JvmField
+val EX_UNQUOTE = ExTokenType("unquote")
+
+@JvmField
+val EX_UNQUOTE_SPLICING = ExTokenType("unquote_splicing")
+
+@JvmField
 val EX_AFTER = ExTokenType("after")
 
 @JvmField
@@ -431,6 +440,9 @@ val EX_KEYWORDS = TokenSet.create(
     EX_INTO_COLON,
     EX_UNIQ_COLON,
     EX_REDUCE_COLON,
+    EX_QUOTE,
+    EX_UNQUOTE,
+    EX_UNQUOTE_SPLICING,
     EX_AFTER,
     EX_ELSE,
     EX_CATCH,

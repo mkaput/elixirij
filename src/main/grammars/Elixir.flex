@@ -104,6 +104,9 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "into" ":" / {HORIZONTAL_SPACE}    { return EX_INTO_COLON; }
     "uniq" ":" / {HORIZONTAL_SPACE}    { return EX_UNIQ_COLON; }
     "reduce" ":" / {HORIZONTAL_SPACE}  { return EX_REDUCE_COLON; }
+    "quote"                            { return EX_QUOTE; }
+    "unquote_splicing"                 { return EX_UNQUOTE_SPLICING; }
+    "unquote"                          { return EX_UNQUOTE; }
     "after"                            { return EX_AFTER; }
     "else"                             { return EX_ELSE; }
     "catch"                            { return EX_CATCH; }

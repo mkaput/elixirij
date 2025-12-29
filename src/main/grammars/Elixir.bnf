@@ -197,6 +197,9 @@ private primaryExpr ::= literal
                       | useExpr
                       | aliasDirective
                       | forExpr
+                      | quoteExpr
+                      | unquoteExpr
+                      | unquoteSplicingExpr
                       | fnExpr
                       | caseExpr
                       | condExpr
@@ -251,6 +254,12 @@ private forClause ::= forGenerator | forFilter
 private forGenerator ::= expression EX_LEFT_ARROW expression
 private forFilter ::= expression
 private forOpts ::= EX_COMMA (EX_INTO_COLON | EX_UNIQ_COLON | EX_REDUCE_COLON) expression
+
+// Quote and unquote
+quoteExpr ::= EX_QUOTE quoteOpts? doBlock { pin=1 }
+private quoteOpts ::= EX_COMMA keywordList
+unquoteExpr ::= EX_UNQUOTE EX_LPAREN expression EX_RPAREN { pin=1 }
+unquoteSplicingExpr ::= EX_UNQUOTE_SPLICING EX_LPAREN expression EX_RPAREN { pin=1 }
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }

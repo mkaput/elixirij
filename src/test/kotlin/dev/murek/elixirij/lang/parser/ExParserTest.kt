@@ -262,4 +262,10 @@ class ExParserTest : ParsingTestCase(
     fun testForInto() = doTest()
     fun testForUniq() = doTest()
     fun testForBitstring() = doTest()
+
+    // Phase 26: Quote and Unquote
+    fun testQuote() = doTest()
+    fun testQuoteUnquote() = doTest()
+    fun testQuoteSplice() = doTest()
+    fun testQuoteBind() = doTest()
 }
