@@ -86,6 +86,8 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "defmodule"                        { return EX_DEFMODULE; }
     "def"                              { return EX_DEF; }
     "defp"                             { return EX_DEFP; }
+    "defmacro"                         { return EX_DEFMACRO; }
+    "defmacrop"                        { return EX_DEFMACROP; }
     "after"                            { return EX_AFTER; }
     "else"                             { return EX_ELSE; }
     "catch"                            { return EX_CATCH; }

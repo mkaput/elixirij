@@ -216,4 +216,8 @@ class ExParserTest : ParsingTestCase(
     fun testDef() = doTest()
     fun testDefMultiClause() = doTest()
     fun testDefp() = doTest()
+
+    // Phase 18: Macro Definitions
+    fun testDefmacro() = doTest()
+    fun testDefmacrop() = doTest()
 }

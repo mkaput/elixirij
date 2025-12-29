@@ -182,6 +182,7 @@ private primaryExpr ::= literal
                       | charlistHeredoc
                       | defmoduleExpr
                       | defExpr
+                      | defmacroExpr
                       | fnExpr
                       | caseExpr
                       | condExpr
@@ -203,6 +204,9 @@ private defHead ::= identifier defArgs? whenClause?
 private defArgs ::= EX_LPAREN argList? EX_RPAREN
 private defBody ::= doBlock | doInline
 private doInline ::= EX_COMMA keywordList
+
+// Macro definitions: defmacro/defmacrop
+defmacroExpr ::= (EX_DEFMACRO | EX_DEFMACROP) defHead defBody { pin=1 }
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }

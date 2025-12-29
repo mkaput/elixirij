@@ -898,7 +898,7 @@ Implement function definitions.
 
 ---
 
-### Phase 18: Macro Definitions (defmacro/defmacrop)
+### Phase 18: Macro Definitions (defmacro/defmacrop) ✅ DONE
 
 Implement macro definitions.
 
