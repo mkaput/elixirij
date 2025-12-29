@@ -103,6 +103,21 @@ enum class ExTextAttributes(
         DefaultLanguageHighlighterColors.METADATA,
         ExBundle.messagePointer("color.settings.attribute")
     ),
+    FUNCTION_DECLARATION(
+        "ELIXIR_FUNCTION_DECLARATION",
+        DefaultLanguageHighlighterColors.FUNCTION_DECLARATION,
+        ExBundle.messagePointer("color.settings.functionDeclaration")
+    ),
+    MACRO_DECLARATION(
+        "ELIXIR_MACRO_DECLARATION",
+        DefaultLanguageHighlighterColors.FUNCTION_DECLARATION,
+        ExBundle.messagePointer("color.settings.macroDeclaration")
+    ),
+    SPECIAL_FORM(
+        "ELIXIR_SPECIAL_FORM",
+        DefaultLanguageHighlighterColors.KEYWORD,
+        ExBundle.messagePointer("color.settings.specialForm")
+    ),
     BAD_CHARACTER(
         "ELIXIR_BAD_CHARACTER",
         HighlighterColors.BAD_CHARACTER,

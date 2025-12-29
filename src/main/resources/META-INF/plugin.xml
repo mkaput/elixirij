@@ -32,6 +32,9 @@
 
     <colorSettingsPage implementation="dev.murek.elixirij.ide.highlighting.ExColorSettingsPage"/>
 
+    <annotator language="Elixir"
+               implementationClass="dev.murek.elixirij.ide.highlighting.ExHighlightingAnnotator"/>
+
     <postStartupActivity implementation="dev.murek.elixirij.lsp.ExLspServerStartupActivity"/>
 
     <platform.lsp.serverSupportProvider implementation="dev.murek.elixirij.lsp.ExLspServerSupportProvider"/>
