@@ -755,7 +755,7 @@ Enhance capture operator for named and anonymous captures.
 
 ---
 
-### Phase 7: Do-Blocks (Basic)
+### Phase 7: Do-Blocks (Basic) ✅ DONE
 
 Implement basic do-end blocks.
 
@@ -783,7 +783,7 @@ Add else/after/catch/rescue clauses to do-blocks.
 
 ---
 
-### Phase 9: No-Parens Function Calls
+### Phase 9: No-Parens Function Calls ✅ DONE
 
 Implement function calls without parentheses.
 
