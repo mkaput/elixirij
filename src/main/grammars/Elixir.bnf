@@ -199,9 +199,18 @@ private stabArg ::= matchExpr
 private stabBody ::= matchExpr (eoe matchExpr !EX_ARROW)*
 private whenClause ::= EX_WHEN matchExpr
 
-// Do blocks: do ... end
-doBlock ::= EX_DO doContents EX_END { pin=1 }
-doContents ::= (eoe? expression (eoe expression)*)? eoe?
+// Do blocks: do ... end (with optional clauses)
+doBlock ::= EX_DO doContents doBlockSuffix EX_END { pin=1 }
+private doBlockSuffix ::= eoe* blockClauses? eoe*
+private blockClauses ::= blockClause (eoe* blockClause)*
+doContents ::= (eoeWithExpression* expression (eoeWithExpression expression)*)?
+private eoeWithExpression ::= &(eoe expression) eoe
+private blockClause ::= elseClause | afterClause | catchClause | rescueClause
+private elseClause ::= EX_ELSE doContents
+private afterClause ::= EX_AFTER doContents
+private catchClause ::= EX_CATCH stabClauseList
+private rescueClause ::= EX_RESCUE stabClauseList
+private stabClauseList ::= eoe? stabClause (eoe stabClause)* eoe?
 
 // =============================================================================
 // Literals

@@ -768,7 +768,7 @@ Implement basic do-end blocks.
 
 ---
 
-### Phase 8: Do-Block Clauses
+### Phase 8: Do-Block Clauses ✅ DONE
 
 Add else/after/catch/rescue clauses to do-blocks.
 

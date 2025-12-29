@@ -179,4 +179,8 @@ class ExParserTest : ParsingTestCase(
 
     fun testDoBlockSimple() = doTest()
     fun testDoBlockMultiExpr() = doTest()
+    fun testIfElse() = doTest()
+    fun testTryCatch() = doTest()
+    fun testTryAfter() = doTest()
+    fun testTryRescue() = doTest()
 }
