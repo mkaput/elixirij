@@ -183,4 +183,9 @@ class ExParserTest : ParsingTestCase(
     fun testTryCatch() = doTest()
     fun testTryAfter() = doTest()
     fun testTryRescue() = doTest()
+
+    // Phase 10: Calls with Do-Blocks
+    fun testIfSimple() = doTest()
+    fun testIfOneLiner() = doTest()
+    fun testUnless() = doTest()
 }

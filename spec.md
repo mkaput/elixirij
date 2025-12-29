@@ -797,7 +797,7 @@ Implement function calls without parentheses.
 
 ---
 
-### Phase 10: Calls with Do-Blocks
+### Phase 10: Calls with Do-Blocks ✅ DONE
 
 Integrate do-blocks with function calls.
 

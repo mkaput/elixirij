@@ -143,7 +143,7 @@ accessExpr ::= primaryExpr accessSuffix*
 private accessSuffix ::= dotAccess | anonymousCall | bracketAccess | parenCall
 
 // No-parens function call: func arg1, arg2
-noParensCall ::= callTarget &noParensArgStart noParensArgs
+noParensCall ::= !literal callTarget &noParensArgStart noParensArgs doBlock?
 private callTarget ::= accessExpr
 private noParensArgStart ::= keywordPair | expression
 private noParensArgs ::= noParensKeywordArgs | noParensPositionalArgs
@@ -162,7 +162,7 @@ anonymousCall ::= EX_DOT &EX_LPAREN EX_LPAREN callArgs? EX_RPAREN
 bracketAccess ::= EX_LBRACKET containerExpr EX_RBRACKET { pin=1 }
 
 // Parenthesized function call: func(args)
-parenCall ::= EX_LPAREN callArgs? EX_RPAREN { pin=1 }
+parenCall ::= EX_LPAREN callArgs? EX_RPAREN doBlock? { pin=1 }
 
 // =============================================================================
 // Primary expressions
