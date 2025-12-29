@@ -24,6 +24,7 @@ class ExParserTest : ParsingTestCase(
     fun testOnlyComments() = doTest()
     fun testTrailingComma() = doTest()
     fun testNewlinesInExpr() = doTest()
+    fun testNewlinesAroundOp() = doTest()
     fun testMultipleStatements() = doTest()
     fun testNestedDoBlocks() = doTest()
     fun testOperatorAsAtom() = doTest()
