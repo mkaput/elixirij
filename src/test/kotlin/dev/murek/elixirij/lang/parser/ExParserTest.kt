@@ -231,4 +231,14 @@ class ExParserTest : ParsingTestCase(
     // Phase 21: Protocol Definitions
     fun testDefprotocol() = doTest()
     fun testDefimpl() = doTest()
+
+    // Phase 22: Module Attributes
+    fun testModuleAttr() = doTest()
+    fun testModuleDoc() = doTest()
+    fun testDoc() = doTest()
+    fun testSpec() = doTest()
+    fun testType() = doTest()
+    fun testOpaque() = doTest()
+    fun testCallback() = doTest()
+    fun testBehaviour() = doTest()
 }

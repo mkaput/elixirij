@@ -134,8 +134,12 @@ capturePlaceholderExpr ::= EX_AMPERSAND EX_INTEGER
 private captureBareExpr ::= EX_AMPERSAND captureTarget
 private captureTarget ::= (atom | alias | identifier) (EX_DOT identifier)*
 
+// Module attributes
+moduleAttr ::= EX_AT identifier attrValue?
+private attrValue ::= expression
+
 // @ operator (module attributes)
-atExpr ::= EX_AT atExpr | noParensCall | accessExpr
+atExpr ::= moduleAttr | noParensCall | accessExpr
 
 // Precedence 310: Dot access and calls (left associative)
 // Access expression includes primary expressions, dot access, bracket access, and function calls

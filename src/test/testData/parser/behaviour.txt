@@ -4,4 +4,7 @@ Elixir File
       ExModuleAttrImpl(MODULE_ATTR)
         PsiElement(@)('@')
         ExIdentifierImpl(IDENTIFIER)
-          PsiElement(IDENTIFIER)('foo')
+          PsiElement(IDENTIFIER)('behaviour')
+        PsiWhiteSpace(' ')
+        ExAliasImpl(ALIAS)
+          PsiElement(ALIAS)('MyBehaviour')

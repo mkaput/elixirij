@@ -1,0 +1,1 @@
+@callback foo(integer) :: integer
