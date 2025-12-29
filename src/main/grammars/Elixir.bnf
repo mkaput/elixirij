@@ -25,7 +25,7 @@
   
   // Expression hierarchy - all expression types extend from expression
   extends(".*Expr")=expression
-  extends("literal|atom|identifier|alias|list|tuple|map|struct|bitstring|sigil|heredoc|charlistHeredoc|parenExpr")=expression
+  extends("literal|atom|identifier|alias|list|tuple|map|struct|bitstring|sigil|heredoc|charlistHeredoc|parenExpr|doBlock|noParensCall")=expression
   
   // Named rules for binary operators (for better PSI structure)
   name("stabExpr")="stab expression"
@@ -135,12 +135,21 @@ private captureBareExpr ::= EX_AMPERSAND captureTarget
 private captureTarget ::= (atom | alias | identifier) (EX_DOT identifier)*
 
 // @ operator (module attributes)
-atExpr ::= EX_AT atExpr | accessExpr
+atExpr ::= EX_AT atExpr | noParensCall | accessExpr
 
 // Precedence 310: Dot access and calls (left associative)
 // Access expression includes primary expressions, dot access, bracket access, and function calls
 accessExpr ::= primaryExpr accessSuffix*
 private accessSuffix ::= dotAccess | anonymousCall | bracketAccess | parenCall
+
+// No-parens function call: func arg1, arg2
+noParensCall ::= callTarget &noParensArgStart noParensArgs
+private callTarget ::= accessExpr
+private noParensArgStart ::= keywordPair | expression
+private noParensArgs ::= noParensKeywordArgs | noParensPositionalArgs
+private noParensKeywordArgs ::= keywordPair (EX_COMMA keywordPair)*
+private noParensPositionalArgs ::= expression (EX_COMMA expression)* keywordTail?
+private keywordTail ::= EX_COMMA keywordPair (EX_COMMA keywordPair)*
 
 // Dot access: expr.field or Mod.Func
 dotAccess ::= EX_DOT &dotTarget dotTarget
@@ -172,6 +181,7 @@ private primaryExpr ::= literal
                       | heredoc
                       | charlistHeredoc
                       | fnExpr
+                      | doBlock
                       | parenExpr
 
 // Parenthesized expression
@@ -188,6 +198,10 @@ private stabArgList ::= stabArg (EX_COMMA stabArg)*
 private stabArg ::= matchExpr
 private stabBody ::= matchExpr (eoe matchExpr !EX_ARROW)*
 private whenClause ::= EX_WHEN matchExpr
+
+// Do blocks: do ... end
+doBlock ::= EX_DO doContents EX_END { pin=1 }
+doContents ::= (eoe? expression (eoe expression)*)? eoe?
 
 // =============================================================================
 // Literals

@@ -1,0 +1,11 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExDoBlockImpl(DO_BLOCK)
+      PsiElement(do)('do')
+      PsiWhiteSpace(' ')
+      ExDoContentsImpl(DO_CONTENTS)
+        ExLiteralImpl(LITERAL)
+          ExIntegerImpl(INTEGER)
+            PsiElement(INTEGER)('1')
+      PsiWhiteSpace(' ')
+      PsiElement(end)('end')

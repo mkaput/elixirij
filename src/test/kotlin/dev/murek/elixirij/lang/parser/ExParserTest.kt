@@ -148,6 +148,8 @@ class ExParserTest : ParsingTestCase(
     fun testCallQualifiedNested() = doTest()
     fun testCallRemote() = doTest()
     fun testCallAnonymous() = doTest()
+    fun testCallNoParen() = doTest()
+    fun testAmbiguousCall() = doTest()
 
     // =============================================================================
     // 9. Anonymous Functions (Phase 5)
@@ -170,4 +172,11 @@ class ExParserTest : ParsingTestCase(
     fun testCaptureNamed() = doTest()
     fun testCaptureAnonymous() = doTest()
     fun testCaptureQualified() = doTest()
+
+    // =============================================================================
+    // 11. Do-Blocks (Phase 7)
+    // =============================================================================
+
+    fun testDoBlockSimple() = doTest()
+    fun testDoBlockMultiExpr() = doTest()
 }
