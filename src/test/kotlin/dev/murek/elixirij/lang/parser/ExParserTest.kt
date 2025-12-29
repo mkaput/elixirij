@@ -196,4 +196,8 @@ class ExParserTest : ParsingTestCase(
 
     // Phase 12: Control Flow - cond
     fun testCond() = doTest()
+
+    // Phase 13: Control Flow - with
+    fun testWith() = doTest()
+    fun testWithElse() = doTest()
 }

@@ -183,6 +183,7 @@ private primaryExpr ::= literal
                       | fnExpr
                       | caseExpr
                       | condExpr
+                      | withExpr
                       | doBlock
                       | parenExpr
 
@@ -211,6 +212,13 @@ private caseClause ::= stabClause
 condExpr ::= EX_COND EX_DO condClauseList EX_END { pin=1 }
 private condClauseList ::= eoe? condClause (eoe condClause)* eoe?
 private condClause ::= matchExpr EX_ARROW matchExpr
+
+// With expression: with ... do ... end
+withExpr ::= EX_WITH withClause (EX_COMMA withClause)* doBlock { pin=1 }
+private withClause ::= matchExpr EX_LEFT_ARROW withAccessExpr
+private withAccessExpr ::= primaryExpr withAccessSuffix*
+private withAccessSuffix ::= dotAccess | anonymousCall | bracketAccess | withParenCall
+private withParenCall ::= EX_LPAREN callArgs? EX_RPAREN { pin=1 }
 
 // Do blocks: do ... end (with optional clauses)
 doBlock ::= EX_DO doContents doBlockSuffix EX_END { pin=1 }

@@ -93,6 +93,9 @@ val EX_CASE = ExTokenType("case")
 val EX_COND = ExTokenType("cond")
 
 @JvmField
+val EX_WITH = ExTokenType("with")
+
+@JvmField
 val EX_AFTER = ExTokenType("after")
 
 @JvmField
@@ -335,6 +338,7 @@ val EX_KEYWORDS = TokenSet.create(
     EX_FN,
     EX_CASE,
     EX_COND,
+    EX_WITH,
     EX_AFTER,
     EX_ELSE,
     EX_CATCH,
