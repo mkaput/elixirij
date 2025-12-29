@@ -1,0 +1,6 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExSuperExprImpl(SUPER_EXPR)
+      PsiElement(super)('super')
+      PsiElement(()('(')
+      PsiElement())(')')

@@ -1014,7 +1014,7 @@ Implement quote special form.
 
 ---
 
-### Phase 27: Raise, Throw, and Send
+### Phase 27: Raise, Throw, and Send ✅ DONE
 
 Implement remaining special forms.
 
@@ -1145,9 +1145,15 @@ identifier-first model. This list is intentionally concrete, so we can grep and 
    - In practice this means: delete the explicit keyword-return rules for special forms and Kernel macros
      (module/function/macro definitions, control-flow special forms, import/alias/require/use, quote/unquote,
      and comprehension entry words). The identifiers should fall through to `{IDENTIFIER}` and become `EX_IDENTIFIER`.
+   - Concrete deletion anchors (current code): the `return EX_*` rules for the tokens listed in 31.2.2.
 
 2. **Token type declarations** in `src/main/kotlin/dev/murek/elixirij/lang/ElementTypes.kt`:
    - Remove the `EX_*` token constants that represent non-lexical keywords (special forms and Kernel macros).
+   - Concrete removal list (current code): `EX_CASE`, `EX_COND`, `EX_WITH`, `EX_TRY`, `EX_RECEIVE`,
+     `EX_DEFMODULE`, `EX_DEF`, `EX_DEFP`, `EX_DEFMACRO`, `EX_DEFMACROP`, `EX_DEFGUARD`, `EX_DEFGUARDP`,
+     `EX_DEFSTRUCT`, `EX_DEFEXCEPTION`, `EX_DEFPROTOCOL`, `EX_DEFIMPL`, `EX_IMPORT`, `EX_REQUIRE`, `EX_USE`,
+     `EX_ALIAS_KW`, `EX_FOR`, `EX_FOR_COLON`, `EX_AS_COLON`, `EX_INTO_COLON`, `EX_UNIQ_COLON`,
+     `EX_REDUCE_COLON`, `EX_QUOTE`, `EX_UNQUOTE`, `EX_UNQUOTE_SPLICING`.
    - Remove those same tokens from `EX_KEYWORDS`.
    - Keep lexical tokens such as `EX_DO`, `EX_END`, `EX_FN`, `EX_AFTER`, `EX_ELSE`, `EX_CATCH`, `EX_RESCUE`,
      and literal atoms (`EX_TRUE`, `EX_FALSE`, `EX_NIL`), plus word-operators (`EX_IN`, `EX_NOT`, `EX_AND`, `EX_OR`,
@@ -1160,6 +1166,11 @@ identifier-first model. This list is intentionally concrete, so we can grep and 
      special forms, quote/unquote, and any top-level “directive” constructs.
    - Do **not** remove these grammar productions; rewrite their heads to match identifiers by text instead of
      keyword tokens.
+   - Concrete rule heads to rewrite (current code):
+     `defmoduleExpr`, `defExpr`, `defmacroExpr`, `defguardExpr`, `defstructExpr`, `defexceptionExpr`,
+     `defprotocolExpr`, `defimplExpr`, `importExpr`, `requireExpr`, `useExpr`, `aliasDirective`, `forExpr`,
+     `quoteExpr`, `unquoteExpr`, `unquoteSplicingExpr`, `caseExpr`, `condExpr`, `withExpr`, `tryExpr`,
+     `receiveExpr`.
 
 4. **Syntax highlighting keyword set**:
    - In `src/main/kotlin/dev/murek/elixirij/ide/highlighting/ExSyntaxHighlighter.kt`, make sure we only treat

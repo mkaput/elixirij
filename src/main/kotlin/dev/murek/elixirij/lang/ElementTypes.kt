@@ -174,6 +174,18 @@ val EX_UNQUOTE = ExTokenType("unquote")
 val EX_UNQUOTE_SPLICING = ExTokenType("unquote_splicing")
 
 @JvmField
+val EX_RAISE = ExTokenType("raise")
+
+@JvmField
+val EX_THROW = ExTokenType("throw")
+
+@JvmField
+val EX_SEND = ExTokenType("send")
+
+@JvmField
+val EX_SUPER = ExTokenType("super")
+
+@JvmField
 val EX_AFTER = ExTokenType("after")
 
 @JvmField
@@ -443,6 +455,10 @@ val EX_KEYWORDS = TokenSet.create(
     EX_QUOTE,
     EX_UNQUOTE,
     EX_UNQUOTE_SPLICING,
+    EX_RAISE,
+    EX_THROW,
+    EX_SEND,
+    EX_SUPER,
     EX_AFTER,
     EX_ELSE,
     EX_CATCH,

@@ -1,0 +1,12 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExRaiseExprImpl(RAISE_EXPR)
+      PsiElement(raise)('raise')
+      PsiWhiteSpace(' ')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('RuntimeError')
+      PsiElement(,)(',')
+      PsiWhiteSpace(' ')
+      ExLiteralImpl(LITERAL)
+        ExStringImpl(STRING)
+          PsiElement(STRING)('"oops"')

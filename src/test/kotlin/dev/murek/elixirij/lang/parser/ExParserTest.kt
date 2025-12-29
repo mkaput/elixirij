@@ -268,4 +268,11 @@ class ExParserTest : ParsingTestCase(
     fun testQuoteUnquote() = doTest()
     fun testQuoteSplice() = doTest()
     fun testQuoteBind() = doTest()
+
+    // Phase 27: Raise, Throw, and Send
+    fun testRaise() = doTest()
+    fun testRaiseException() = doTest()
+    fun testThrow() = doTest()
+    fun testSend() = doTest()
+    fun testSuper() = doTest()
 }

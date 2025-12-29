@@ -200,6 +200,10 @@ private primaryExpr ::= literal
                       | quoteExpr
                       | unquoteExpr
                       | unquoteSplicingExpr
+                      | raiseExpr
+                      | throwExpr
+                      | sendExpr
+                      | superExpr
                       | fnExpr
                       | caseExpr
                       | condExpr
@@ -260,6 +264,13 @@ quoteExpr ::= EX_QUOTE quoteOpts? doBlock { pin=1 }
 private quoteOpts ::= EX_COMMA keywordList
 unquoteExpr ::= EX_UNQUOTE EX_LPAREN expression EX_RPAREN { pin=1 }
 unquoteSplicingExpr ::= EX_UNQUOTE_SPLICING EX_LPAREN expression EX_RPAREN { pin=1 }
+
+// Raise, throw, send, super
+raiseExpr ::= EX_RAISE expression (EX_COMMA expression)? { pin=1 }
+throwExpr ::= EX_THROW expression { pin=1 }
+sendExpr ::= EX_SEND expression EX_COMMA expression { pin=1 }
+superExpr ::= EX_SUPER superArgs? { pin=1 }
+private superArgs ::= EX_LPAREN callArgs? EX_RPAREN
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }

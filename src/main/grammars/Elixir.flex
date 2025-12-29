@@ -107,6 +107,10 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "quote"                            { return EX_QUOTE; }
     "unquote_splicing"                 { return EX_UNQUOTE_SPLICING; }
     "unquote"                          { return EX_UNQUOTE; }
+    "raise"                            { return EX_RAISE; }
+    "throw"                            { return EX_THROW; }
+    "send"                             { return EX_SEND; }
+    "super"                            { return EX_SUPER; }
     "after"                            { return EX_AFTER; }
     "else"                             { return EX_ELSE; }
     "catch"                            { return EX_CATCH; }

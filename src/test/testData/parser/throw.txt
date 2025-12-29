@@ -1,0 +1,7 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExThrowExprImpl(THROW_EXPR)
+      PsiElement(throw)('throw')
+      PsiWhiteSpace(' ')
+      ExAtomImpl(ATOM)
+        PsiElement(ATOM)(':error')
