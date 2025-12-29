@@ -29,7 +29,7 @@ We target the latest and greatest platform version and modern Elixir language co
 
 # Regenerate test fixtures
 # Use this to regenerate expected output files for ParsingTestCase and similar tests
-./gradlew test -Didea.tests.overwrite.data=true
+JAVA_TOOL_OPTIONS="-Didea.tests.overwrite.data=true" ./gradlew test --tests "dev.murek.elixirij.lang.parser.ExParserTest"
 
 # Format code
 # This project uses .editorconfig for code style conventions.
