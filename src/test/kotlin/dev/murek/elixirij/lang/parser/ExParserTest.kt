@@ -207,4 +207,8 @@ class ExParserTest : ParsingTestCase(
     // Phase 15: Control Flow - receive
     fun testReceive() = doTest()
     fun testReceiveAfter() = doTest()
+
+    // Phase 16: Module Definitions
+    fun testDefmodule() = doTest()
+    fun testDefmoduleNested() = doTest()
 }

@@ -180,6 +180,7 @@ private primaryExpr ::= literal
                       | sigil
                       | heredoc
                       | charlistHeredoc
+                      | defmoduleExpr
                       | fnExpr
                       | caseExpr
                       | condExpr
@@ -191,6 +192,9 @@ private primaryExpr ::= literal
 
 // Parenthesized expression
 parenExpr ::= EX_LPAREN expression? EX_RPAREN { pin=1 }
+
+// Module definitions: defmodule MyApp.Module do ... end
+defmoduleExpr ::= EX_DEFMODULE alias doBlock { pin=1 }
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }

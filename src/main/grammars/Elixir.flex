@@ -83,6 +83,7 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "with"                             { return EX_WITH; }
     "try"                              { return EX_TRY; }
     "receive"                          { return EX_RECEIVE; }
+    "defmodule"                        { return EX_DEFMODULE; }
     "after"                            { return EX_AFTER; }
     "else"                             { return EX_ELSE; }
     "catch"                            { return EX_CATCH; }
