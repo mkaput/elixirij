@@ -140,14 +140,14 @@ atExpr ::= EX_AT atExpr | accessExpr
 // Precedence 310: Dot access and calls (left associative)
 // Access expression includes primary expressions, dot access, bracket access, and function calls
 accessExpr ::= primaryExpr accessSuffix*
-private accessSuffix ::= anonymousCall | dotAccess | bracketAccess | parenCall
+private accessSuffix ::= dotAccess | anonymousCall | bracketAccess | parenCall
 
 // Dot access: expr.field or Mod.Func
-dotAccess ::= EX_DOT dotTarget { pin=1 }
+dotAccess ::= EX_DOT &dotTarget dotTarget
 private dotTarget ::= identifier | alias
 
 // Anonymous call: func.()
-anonymousCall ::= EX_DOT EX_LPAREN callArgs? EX_RPAREN { pin=1 }
+anonymousCall ::= EX_DOT &EX_LPAREN EX_LPAREN callArgs? EX_RPAREN
 
 // Bracket access: expr[key]
 bracketAccess ::= EX_LBRACKET containerExpr EX_RBRACKET { pin=1 }
@@ -179,8 +179,10 @@ parenExpr ::= EX_LPAREN expression? EX_RPAREN { pin=1 }
 
 // Anonymous function: fn -> end
 fnExpr ::= EX_FN stabClause (eoe stabClause)* eoe? EX_END { pin=1 }
-stabClause ::= EX_LPAREN EX_RPAREN EX_ARROW stabBody { pin=1 }
-            | stabArgs? EX_ARROW stabBody
+stabClause ::= stabParenClause | stabArgsClause | stabNoArgsClause
+private stabParenClause ::= EX_LPAREN EX_RPAREN EX_ARROW stabBody { pin=1 }
+private stabArgsClause ::= stabArgs EX_ARROW stabBody { pin=1 }
+private stabNoArgsClause ::= EX_ARROW stabBody { pin=1 }
 private stabArgs ::= stabArgList whenClause?
 private stabArgList ::= stabArg (EX_COMMA stabArg)*
 private stabArg ::= matchExpr
