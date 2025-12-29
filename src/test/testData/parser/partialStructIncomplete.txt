@@ -1,0 +1,14 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExNoParensCallImpl(NO_PARENS_CALL)
+      ExStructImpl(STRUCT)
+        PsiElement(%)('%')
+        ExAliasImpl(ALIAS)
+          PsiElement(ALIAS)('User')
+        PsiElement({)('{')
+        PsiErrorElement:'(', '.', '[' or '}' expected, got 'name'
+          <empty list>
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('name')
+    PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', '[', '\\', and, do, in, not, or, when, '|', '|>', '||', '|||' and ... expected, got ':'
+      PsiElement(:)(':')

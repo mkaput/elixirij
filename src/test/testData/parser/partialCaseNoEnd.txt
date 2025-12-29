@@ -1,0 +1,22 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExCaseExprImpl(CASE_EXPR)
+      PsiElement(case)('case')
+      PsiWhiteSpace(' ')
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('x')
+      PsiWhiteSpace(' ')
+      PsiElement(do)('do')
+      PsiElement(EOL)('\n')
+      PsiWhiteSpace('  ')
+      ExStabClauseImpl(STAB_CLAUSE)
+        ExAtomImpl(ATOM)
+          PsiElement(ATOM)(':a')
+        PsiWhiteSpace(' ')
+        PsiElement(->)('->')
+        PsiWhiteSpace(' ')
+        ExLiteralImpl(LITERAL)
+          ExIntegerImpl(INTEGER)
+            PsiElement(INTEGER)('1')
+      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', ';', <, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', EOL, '[', and, end, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected
+        <empty list>

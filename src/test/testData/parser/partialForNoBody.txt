@@ -1,0 +1,15 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExForExprImpl(FOR_EXPR)
+      PsiElement(for)('for')
+      PsiWhiteSpace(' ')
+      ExInMatchExprImpl(IN_MATCH_EXPR)
+        ExIdentifierImpl(IDENTIFIER)
+          PsiElement(IDENTIFIER)('x')
+        PsiWhiteSpace(' ')
+        PsiElement(<-)('<-')
+        PsiWhiteSpace(' ')
+        ExIdentifierImpl(IDENTIFIER)
+          PsiElement(IDENTIFIER)('list')
+      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, KW_IDENTIFIER, '[', '\\', and, as:, do, for:, in, not, or and ... expected
+        <empty list>

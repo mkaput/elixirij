@@ -1,0 +1,14 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExDefmacroExprImpl(DEFMACRO_EXPR)
+      PsiElement(defmacro)('defmacro')
+      PsiWhiteSpace(' ')
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('foo')
+      PsiWhiteSpace(' ')
+      ExDoBlockImpl(DO_BLOCK)
+        PsiElement(do)('do')
+        ExDoContentsImpl(DO_CONTENTS)
+          <empty list>
+        PsiErrorElement:'(', '.', ';', <keyword pair>, <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', after, as:, catch, else, end, for: or rescue expected
+          <empty list>

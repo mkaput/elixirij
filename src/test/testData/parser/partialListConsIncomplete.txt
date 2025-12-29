@@ -1,0 +1,10 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExListImpl(LIST)
+      PsiElement([)('[')
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('h')
+      PsiErrorElement:'(', ',', '.', '[', ']' or '|' expected, got '|'
+        <empty list>
+    PsiWhiteSpace(' ')
+    PsiElement(|)('|')

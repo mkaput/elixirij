@@ -8,11 +8,13 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
 import dev.murek.elixirij.ExLanguage
 import dev.murek.elixirij.lang.lexer.ExLexer
 import dev.murek.elixirij.lang.parser.ExParser
+import dev.murek.elixirij.lang.psi.ExErrorElement
 import dev.murek.elixirij.lang.psi.ExTypes
 
 private val FILE = IFileElementType(ExLanguage)
@@ -29,7 +31,8 @@ class ExParserDefinition : ParserDefinition {
 
     override fun getStringLiteralElements(): TokenSet = EX_STRINGS
 
-    override fun createElement(node: ASTNode): PsiElement = ExTypes.Factory.createElement(node)
+    override fun createElement(node: ASTNode): PsiElement =
+        if (node.elementType == TokenType.ERROR_ELEMENT) ExErrorElement(node) else ExTypes.Factory.createElement(node)
 
     override fun createFile(viewProvider: FileViewProvider): PsiFile = ExFile(viewProvider)
 }

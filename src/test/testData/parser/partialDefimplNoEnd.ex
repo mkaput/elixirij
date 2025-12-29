@@ -1,0 +1,1 @@
+defimpl P, for: T do

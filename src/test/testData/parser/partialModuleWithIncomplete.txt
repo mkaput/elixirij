@@ -1,0 +1,23 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExDefmoduleExprImpl(DEFMODULE_EXPR)
+      PsiElement(defmodule)('defmodule')
+      PsiWhiteSpace(' ')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('Foo')
+      PsiWhiteSpace(' ')
+      PsiElement(do)('do')
+      PsiElement(EOL)('\n')
+      PsiWhiteSpace('  ')
+      ExAccessExprImpl(ACCESS_EXPR)
+        ExDefExprImpl(DEF_EXPR)
+          PsiElement(def)('def')
+          PsiWhiteSpace(' ')
+          ExIdentifierImpl(IDENTIFIER)
+            PsiElement(IDENTIFIER)('bar')
+          PsiErrorElement:'(', ',', '.', '[', do or when expected, got '('
+            <empty list>
+        ExParenCallImpl(PAREN_CALL)
+          PsiElement(()('(')
+          PsiErrorElement:'!=', '!==', '&&', '&&&', '(', ')', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', ';', <, <-, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', '\\', and, as:, do, end, for: and ... expected
+            <empty list>

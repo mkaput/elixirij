@@ -1,0 +1,12 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExQuoteExprImpl(QUOTE_EXPR)
+      PsiElement(quote)('quote')
+      PsiWhiteSpace(' ')
+      ExDoBlockImpl(DO_BLOCK)
+        PsiElement(do)('do')
+        ExDoContentsImpl(DO_CONTENTS)
+          <empty list>
+        PsiErrorElement:';', EOL, after, catch, else, end or rescue expected, got ':'
+          <empty list>
+    PsiElement(:)(':')

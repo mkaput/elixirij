@@ -1,0 +1,18 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExCondExprImpl(COND_EXPR)
+      PsiElement(cond)('cond')
+      PsiWhiteSpace(' ')
+      PsiElement(do)('do')
+      PsiElement(EOL)('\n')
+      PsiWhiteSpace('  ')
+      ExLiteralImpl(LITERAL)
+        ExBooleanLiteralImpl(BOOLEAN_LITERAL)
+          PsiElement(true)('true')
+      PsiWhiteSpace(' ')
+      PsiElement(->)('->')
+      PsiWhiteSpace(' ')
+      ExAtomImpl(ATOM)
+        PsiElement(ATOM)(':ok')
+      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', ';', <, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', and, as:, end, for:, in, not, or, '|>', '||', '|||' and ... expected
+        <empty list>

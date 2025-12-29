@@ -1,0 +1,10 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExLiteralImpl(LITERAL)
+      ExStringImpl(STRING)
+        PsiElement(STRING)('""')
+    PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', '[', '\\', and, in, not, or, when, '|', '|>', '||', '|||', '~>' or '~>>' expected, got '"'
+      PsiElement(BAD_CHARACTER)('"')
+    PsiElement(EOL)('\n')
+    ExIdentifierImpl(IDENTIFIER)
+      PsiElement(IDENTIFIER)('hello')

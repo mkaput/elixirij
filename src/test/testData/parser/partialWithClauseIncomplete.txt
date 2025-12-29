@@ -1,0 +1,21 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExNoParensCallImpl(NO_PARENS_CALL)
+      ExWithExprImpl(WITH_EXPR)
+        PsiElement(with)('with')
+        PsiErrorElement:'(', ',', '.', '[' or do expected, got '{'
+          <empty list>
+      PsiWhiteSpace(' ')
+      ExTupleImpl(TUPLE)
+        PsiElement({)('{')
+        ExAtomImpl(ATOM)
+          PsiElement(ATOM)(':ok')
+        PsiElement(,)(',')
+        PsiWhiteSpace(' ')
+        ExIdentifierImpl(IDENTIFIER)
+          PsiElement(IDENTIFIER)('x')
+        PsiElement(})('}')
+    PsiWhiteSpace(' ')
+    PsiElement(<-)('<-')
+    PsiErrorElement:<unary expr> or EOL expected
+      <empty list>

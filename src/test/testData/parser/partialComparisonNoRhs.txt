@@ -1,0 +1,8 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExIdentifierImpl(IDENTIFIER)
+      PsiElement(IDENTIFIER)('x')
+    PsiWhiteSpace(' ')
+    PsiElement(==)('==')
+    PsiErrorElement:<unary expr> or EOL expected
+      <empty list>

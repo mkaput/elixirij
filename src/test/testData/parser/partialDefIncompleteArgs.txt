@@ -1,0 +1,17 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExAccessExprImpl(ACCESS_EXPR)
+      ExDefExprImpl(DEF_EXPR)
+        PsiElement(def)('def')
+        PsiWhiteSpace(' ')
+        ExIdentifierImpl(IDENTIFIER)
+          PsiElement(IDENTIFIER)('foo')
+        PsiErrorElement:'(', ',', '.', '[', do or when expected, got '('
+          <empty list>
+      ExParenCallImpl(PAREN_CALL)
+        PsiElement(()('(')
+        ExIdentifierImpl(IDENTIFIER)
+          PsiElement(IDENTIFIER)('a')
+        PsiElement(,)(',')
+        PsiErrorElement:')', <keyword pair>, <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, as: or for: expected
+          <empty list>

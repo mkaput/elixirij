@@ -1,0 +1,9 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExStructImpl(STRUCT)
+      PsiElement(%)('%')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('User')
+      PsiElement({)('{')
+      PsiErrorElement:'(', '.', <keyword pair>, <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, '[', as:, for: or '}' expected
+        <empty list>

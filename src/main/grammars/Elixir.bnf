@@ -38,13 +38,23 @@
 // Root rule
 root ::= topLevelExpressions
 
-topLevelExpressions ::= (eoe? expression (eoe expression)*)? eoe? {
+topLevelExpressions ::= (eoe? topLevelExpression (eoe topLevelExpression)*)? eoe? {
   pin=1
 }
+private topLevelExpression ::= expression { recoverWhile=topLevelRecovery }
 
 // End of expression: newlines or semicolons
 private eoe ::= (EX_EOL | EX_SEMICOLON)+
 private opSep ::= EX_EOL*
+private topLevelRecovery ::= !(EX_EOL | EX_SEMICOLON)
+private doRecovery ::= !(EX_ELSE | EX_AFTER | EX_CATCH | EX_RESCUE | EX_END | EX_EOL)
+private moduleRecovery ::= !(EX_DEF | EX_DEFP | EX_DEFMACRO | EX_DEFMACROP | EX_END | EX_EOL)
+private listRecovery ::= !(EX_COMMA | EX_RBRACKET | EX_PIPE)
+private tupleRecovery ::= !(EX_COMMA | EX_RBRACE)
+private mapRecovery ::= !(EX_COMMA | EX_RBRACE)
+private bitstringRecovery ::= !(EX_COMMA | EX_GT_GT)
+private callArgRecovery ::= !(EX_COMMA | EX_RPAREN)
+private keywordPairRecovery ::= !(EX_COMMA | EX_RBRACKET | EX_RBRACE | EX_RPAREN | EX_END)
 
 // =============================================================================
 // Expression hierarchy - following operator precedence (lowest to highest)
@@ -59,69 +69,69 @@ expression ::= stabExpr
 private containerExpr ::= matchExpr
 
 // Precedence 10: -> (right associative) - stab operator
-stabExpr ::= inMatchExpr (opSep EX_ARROW opSep stabExpr)?
+stabExpr ::= inMatchExpr (EX_ARROW opSep stabExpr)?
 
 // Precedence 40: <-, \\ (left associative) - in-match operators
-inMatchExpr ::= whenExpr (opSep inMatchOp opSep whenExpr)*
+inMatchExpr ::= whenExpr (inMatchOp opSep whenExpr)*
 private inMatchOp ::= EX_LEFT_ARROW | EX_BACK_SLASH_BACK_SLASH
 
 // Precedence 50: when (right associative)
-whenExpr ::= typeExpr (opSep EX_WHEN opSep whenExpr)?
+whenExpr ::= typeExpr (EX_WHEN opSep whenExpr)?
 
 // Precedence 60: :: (right associative) - type operator
-typeExpr ::= pipeExpr (opSep EX_COLON_COLON opSep typeExpr)?
+typeExpr ::= pipeExpr (EX_COLON_COLON opSep typeExpr)?
 
 // Precedence 70: | (right associative) - pipe operator for patterns
-pipeExpr ::= matchExpr (opSep EX_PIPE opSep pipeExpr)?
+pipeExpr ::= matchExpr (EX_PIPE opSep pipeExpr)?
 
 // Precedence 100: = (right associative)
-matchExpr ::= orExpr (opSep EX_EQ opSep matchExpr)?
+matchExpr ::= orExpr (EX_EQ opSep matchExpr)?
 
 // Precedence 120: ||, |||, or (left associative)
-orExpr ::= andExpr (opSep orOp opSep andExpr)*
+orExpr ::= andExpr (orOp opSep andExpr)*
 private orOp ::= EX_PIPE_PIPE | EX_PIPE_PIPE_PIPE | EX_OR
 
 // Precedence 130: &&, &&&, and (left associative)
-andExpr ::= compExpr (opSep andOp opSep compExpr)*
+andExpr ::= compExpr (andOp opSep compExpr)*
 private andOp ::= EX_AMP_AMP | EX_AMP_AMP_AMP | EX_AND
 
 // Precedence 140: ==, !=, =~, ===, !== (left associative)
-compExpr ::= relExpr (opSep compOp opSep relExpr)*
+compExpr ::= relExpr (compOp opSep relExpr)*
 private compOp ::= EX_EQ_EQ | EX_NOT_EQ | EX_EQ_TILDE | EX_EQ_EQ_EQ | EX_NOT_EQ_EQ
 
 // Precedence 150: <, >, <=, >= (left associative)
-relExpr ::= arrowExpr (opSep relOp opSep arrowExpr)*
+relExpr ::= arrowExpr (relOp opSep arrowExpr)*
 private relOp ::= EX_LT_EQ | EX_GT_EQ | EX_LT | EX_GT
 
 // Precedence 160: |>, <<<, >>>, <<~, ~>>, <~, ~>, <~>, <|> (left associative)
-arrowExpr ::= inExpr (opSep arrowOp opSep inExpr)*
+arrowExpr ::= inExpr (arrowOp opSep inExpr)*
 private arrowOp ::= EX_PIPE_GT | EX_LT_LT_LT | EX_GT_GT_GT | EX_LT_LT_TILDE | EX_TILDE_GT_GT | EX_LT_TILDE | EX_TILDE_GT | EX_LT_TILDE_GT | EX_LT_PIPE_GT
 
 // Precedence 170: in, not in (left associative)
-inExpr ::= xorExpr (opSep inOp opSep xorExpr)*
+inExpr ::= xorExpr (inOp opSep xorExpr)*
 private inOp ::= EX_NOT EX_IN | EX_IN
 
 // Precedence 190: // (right associative) - ternary/default operator
-xorExpr ::= concatExpr (opSep EX_SLASH_SLASH opSep xorExpr)?
+xorExpr ::= concatExpr (EX_SLASH_SLASH opSep xorExpr)?
 
 // Precedence 200: ++, --, +++, ---, <>, .. (right associative)
-concatExpr ::= rangeExpr (opSep concatOp opSep concatExpr)?
+concatExpr ::= rangeExpr (concatOp opSep concatExpr)?
 private concatOp ::= EX_PLUS_PLUS_PLUS | EX_MINUS_MINUS_MINUS | EX_PLUS_PLUS | EX_MINUS_MINUS | EX_LT_GT
 
 // Range operator: .. and ..// (right associative)
-rangeExpr ::= dualExpr (opSep rangeOp opSep rangeExpr)?
+rangeExpr ::= dualExpr (rangeOp opSep rangeExpr)?
 private rangeOp ::= EX_DOT_DOT_SLASH_SLASH | EX_DOT_DOT
 
 // Precedence 210: +, - binary (left associative)
-dualExpr ::= multExpr (opSep dualOp opSep multExpr)*
+dualExpr ::= multExpr (dualOp opSep multExpr)*
 private dualOp ::= EX_PLUS | EX_MINUS
 
 // Precedence 220: *, / (left associative)
-multExpr ::= powerExpr (opSep multOp opSep powerExpr)*
+multExpr ::= powerExpr (multOp opSep powerExpr)*
 private multOp ::= EX_STAR | EX_SLASH
 
 // Precedence 230: ** (left associative)
-powerExpr ::= unaryExpr (opSep EX_STAR_STAR opSep unaryExpr)*
+powerExpr ::= unaryExpr (EX_STAR_STAR opSep unaryExpr)*
 
 // Precedence 300: Unary operators (right associative / prefix)
 unaryExpr ::= unaryOp unaryExpr | captureExpr
@@ -150,11 +160,11 @@ private accessSuffix ::= dotAccess | anonymousCall | bracketAccess | parenCall
 // No-parens function call: func arg1, arg2
 noParensCall ::= !literal callTarget &noParensArgStart noParensArgs doBlock?
 private callTarget ::= accessExpr
-private noParensArgStart ::= !EX_DO (keywordPair | expression)
+private noParensArgStart ::= !EX_DO (keywordPairItem | expression)
 private noParensArgs ::= noParensKeywordArgs | noParensPositionalArgs
-private noParensKeywordArgs ::= keywordPair (EX_COMMA keywordPair)*
+private noParensKeywordArgs ::= keywordPairItem (EX_COMMA keywordPairItem)*
 private noParensPositionalArgs ::= expression (EX_COMMA expression)* keywordTail?
-private keywordTail ::= EX_COMMA keywordPair (EX_COMMA keywordPair)*
+private keywordTail ::= EX_COMMA keywordPairItem (EX_COMMA keywordPairItem)*
 
 // Dot access: expr.field or Mod.Func
 dotAccess ::= EX_DOT &dotTarget dotTarget
@@ -218,7 +228,7 @@ private primaryExpr ::= literal
 parenExpr ::= EX_LPAREN expression? EX_RPAREN { pin=1 }
 
 // Module definitions: defmodule MyApp.Module do ... end
-defmoduleExpr ::= EX_DEFMODULE alias doBlock { pin=1 }
+defmoduleExpr ::= EX_DEFMODULE alias moduleBlock { pin=1 }
 
 // Function definitions: def/defp
 defExpr ::= (EX_DEF | EX_DEFP) defHead defBody { pin=1 }
@@ -238,8 +248,8 @@ defstructExpr ::= EX_DEFSTRUCT (list | keywordList) { pin=1 }
 defexceptionExpr ::= EX_DEFEXCEPTION (list | keywordList) { pin=1 }
 
 // Protocol definitions
-defprotocolExpr ::= EX_DEFPROTOCOL alias doBlock { pin=1 }
-defimplExpr ::= EX_DEFIMPL alias EX_COMMA EX_FOR_COLON alias doBlock { pin=1 }
+defprotocolExpr ::= EX_DEFPROTOCOL alias moduleBlock { pin=1 }
+defimplExpr ::= EX_DEFIMPL alias EX_COMMA EX_FOR_COLON alias moduleBlock { pin=1 }
 
 // Import/require/use
 importExpr ::= EX_IMPORT alias importOpts? { pin=1 }
@@ -318,14 +328,20 @@ private receiveAfterClause ::= eoe* afterClause eoe*
 doBlock ::= EX_DO doContents doBlockSuffix EX_END { pin=1 }
 private doBlockSuffix ::= eoe* blockClauses? eoe*
 private blockClauses ::= blockClause (eoe* blockClause)*
-doContents ::= (eoeWithExpression* expression (eoeWithExpression expression)*)?
+doContents ::= (eoeWithExpression* doExpression (eoeWithExpression doExpression)*)?
 private eoeWithExpression ::= &(eoe expression) eoe
+private doExpression ::= expression { recoverWhile=doRecovery }
 private blockClause ::= elseClause | afterClause | catchClause | rescueClause
 private elseClause ::= EX_ELSE doContents
 private afterClause ::= EX_AFTER doContents
 private catchClause ::= EX_CATCH stabClauseList
 private rescueClause ::= EX_RESCUE stabClauseList
 private stabClauseList ::= eoe? stabClause (eoe stabClause)* eoe?
+
+// Module blocks: do ... end with module-specific recovery
+private moduleBlock ::= EX_DO moduleContents eoe* EX_END { pin=1 }
+private moduleContents ::= (eoeWithExpression* moduleExpression (eoeWithExpression moduleExpression)*)?
+private moduleExpression ::= expression { recoverWhile=moduleRecovery }
 
 // =============================================================================
 // Literals
@@ -369,22 +385,25 @@ atom ::= EX_ATOM | EX_ATOM_QUOTED
 list ::= EX_LBRACKET listContents? EX_RBRACKET { pin=1 }
 private listContents ::= listElement (EX_COMMA listElement)* EX_COMMA? (EX_PIPE containerExpr)?
                        | containerExpr EX_PIPE containerExpr
-private listElement ::= keywordPair | containerExpr
+private listElement ::= (keywordPairItem | containerExpr) { recoverWhile=listRecovery }
 
 // Keyword pair: key: value
 keywordPair ::= keywordKey containerExpr
+private keywordPairIncomplete ::= keywordKey { recoverWhile=keywordPairRecovery }
+private keywordPairItem ::= keywordPair | keywordPairIncomplete
 private keywordKey ::= EX_KW_IDENTIFIER | EX_FOR_COLON | EX_AS_COLON | EX_ATOM_QUOTED EX_COLON
 
 // Tuple: {1, 2, 3}
 tuple ::= EX_LBRACE tupleContents? EX_RBRACE { pin=1 }
-private tupleContents ::= containerExpr (EX_COMMA containerExpr)* EX_COMMA?
+private tupleContents ::= tupleElement (EX_COMMA tupleElement)* EX_COMMA?
+private tupleElement ::= containerExpr { recoverWhile=tupleRecovery }
 
 // Map: %{key: value} or %{"key" => value}
 map ::= EX_PERCENT_LBRACE mapContents? EX_RBRACE { pin=1 }
 private mapContents ::= mapUpdateContents | mapPairContents
 private mapUpdateContents ::= containerExpr EX_PIPE mapPairContents
 private mapPairContents ::= mapPair (EX_COMMA mapPair)* EX_COMMA?
-private mapPair ::= keywordPair | assocPair
+private mapPair ::= (keywordPairItem | assocPair) { recoverWhile=mapRecovery }
 assocPair ::= containerExpr EX_FAT_ARROW containerExpr
 
 // Struct: %ModuleName{key: value}
@@ -393,7 +412,7 @@ struct ::= EX_PERCENT alias EX_LBRACE mapContents? EX_RBRACE { pin=1 }
 // Bitstring: <<1, 2, 3>> or <<x::binary>>
 bitstring ::= EX_LT_LT bitstringContents? EX_GT_GT { pin=1 }
 private bitstringContents ::= bitstringElement (EX_COMMA bitstringElement)* EX_COMMA?
-private bitstringElement ::= containerExpr bitstringType?
+private bitstringElement ::= containerExpr bitstringType? { recoverWhile=bitstringRecovery }
 private bitstringType ::= EX_COLON_COLON bitstringTypeSpec (EX_MINUS bitstringTypeSpec)*
 private bitstringTypeSpec ::= bitstringTypeName (EX_LPAREN containerExpr EX_RPAREN)?
 private bitstringTypeName ::= EX_IDENTIFIER | EX_INTEGER
@@ -404,10 +423,11 @@ private bitstringTypeName ::= EX_IDENTIFIER | EX_INTEGER
 
 // Call arguments: comma-separated expressions or keyword pairs
 private callArgs ::= callArg (EX_COMMA callArg)* EX_COMMA?
-private callArg ::= keywordPair | containerExpr
+private callArg ::= (keywordPairItem | containerExpr) { recoverWhile=callArgRecovery }
 
 // Argument list: used in function heads and guards
-private argList ::= matchExpr (EX_COMMA matchExpr)* EX_COMMA?
+private argList ::= argListElement (EX_COMMA argListElement)* EX_COMMA?
+private argListElement ::= matchExpr { recoverWhile=callArgRecovery }
 
 // Keyword list: comma-separated keyword pairs
-private keywordList ::= keywordPair (EX_COMMA keywordPair)* EX_COMMA?
+private keywordList ::= keywordPairItem (EX_COMMA keywordPairItem)* EX_COMMA?

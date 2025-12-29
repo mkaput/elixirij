@@ -1,0 +1,9 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExAccessExprImpl(ACCESS_EXPR)
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('list')
+      ExBracketAccessImpl(BRACKET_ACCESS)
+        PsiElement([)('[')
+        PsiErrorElement:'(', '.', <keyword pair>, <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, '[', ']', as: or for: expected
+          <empty list>

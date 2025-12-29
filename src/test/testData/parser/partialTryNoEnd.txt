@@ -1,0 +1,17 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExTryExprImpl(TRY_EXPR)
+      PsiElement(try)('try')
+      PsiWhiteSpace(' ')
+      PsiElement(do)('do')
+      ExDoContentsImpl(DO_CONTENTS)
+        PsiElement(EOL)('\n')
+        PsiWhiteSpace('  ')
+        ExAccessExprImpl(ACCESS_EXPR)
+          ExIdentifierImpl(IDENTIFIER)
+            PsiElement(IDENTIFIER)('f')
+          ExParenCallImpl(PAREN_CALL)
+            PsiElement(()('(')
+            PsiElement())(')')
+      PsiErrorElement:';', EOL, after, catch, end or rescue expected
+        <empty list>

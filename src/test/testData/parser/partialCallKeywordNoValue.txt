@@ -1,0 +1,11 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExAccessExprImpl(ACCESS_EXPR)
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('foo')
+      ExParenCallImpl(PAREN_CALL)
+        PsiElement(()('(')
+        ExIdentifierImpl(IDENTIFIER)
+          PsiElement(IDENTIFIER)('a')
+        PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', <, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', '[', and, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected, got ':'
+          PsiElement(:)(':')

@@ -1,0 +1,21 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExDefmoduleExprImpl(DEFMODULE_EXPR)
+      PsiElement(defmodule)('defmodule')
+      PsiWhiteSpace(' ')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('A')
+      PsiWhiteSpace(' ')
+      PsiElement(do)('do')
+      PsiElement(EOL)('\n')
+      PsiElement(end)('end')
+    PsiElement(EOL)('\n')
+    ExDefmoduleExprImpl(DEFMODULE_EXPR)
+      PsiElement(defmodule)('defmodule')
+      PsiWhiteSpace(' ')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('B')
+      PsiWhiteSpace(' ')
+      PsiElement(do)('do')
+      PsiErrorElement:'(', '.', ';', <keyword pair>, <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', as:, end or for: expected
+        <empty list>

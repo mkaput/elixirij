@@ -1,0 +1,28 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExListImpl(LIST)
+      PsiElement([)('[')
+      ExLiteralImpl(LITERAL)
+        ExIntegerImpl(INTEGER)
+          PsiElement(INTEGER)('1')
+      PsiElement(,)(',')
+      PsiWhiteSpace(' ')
+      ExTupleImpl(TUPLE)
+        PsiElement({)('{')
+        ExLiteralImpl(LITERAL)
+          ExIntegerImpl(INTEGER)
+            PsiElement(INTEGER)('2')
+        PsiElement(,)(',')
+        PsiWhiteSpace(' ')
+        ExDefExprImpl(DEF_EXPR)
+          PsiElement(def)('def')
+          PsiWhiteSpace(' ')
+          ExIdentifierImpl(IDENTIFIER)
+            PsiElement(IDENTIFIER)('foo')
+          PsiWhiteSpace(' ')
+          ExDoBlockImpl(DO_BLOCK)
+            PsiElement(do)('do')
+            ExDoContentsImpl(DO_CONTENTS)
+              <empty list>
+            PsiErrorElement:'(', '.', ';', <keyword pair>, <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', after, as:, catch, else, end, for: or rescue expected
+              <empty list>

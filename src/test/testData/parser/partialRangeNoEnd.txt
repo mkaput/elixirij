@@ -1,0 +1,8 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExLiteralImpl(LITERAL)
+      ExIntegerImpl(INTEGER)
+        PsiElement(INTEGER)('1')
+    PsiElement(..)('..')
+    PsiErrorElement:<unary expr> or EOL expected
+      <empty list>

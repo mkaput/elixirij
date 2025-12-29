@@ -1,0 +1,15 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExListImpl(LIST)
+      PsiElement([)('[')
+      ExAccessExprImpl(ACCESS_EXPR)
+        ExIdentifierImpl(IDENTIFIER)
+          PsiElement(IDENTIFIER)('foo')
+        ExParenCallImpl(PAREN_CALL)
+          PsiElement(()('(')
+          ExLiteralImpl(LITERAL)
+            ExIntegerImpl(INTEGER)
+              PsiElement(INTEGER)('1')
+          PsiElement(,)(',')
+          PsiErrorElement:')', <keyword pair>, <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, as: or for: expected
+            <empty list>

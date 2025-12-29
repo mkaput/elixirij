@@ -1,0 +1,14 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExListImpl(LIST)
+      PsiElement([)('[')
+      ExLiteralImpl(LITERAL)
+        ExIntegerImpl(INTEGER)
+          PsiElement(INTEGER)('1')
+      PsiElement(,)(',')
+      PsiWhiteSpace(' ')
+      ExLiteralImpl(LITERAL)
+        ExIntegerImpl(INTEGER)
+          PsiElement(INTEGER)('2')
+      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', <, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', '[', and, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected, got '}'
+        PsiElement(})('}')

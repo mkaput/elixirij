@@ -1,0 +1,15 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExListImpl(LIST)
+      PsiElement([)('[')
+      ExListImpl(LIST)
+        PsiElement([)('[')
+        ExListImpl(LIST)
+          PsiElement([)('[')
+          ExListImpl(LIST)
+            PsiElement([)('[')
+            ExLiteralImpl(LITERAL)
+              ExIntegerImpl(INTEGER)
+                PsiElement(INTEGER)('1')
+            PsiErrorElement:',', ']' or '|' expected
+              <empty list>

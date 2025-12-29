@@ -1,0 +1,14 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExAccessExprImpl(ACCESS_EXPR)
+      ExAliasDirectiveImpl(ALIAS_DIRECTIVE)
+        PsiElement(alias)('alias')
+        PsiWhiteSpace(' ')
+        ExAliasImpl(ALIAS)
+          PsiElement(ALIAS)('Foo')
+    PsiElement(.)('.')
+    PsiElement({)('{')
+    PsiElement(ALIAS)('A')
+    PsiElement(,)(',')
+    PsiErrorElement:ALIAS expected
+      <empty list>

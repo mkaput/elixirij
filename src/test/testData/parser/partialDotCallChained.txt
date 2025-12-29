@@ -1,0 +1,12 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExAccessExprImpl(ACCESS_EXPR)
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('a')
+      ExDotAccessImpl(DOT_ACCESS)
+        PsiElement(.)('.')
+        ExIdentifierImpl(IDENTIFIER)
+          PsiElement(IDENTIFIER)('b')
+    PsiElement(.)('.')
+    PsiErrorElement:'(', ALIAS or IDENTIFIER expected
+      <empty list>

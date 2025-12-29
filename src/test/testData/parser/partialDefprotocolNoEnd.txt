@@ -1,0 +1,11 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExDefprotocolExprImpl(DEFPROTOCOL_EXPR)
+      PsiElement(defprotocol)('defprotocol')
+      PsiWhiteSpace(' ')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('P')
+      PsiWhiteSpace(' ')
+      PsiElement(do)('do')
+      PsiErrorElement:'(', '.', ';', <keyword pair>, <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', as:, end or for: expected
+        <empty list>

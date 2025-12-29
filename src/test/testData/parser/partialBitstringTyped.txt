@@ -1,0 +1,9 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExBitstringImpl(BITSTRING)
+      PsiElement(<<)('<<')
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('x')
+      PsiElement(::)('::')
+      PsiErrorElement:IDENTIFIER or INTEGER expected
+        <empty list>

@@ -1,0 +1,8 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExUnaryExprImpl(UNARY_EXPR)
+      PsiElement(+)('+')
+      PsiWhiteSpace(' ')
+      ExLiteralImpl(LITERAL)
+        ExIntegerImpl(INTEGER)
+          PsiElement(INTEGER)('1')

@@ -1,0 +1,8 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    <empty list>
+  PsiErrorElement:';' or EOL expected, got '"'
+    PsiElement(BAD_CHARACTER)('"')
+  PsiElement(IDENTIFIER)('hello')
+  PsiWhiteSpace(' ')
+  PsiComment(COMMENT)('#{')

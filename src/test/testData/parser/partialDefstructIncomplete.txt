@@ -1,0 +1,9 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExDefstructExprImpl(DEFSTRUCT_EXPR)
+      PsiElement(defstruct)('defstruct')
+      PsiWhiteSpace(' ')
+      ExListImpl(LIST)
+        PsiElement([)('[')
+        PsiErrorElement:'(', '.', <keyword pair>, <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, '[', ']', as: or for: expected
+          <empty list>

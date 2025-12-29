@@ -8,7 +8,7 @@ Elixir File
           ExStabClauseImpl(STAB_CLAUSE)
             ExIdentifierImpl(IDENTIFIER)
               PsiElement(IDENTIFIER)('x')
-            PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', ';', <, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', EOL, '[', and, end, in, not, or, when, '|>', '||', '|||', '~>' and ... expected, got '::'
+            PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', <, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', '[', and, in, not, or, when, '|>', '||', '|||', '~>' or '~>>' expected, got '::'
               <empty list>
         PsiWhiteSpace(' ')
         PsiElement(::)('::')
@@ -20,6 +20,6 @@ Elixir File
       PsiWhiteSpace(' ')
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('x')
-  PsiWhiteSpace(' ')
-  PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', ';', <, <-, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', EOL, '[', '\\', and, in, not, or, when, '|', '|>', '||' and ... expected, got 'end'
-    PsiElement(end)('end')
+    PsiWhiteSpace(' ')
+    PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, KW_IDENTIFIER, '[', '\\', and, as:, for:, in, not, or, when, '|' and ... expected, got 'end'
+      PsiElement(end)('end')
