@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Expert Source Cloner
-# Clones elixir-lang/expert repository to /tmp/elixir-refs/expert
+# Expert Source Downloader
+# Downloads elixir-lang/expert repository tarball to /tmp/elixir-refs/expert
 
 OUTPUT_ROOT="/tmp/elixir-refs"
 OUTPUT_DIR="$OUTPUT_ROOT/expert"
-REPO_URL="https://github.com/elixir-lang/expert.git"
+REPO_TARBALL_URL="https://codeload.github.com/elixir-lang/expert/tar.gz/HEAD"
 
 # If already cloned then just print the output and quit.
 if [ -d "$OUTPUT_DIR" ]; then
@@ -15,18 +15,32 @@ if [ -d "$OUTPUT_DIR" ]; then
     exit 0
 fi
 
-echo "Cloning Expert source repository..." >&2
+echo "Downloading Expert source tarball..." >&2
 
 # Create output directory if it doesn't exist
 mkdir -p "$OUTPUT_ROOT"
 
-# Clone the repository
-if ! git clone "$REPO_URL" "$OUTPUT_DIR" 2>&1 | sed 's/^/  /' >&2; then
-    echo "Error: Failed to clone Expert repository" >&2
+tmp_dir="$(mktemp -d)"
+tarball="$tmp_dir/expert.tar.gz"
+
+cleanup() {
+    rm -rf "$tmp_dir"
+}
+trap cleanup EXIT
+
+if ! curl -fsSL "$REPO_TARBALL_URL" -o "$tarball" 2>&1 | sed 's/^/  /' >&2; then
+    echo "Error: Failed to download Expert repository tarball" >&2
     exit 1
 fi
 
-echo "Successfully cloned Expert source repository" >&2
+mkdir -p "$OUTPUT_DIR"
+if ! tar -xzf "$tarball" -C "$OUTPUT_DIR" --strip-components=1 2>&1 | sed 's/^/  /' >&2; then
+    rm -rf "$OUTPUT_DIR"
+    echo "Error: Failed to extract Expert repository tarball" >&2
+    exit 1
+fi
+
+echo "Successfully downloaded Expert source repository" >&2
 
 # Print the absolute path to stdout (this is the main output)
 echo "$OUTPUT_DIR"

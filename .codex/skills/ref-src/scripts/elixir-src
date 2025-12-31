@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Elixir Language Source Cloner
-# Clones elixir-lang/elixir repository to /tmp/elixir-refs/elixir
+# Elixir Language Source Downloader
+# Downloads elixir-lang/elixir repository tarball to /tmp/elixir-refs/elixir
 
 OUTPUT_ROOT="/tmp/elixir-refs"
 OUTPUT_DIR="$OUTPUT_ROOT/elixir"
-REPO_URL="https://github.com/elixir-lang/elixir.git"
+REPO_TARBALL_URL="https://codeload.github.com/elixir-lang/elixir/tar.gz/HEAD"
 
 # If already cloned then just print the output and quit.
 if [ -d "$OUTPUT_DIR" ]; then
@@ -15,18 +15,32 @@ if [ -d "$OUTPUT_DIR" ]; then
     exit 0
 fi
 
-echo "Cloning Elixir source repository..." >&2
+echo "Downloading Elixir source tarball..." >&2
 
 # Create output directory if it doesn't exist
 mkdir -p "$OUTPUT_ROOT"
 
-# Clone the repository
-if ! git clone "$REPO_URL" "$OUTPUT_DIR" 2>&1 | sed 's/^/  /' >&2; then
-    echo "Error: Failed to clone Elixir repository" >&2
+tmp_dir="$(mktemp -d)"
+tarball="$tmp_dir/elixir.tar.gz"
+
+cleanup() {
+    rm -rf "$tmp_dir"
+}
+trap cleanup EXIT
+
+if ! curl -fsSL "$REPO_TARBALL_URL" -o "$tarball" 2>&1 | sed 's/^/  /' >&2; then
+    echo "Error: Failed to download Elixir repository tarball" >&2
     exit 1
 fi
 
-echo "Successfully cloned Elixir source repository" >&2
+mkdir -p "$OUTPUT_DIR"
+if ! tar -xzf "$tarball" -C "$OUTPUT_DIR" --strip-components=1 2>&1 | sed 's/^/  /' >&2; then
+    rm -rf "$OUTPUT_DIR"
+    echo "Error: Failed to extract Elixir repository tarball" >&2
+    exit 1
+fi
+
+echo "Successfully downloaded Elixir source repository" >&2
 
 # Print the absolute path to stdout (this is the main output)
 echo "$OUTPUT_DIR"

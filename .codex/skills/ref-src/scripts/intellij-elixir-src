@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# IntelliJ-Elixir Source Cloner
-# Clones KronicDeth/intellij-elixir repository to /tmp/elixir-refs/intellij-elixir
+# IntelliJ-Elixir Source Downloader
+# Downloads KronicDeth/intellij-elixir repository tarball to /tmp/elixir-refs/intellij-elixir
 
 OUTPUT_ROOT="/tmp/elixir-refs"
 OUTPUT_DIR="$OUTPUT_ROOT/intellij-elixir"
-REPO_URL="https://github.com/KronicDeth/intellij-elixir.git"
+REPO_TARBALL_URL="https://codeload.github.com/KronicDeth/intellij-elixir/tar.gz/HEAD"
 
 # If already cloned then just print the output and quit.
 if [ -d "$OUTPUT_DIR" ]; then
@@ -15,18 +15,32 @@ if [ -d "$OUTPUT_DIR" ]; then
     exit 0
 fi
 
-echo "Cloning IntelliJ-Elixir source repository..." >&2
+echo "Downloading IntelliJ-Elixir source tarball..." >&2
 
 # Create output directory if it doesn't exist
 mkdir -p "$OUTPUT_ROOT"
 
-# Clone the repository
-if ! git clone "$REPO_URL" "$OUTPUT_DIR" 2>&1 | sed 's/^/  /' >&2; then
-    echo "Error: Failed to clone IntelliJ-Elixir repository" >&2
+tmp_dir="$(mktemp -d)"
+tarball="$tmp_dir/intellij-elixir.tar.gz"
+
+cleanup() {
+    rm -rf "$tmp_dir"
+}
+trap cleanup EXIT
+
+if ! curl -fsSL "$REPO_TARBALL_URL" -o "$tarball" 2>&1 | sed 's/^/  /' >&2; then
+    echo "Error: Failed to download IntelliJ-Elixir repository tarball" >&2
     exit 1
 fi
 
-echo "Successfully cloned IntelliJ-Elixir source repository" >&2
+mkdir -p "$OUTPUT_DIR"
+if ! tar -xzf "$tarball" -C "$OUTPUT_DIR" --strip-components=1 2>&1 | sed 's/^/  /' >&2; then
+    rm -rf "$OUTPUT_DIR"
+    echo "Error: Failed to extract IntelliJ-Elixir repository tarball" >&2
+    exit 1
+fi
+
+echo "Successfully downloaded IntelliJ-Elixir source repository" >&2
 
 # Print the absolute path to stdout (this is the main output)
 echo "$OUTPUT_DIR"
