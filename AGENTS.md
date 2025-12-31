@@ -17,6 +17,7 @@ Targets the latest IntelliJ Platform version and modern Elixir language conventi
     ```kotlin
     fun `test something is happening`() { ... }
     ```
+- prefer `parent / child` instead of `parent.resolve(child)` when glueing `java.nio.file.Path`s together
 
 ## Tools
 
