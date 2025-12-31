@@ -14,9 +14,11 @@ import dev.murek.elixirij.toolchain.ExToolchainManager
 
 class ExConfigurable(private val project: Project) : BoundConfigurable(
     ExBundle.message("configurable.elixir.displayName")
-) {
+), SearchableConfigurable {
     private val settings = ExSettings.getInstance(project)
     private val toolchainProvider = ExToolchainManager.getInstance(project)
+
+    override fun getId(): String = "dev.murek.elixirij.elixir"
 
     override fun createPanel(): DialogPanel = panel {
         row(ExBundle.message("configurable.codeIntelligenceService.label")) {
