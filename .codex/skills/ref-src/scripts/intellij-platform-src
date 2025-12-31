@@ -2,11 +2,13 @@
 set -euo pipefail
 
 # IntelliJ Platform Source Extractor
-# Extracts IntelliJ Platform sources from Gradle cache to .refs/intellij-platform
+# Extracts IntelliJ Platform sources from Gradle cache to /tmp/elixir-refs/intellij-platform
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-OUTPUT_DIR="$PROJECT_ROOT/.refs/intellij-platform"
+# Skill lives in .codex/skills/ref-src; project root is 4 levels up.
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+OUTPUT_ROOT="/tmp/elixir-refs"
+OUTPUT_DIR="$OUTPUT_ROOT/intellij-platform"
 
 # If already extracted than just print the output and quit.
 if [ -d "$OUTPUT_DIR" ]; then

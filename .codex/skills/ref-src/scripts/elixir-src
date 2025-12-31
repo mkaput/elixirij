@@ -2,11 +2,10 @@
 set -euo pipefail
 
 # Elixir Language Source Cloner
-# Clones elixir-lang/elixir repository to .refs/elixir
+# Clones elixir-lang/elixir repository to /tmp/elixir-refs/elixir
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-OUTPUT_DIR="$PROJECT_ROOT/.refs/elixir"
+OUTPUT_ROOT="/tmp/elixir-refs"
+OUTPUT_DIR="$OUTPUT_ROOT/elixir"
 REPO_URL="https://github.com/elixir-lang/elixir.git"
 
 # If already cloned then just print the output and quit.
@@ -18,8 +17,8 @@ fi
 
 echo "Cloning Elixir source repository..." >&2
 
-# Create .refs directory if it doesn't exist
-mkdir -p "$(dirname "$OUTPUT_DIR")"
+# Create output directory if it doesn't exist
+mkdir -p "$OUTPUT_ROOT"
 
 # Clone the repository
 if ! git clone "$REPO_URL" "$OUTPUT_DIR" 2>&1 | sed 's/^/  /' >&2; then
