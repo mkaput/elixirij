@@ -1,5 +1,6 @@
 package dev.murek.elixirij
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.ModificationTracker
@@ -16,6 +17,17 @@ enum class ElixirLSMode { AUTOMATIC, CUSTOM }
 class ExSettings(
     internal val coroutineScope: CoroutineScope
 ) : SimplePersistentStateComponent<ExSettings.State>(State()), ModificationTracker {
+
+    init {
+        // In tests we must not auto-start LSP servers (or block on their responses) because
+        // code highlighting runs in the fixture and can trigger LSP-backed passes such as
+        // sticky lines / document symbols. Setting this to NONE in unit-test mode keeps
+        // highlighting fast and deterministic, and prevents hangs when an LSP server is
+        // unavailable or waiting on external resources.
+        if (ApplicationManager.getApplication()?.isUnitTestMode == true) {
+            state.codeIntelligenceService = CodeIntelligenceService.NONE
+        }
+    }
 
     class State : BaseState() {
         var elixirToolchainPath by string()
