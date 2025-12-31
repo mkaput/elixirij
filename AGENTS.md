@@ -1,16 +1,19 @@
 # ElixirIJ
 
-This project implements a new from-scratch Elixir language support for all IntelliJ Platform-based IDEs.
-We target the latest and greatest platform version and modern Elixir language conventions.
+A new from-scratch Elixir language support plugin for all IntelliJ Platform-based IDEs.
+Targets the latest IntelliJ Platform version and modern Elixir language conventions.
+
+## Rules
+
+- you may be running in parallel with other agents; cooperate to avoid conflicts
+- write tests for every change, unless introducing "declarative" features (code commenter etc.)
+- when bugfixing: write minimal reproduction test that fails, then fix, then confirm test passes
 
 ## Code rules
 
-1. Use modern Kotlin coroutines-powered threading model of IntelliJ Platform.
-   Docs: https://plugins.jetbrains.com/docs/intellij/kotlin-coroutines.html
-2. Prefer expression functions (`fun f() = ...`) instead of statement ones (`fun f() { ... }`) for simple cases.
-3. Try to write tests for every change, unless you're introducing a trivial "declarative" feature (like code commenter
-   configuration).
-4. Name tests like this, unless base class requires classical camelCase test naming:
+- use light services and Kotlin coroutines-powered threading model of IntelliJ Platform
+- prefer expression functions (`fun f() = ...`) instead of statement ones (`fun f() { ... }`) for simple cases
+- name tests like this, unless base class (fixtures) requires testCamelCase:
     ```kotlin
     fun `test something is happening`() { ... }
     ```
@@ -39,3 +42,12 @@ JAVA_TOOL_OPTIONS="-Didea.tests.overwrite.data=true" ./gradlew test --tests "dev
 # Run inspections
 ./gradlew qodanaScan
 ```
+
+## Git
+
+- only commit what has changed in the current thread, don't commit parallel agent's work
+- short, imperative commit titles (e.g., "add game server S3 bucket")
+- detailed commit descriptions telling:
+    - context behind the changes: what, how and why,
+    - manual testing steps,
+    - special considerations.
