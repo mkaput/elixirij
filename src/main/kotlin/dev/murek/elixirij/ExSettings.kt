@@ -3,6 +3,7 @@ package dev.murek.elixirij
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.ModificationTracker
+import kotlinx.coroutines.CoroutineScope
 
 enum class CodeIntelligenceService { EXPERT, ELIXIR_LS, NONE }
 
@@ -12,7 +13,9 @@ enum class ElixirLSMode { AUTOMATIC, CUSTOM }
 
 @Service(Service.Level.PROJECT)
 @State(name = "Elixir", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
-class ExSettings : SimplePersistentStateComponent<ExSettings.State>(State()), ModificationTracker {
+class ExSettings(
+    internal val coroutineScope: CoroutineScope
+) : SimplePersistentStateComponent<ExSettings.State>(State()), ModificationTracker {
 
     class State : BaseState() {
         var elixirToolchainPath by string()

@@ -56,10 +56,7 @@ data class ExToolchain private constructor(
     suspend fun fetchVersion(project: Project): String? = withContext(Dispatchers.IO) {
         val commandLine = GeneralCommandLine("$elixir", "--version").withWorkDirectory(project.basePath)
         val output = ScriptRunnerUtil.getProcessOutput(commandLine)
-
-        // Parse: "Elixir 1.17.0 (compiled with Erlang/OTP 26)"
-        val match = Regex("""Elixir (\d+\.\d+\.\d+)""").find(output)
-        match?.groupValues?.get(1)
+        output.lineSequence().firstOrNull { it.startsWith("Elixir ") }?.trim()
     }
 
     companion object {
