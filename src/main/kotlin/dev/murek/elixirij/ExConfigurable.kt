@@ -5,14 +5,18 @@ import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.platform.lsp.api.LspServerManager
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.listCellRenderer.textListCellRenderer
 import dev.murek.elixirij.lsp.ExLspServerSupportProvider
+import dev.murek.elixirij.toolchain.ExToolchain
+import dev.murek.elixirij.toolchain.ExToolchainManager
 
 class ExConfigurable(private val project: Project) : BoundConfigurable(
     ExBundle.message("configurable.elixir.displayName")
 ) {
     private val settings = ExSettings.getInstance(project)
+    private val toolchainProvider = ExToolchainManager.getInstance(project)
 
     override fun createPanel(): DialogPanel = panel {
         row(ExBundle.message("configurable.codeIntelligenceService.label")) {
@@ -25,6 +29,22 @@ class ExConfigurable(private val project: Project) : BoundConfigurable(
                         CodeIntelligenceService.NONE -> ExBundle.message("configurable.codeIntelligenceService.none")
                     }
                 }).bindItem(settings::codeIntelligenceService.toMutableProperty().toNullableProperty())
+        }
+
+        group(ExBundle.message("configurable.toolchain.group.title")) {
+            row(ExBundle.message("configurable.toolchain.path.label")) {
+                textFieldWithBrowseButton(
+                    FileChooserDescriptorFactory.createSingleFileOrExecutableAppDescriptor()
+                        .withTitle(ExBundle.message("configurable.toolchain.path.browseTitle")), project
+                ).applyToComponent {
+                    // Show auto-detected path as placeholder
+                    (textField as? JBTextField)?.emptyText?.text =
+                        toolchainProvider.detectedToolchain?.elixir?.toString() ?: ""
+                }
+                    .bindText(settings::elixirToolchainPath.toNonNullableProperty(""))
+                    .align(AlignX.FILL)
+                    .textValidation(ExToolchain.CHECK_VALID)
+            }
         }
 
         group(ExBundle.message("configurable.expert.group.title")) {
@@ -41,7 +61,9 @@ class ExConfigurable(private val project: Project) : BoundConfigurable(
                 textFieldWithBrowseButton(
                     FileChooserDescriptorFactory.createSingleFileOrExecutableAppDescriptor()
                         .withTitle(ExBundle.message("configurable.expert.customPath.browseTitle")), project
-                ).bindText(settings::expertCustomExecutablePath.toNonNullableProperty("")).align(AlignX.FILL)
+                )
+                    .bindText(settings::expertCustomExecutablePath.toNonNullableProperty(""))
+                    .align(AlignX.FILL)
             }
         }
 
@@ -59,7 +81,9 @@ class ExConfigurable(private val project: Project) : BoundConfigurable(
                 textFieldWithBrowseButton(
                     FileChooserDescriptorFactory.createSingleFileOrExecutableAppDescriptor()
                         .withTitle(ExBundle.message("configurable.elixirls.customPath.browseTitle")), project
-                ).bindText(settings::elixirLSCustomExecutablePath.toNonNullableProperty("")).align(AlignX.FILL)
+                )
+                    .bindText(settings::elixirLSCustomExecutablePath.toNonNullableProperty(""))
+                    .align(AlignX.FILL)
             }
         }
     }

@@ -2,8 +2,9 @@ package dev.murek.elixirij
 
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.ModificationTracker
 
-enum class CodeIntelligenceService { EXPERT, NONE, ELIXIR_LS }
+enum class CodeIntelligenceService { EXPERT, ELIXIR_LS, NONE }
 
 enum class ExpertMode { AUTOMATIC, CUSTOM }
 
@@ -11,9 +12,10 @@ enum class ElixirLSMode { AUTOMATIC, CUSTOM }
 
 @Service(Service.Level.PROJECT)
 @State(name = "Elixir", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
-class ExSettings : SimplePersistentStateComponent<ExSettings.State>(State()) {
+class ExSettings : SimplePersistentStateComponent<ExSettings.State>(State()), ModificationTracker {
 
     class State : BaseState() {
+        var elixirToolchainPath by string()
         var codeIntelligenceService by enum(CodeIntelligenceService.EXPERT)
         var expertMode by enum(ExpertMode.AUTOMATIC)
         var expertCustomExecutablePath by string()
@@ -26,33 +28,12 @@ class ExSettings : SimplePersistentStateComponent<ExSettings.State>(State()) {
         fun getInstance(project: Project): ExSettings = project.service()
     }
 
-    var codeIntelligenceService: CodeIntelligenceService
-        get() = state.codeIntelligenceService
-        set(value) {
-            state.codeIntelligenceService = value
-        }
+    var elixirToolchainPath: String? by state::elixirToolchainPath
+    var codeIntelligenceService: CodeIntelligenceService by state::codeIntelligenceService
+    var expertMode: ExpertMode by state::expertMode
+    var expertCustomExecutablePath: String? by state::expertCustomExecutablePath
+    var elixirLSMode: ElixirLSMode by state::elixirLSMode
+    var elixirLSCustomExecutablePath: String? by state::elixirLSCustomExecutablePath
 
-    var expertMode: ExpertMode
-        get() = state.expertMode
-        set(value) {
-            state.expertMode = value
-        }
-
-    var expertCustomExecutablePath: String?
-        get() = state.expertCustomExecutablePath
-        set(value) {
-            state.expertCustomExecutablePath = value?.ifBlank { null }
-        }
-
-    var elixirLSMode: ElixirLSMode
-        get() = state.elixirLSMode
-        set(value) {
-            state.elixirLSMode = value
-        }
-
-    var elixirLSCustomExecutablePath: String?
-        get() = state.elixirLSCustomExecutablePath
-        set(value) {
-            state.elixirLSCustomExecutablePath = value?.ifBlank { null }
-        }
+    override fun getModificationCount(): Long = stateModificationCount
 }
