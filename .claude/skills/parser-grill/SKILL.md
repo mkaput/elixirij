@@ -21,6 +21,8 @@ to generate parser smoke-test fixtures in this repo.
 
 ## Workflow
 
+### Phase 1: Error distillation
+
 1. Ensure you’re in the repository root so test paths resolve correctly.
 2. Run the task with the inputs as args.
     ```
@@ -35,13 +37,21 @@ to generate parser smoke-test fixtures in this repo.
 7. Deduplicate added tests, since minimization may reveal multiple fixtures for the same issue.
 8. Rename outcome test case names to clearly describe what the bug is. Rename fixture files as well.
 9. Tell the user short prompts for the agent to fix the parser; it's important to fix each test one by one.
+10. Git commit the changes.
 
 Summary: The Gradle task is dumb and only dumps failing fixtures. The agent must manually refine the results: minimize
 and anonymize fixtures, rename tests and files meaningfully, and run tests with regeneration. This workflow collects
 failing parser fixtures and turns them into clean, minimal, anonymized, and well-named tests. All tests found during
 this skill execution are expected to fail; fixing them is out of scope for this skill.
 
+### Phase 2: Fixing errors one-by-one
+
+1. Read the first failing test case.
+2. Fix the ElixirIJ parser to make this particular test pass. The output fixture should look reasonable for the input.
+3. Git commit the changes.
+4. Repeat steps 1-3 with the next failing test case.
+5. Finish work when all grilled tests pass.
+
 ## Troubleshooting
 
 - If you see “Run this script from the project root; test paths not found.” rerun from the repo root.
-- If the grill limit is exceeded, narrow the path or split the grill into smaller subdirectories.
