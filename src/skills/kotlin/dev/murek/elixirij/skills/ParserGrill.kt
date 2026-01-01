@@ -18,17 +18,6 @@ private data class ParseResult(
     val tree: String,
 )
 
-private data class Candidate(
-    val path: Path,
-    val text: String,
-    val tree: String,
-)
-
-private data class Assigned(
-    val candidate: Candidate,
-    val number: Int,
-)
-
 private data class GrillArgs(
     val root: Path,
     val maxNewTests: Int,
@@ -70,52 +59,51 @@ fun main(args: Array<String>) {
     println("Grilling project: ${args.root}")
     println("Will attempt to collect at most ${args.maxNewTests} tests")
 
-    val existingFixtureContents = loadExistingGrillFixtures()
-    val candidates = mutableListOf<Candidate>()
+    val existingFixtureContents = loadExistingGrillFixtures().toMutableSet()
+    var addedTests = 0
 
     GrillHarness.start().use { harness ->
-        Files.walk(args.root).use { paths ->
-            paths.filter { it.isRegularFile() && it.isElixirSource }.forEach { path ->
-                val text = path.readText()
-                if (existingFixtureContents.contains(text)) {
-                    return@forEach
-                }
-                val result = harness.parse(text, path.name)
-                if (result.hasErrors) {
-                    candidates.add(Candidate(path, text, result.tree))
-                }
+        val paths = Files.walk(args.root).use { paths ->
+            paths.filter { it.isRegularFile() && it.isElixirSource }.toList()
+        }
+
+        println("Scanning ${paths.size} files for parser failures...")
+
+        for (path in paths) {
+            val text = path.readText()
+            if (existingFixtureContents.contains(text)) {
+                continue
             }
+
+            val result = harness.parse(text, path.name)
+            if (!result.hasErrors) {
+                continue
+            }
+
+            addedTests += 1
+            if (addedTests > args.maxNewTests) {
+                println("Found $addedTests new parser failures. Limiting to first ${args.maxNewTests}. Tell the user to re-run this skill after fixing the collected tests.")
+                return@use
+            }
+
+            val testSource = testFilePath.readText()
+            val nextGrill = (findGrillNumbers(testSource).maxOrNull() ?: 0) + 1
+            val baseName = "grill$nextGrill"
+            val sourcePath = testDataDir / "$baseName.ex"
+            val treePath = testDataDir / "$baseName.txt"
+            sourcePath.writeText(text.ensureTrailingNewline())
+            treePath.writeText(result.tree.ensureTrailingNewline())
+            val updated = insertGrillTests(testSource, "testGrill$nextGrill")
+            testFilePath.writeText(updated)
+
+            existingFixtureContents.add(text)
+            println("Added testGrill$nextGrill from $path")
         }
     }
 
-    if (candidates.size > args.maxNewTests) {
-        println("Found ${candidates.size} new parser failures. Limiting to first ${args.maxNewTests}. Tell the user to re-run this skill after fixing the collected tests.")
-        candidates.subList(args.maxNewTests, candidates.size).clear()
-    }
-
-    if (candidates.isEmpty()) {
+    if (addedTests == 0) {
         println("No new parser failures found. Aw yeah!")
-        exitProcess(0)
     }
-
-    val testSource = testFilePath.readText()
-    val nextGrill = (findGrillNumbers(testSource).maxOrNull() ?: 0) + 1
-    val assigned = candidates.mapIndexed { index, candidate ->
-        Assigned(candidate, nextGrill + index)
-    }
-
-    for (assignment in assigned) {
-        val baseName = "grill${assignment.number}"
-        val sourcePath = testDataDir / "$baseName.ex"
-        val treePath = testDataDir / "$baseName.txt"
-        sourcePath.writeText(assignment.candidate.text.ensureTrailingNewline())
-        treePath.writeText(assignment.candidate.tree.ensureTrailingNewline())
-    }
-
-    val updated = insertGrillTests(testSource, assigned.map { "testGrill${it.number}" })
-    testFilePath.writeText(updated)
-
-    println("Added ${assigned.size} freshly grilled test(s): ${assigned.joinToString { "testGrill${it.number}" }}")
     exitProcess(0)
 }
 
@@ -151,10 +139,7 @@ private fun loadExistingGrillFixtures(): Set<String> =
 private fun findGrillNumbers(source: String): List<Int> =
     Regex("fun\\s+testGrill(\\d+)").findAll(source).map { it.groupValues[1].toInt() }.toList()
 
-private fun insertGrillTests(source: String, testNames: List<String>): String {
-    if (testNames.isEmpty()) {
-        return source
-    }
+private fun insertGrillTests(source: String, testName: String): String {
     val sectionIndex = source.indexOf("// C. Parser Grilling")
     require(sectionIndex >= 0) { "Section C header not found in ExParserTest.kt" }
 
@@ -163,13 +148,7 @@ private fun insertGrillTests(source: String, testNames: List<String>): String {
     val insertIndex = source.indexOf(marker, sectionIndex)
     require(insertIndex >= 0) { "Section C end marker not found in ExParserTest.kt" }
 
-    val insertion = buildString {
-        append("\n")
-        for (name in testNames) {
-            append("    fun $name() = doTest()\n")
-        }
-        append("\n")
-    }
+    val insertion = "\n    fun $testName() = doTest()"
 
     return source.substring(0, insertIndex) + insertion + source.substring(insertIndex)
 }
