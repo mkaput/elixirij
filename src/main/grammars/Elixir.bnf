@@ -104,7 +104,7 @@ relExpr ::= arrowExpr (relOp opSep arrowExpr)*
 private relOp ::= EX_LT_EQ | EX_GT_EQ | EX_LT | EX_GT
 
 // Precedence 160: |>, <<<, >>>, <<~, ~>>, <~, ~>, <~>, <|> (left associative)
-arrowExpr ::= inExpr (arrowOp opSep inExpr)*
+arrowExpr ::= inExpr (opSep arrowOp opSep inExpr)*
 private arrowOp ::= EX_PIPE_GT | EX_LT_LT_LT | EX_GT_GT_GT | EX_LT_LT_TILDE | EX_TILDE_GT_GT | EX_LT_TILDE | EX_TILDE_GT | EX_LT_TILDE_GT | EX_LT_PIPE_GT
 
 // Precedence 170: in, not in (left associative)
