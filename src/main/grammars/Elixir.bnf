@@ -49,7 +49,7 @@ private opSep ::= EX_EOL*
 private topLevelRecovery ::= !(EX_EOL | EX_SEMICOLON)
 private doRecovery ::= !(EX_ELSE | EX_AFTER | EX_CATCH | EX_RESCUE | EX_END | EX_EOL)
 private moduleRecovery ::= !(defKeyword | defpKeyword | defmacroKeyword | defmacropKeyword | EX_END | EX_EOL)
-private listRecovery ::= !(EX_COMMA | EX_RBRACKET | EX_PIPE)
+private listRecovery ::= !(EX_COMMA | EX_RBRACKET | EX_PIPE | EX_EOL)
 private tupleRecovery ::= !(EX_COMMA | EX_RBRACE)
 private mapRecovery ::= !(EX_COMMA | EX_RBRACE)
 private bitstringRecovery ::= !(EX_COMMA | EX_GT_GT)
@@ -407,8 +407,8 @@ atom ::= EX_ATOM | EX_ATOM_QUOTED
 // =============================================================================
 
 // List: [1, 2, 3] or [a: 1, b: 2] or [h | t]
-list ::= EX_LBRACKET listContents? EX_RBRACKET { pin=1 }
-private listContents ::= listElement (EX_COMMA listElement)* EX_COMMA? (EX_PIPE containerExpr)?
+list ::= EX_LBRACKET opSep listContents? opSep EX_RBRACKET { pin=1 }
+private listContents ::= opSep listElement (EX_COMMA opSep listElement)* EX_COMMA? opSep (EX_PIPE containerExpr)?
                        | containerExpr EX_PIPE containerExpr
 private listElement ::= (keywordPairItem | containerExpr) { recoverWhile=listRecovery }
 
