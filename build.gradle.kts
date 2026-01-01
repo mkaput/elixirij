@@ -142,6 +142,11 @@ sourceSets {
     }
 }
 
+dependencies {
+    val skills by sourceSets.getting
+    add(skills.implementationConfigurationName, kotlin("stdlib"))
+}
+
 configurations {
     // Skills use IntelliJ test framework classes, so inherit test deps/runtime.
     val skills by sourceSets.getting
@@ -155,6 +160,10 @@ configurations {
     }
     named(skills.runtimeOnlyConfigurationName) {
         extendsFrom(configurations[test.runtimeOnlyConfigurationName])
+    }
+    named(skills.runtimeClasspathConfigurationName) {
+        extendsFrom(configurations["intellijPlatformTestRuntimeClasspath"])
+        extendsFrom(configurations["intellijPlatformTestRuntimeFixClasspath"])
     }
 }
 
@@ -190,10 +199,11 @@ tasks {
 
     register<JavaExec>("runParserGrill") {
         val skills by sourceSets.getting
+        val main by sourceSets.getting
 
         description = $$"$parser-grill agent skill implementation detail"
         dependsOn(skills.classesTaskName)
-        classpath = skills.runtimeClasspath
+        classpath = skills.runtimeClasspath + main.runtimeClasspath
         mainClass.set("dev.murek.elixirij.skills.ParserGrillKt")
         workingDir = projectDir
         // Isolate IntelliJ test framework caches/logs from the Gradle transforms cache.

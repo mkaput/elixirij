@@ -17,25 +17,29 @@ to generate parser smoke-test fixtures in this repo.
 ## Inputs
 
 - Path to the source directory. Ask the user interactively if not already provided.
-- Number of test cases to add. Assume 10 if not specified explicitly. Always tell how many tests will be attempted to add.
+- Max tests to add. Assume 10 if not specified explicitly.
 
 ## Workflow
 
-1. Ensure you are in the repository root so test paths resolve correctly.
+1. Ensure you’re in the repository root so test paths resolve correctly.
 2. Run the task with the inputs as args.
-
-```
-./gradlew runParserGrill --args "<path> <count>"
-```
+    ```
+    ./gradlew runParserGrill --args "<path> <max-tests>"
+    ```
 3. Review the printed summary to see which smoke tests were added.
 4. Run relevant parser tests to verify the original fixtures and regenerate expected outputs.
-5. For each added test case, minimize each fixture so it is a minimal reproduction of the underlying problem. Also anonymize the fixture so it is not possible to tell which codebase it came from (because grilling may run over proprietary code).
+5. For each added test case, minimize each fixture so it’s a minimal reproduction of the underlying problem. Also,
+   anonymize the fixture so it isn’t possible to tell which codebase it came from (because grilling may run over
+   proprietary code).
 6. Run relevant parser tests again to verify and regenerate the newly minimized fixtures.
 7. Deduplicate added tests, since minimization may reveal multiple fixtures for the same issue.
 8. Rename outcome test case names to clearly describe what the bug is. Rename fixture files as well.
 9. Tell the user short prompts for the agent to fix the parser; it's important to fix each test one by one.
 
-Summary: The Gradle task is dumb and only dumps failing fixtures. The agent must manually refine the results: minimize and anonymize fixtures, rename tests and files meaningfully, and run tests with regeneration. This workflow collects failing parser fixtures and turns them into clean, minimal, anonymized, and well-named tests. All tests found during this skill execution are expected to fail; fixing them is out of scope for this skill.
+Summary: The Gradle task is dumb and only dumps failing fixtures. The agent must manually refine the results: minimize
+and anonymize fixtures, rename tests and files meaningfully, and run tests with regeneration. This workflow collects
+failing parser fixtures and turns them into clean, minimal, anonymized, and well-named tests. All tests found during
+this skill execution are expected to fail; fixing them is out of scope for this skill.
 
 ## Troubleshooting
 

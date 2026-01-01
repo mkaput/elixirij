@@ -7,14 +7,7 @@ import dev.murek.elixirij.lang.ExParserDefinition
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.exists
-import kotlin.io.path.extension
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.name
-import kotlin.io.path.readText
-import kotlin.io.path.writeText
+import kotlin.io.path.*
 import kotlin.system.exitProcess
 
 private val testFilePath = Paths.get("src/test/kotlin/dev/murek/elixirij/lang/parser/ExParserTest.kt")
@@ -36,23 +29,23 @@ private data class Assigned(
     val number: Int,
 )
 
-internal data class GrillArgs(
+private data class GrillArgs(
     val root: Path,
     val maxNewTests: Int,
 )
 
-internal sealed interface GrillArgsResult
 
-internal data class GrillArgsOk(val args: GrillArgs) : GrillArgsResult
+@Suppress("JUnitMalformedDeclaration")
+private class GrillHarness private constructor() : ParsingTestCase("parser", "ex", true, ExParserDefinition()),
+    AutoCloseable {
 
-internal data class GrillArgsError(val message: String) : GrillArgsResult
+    companion object {
+        fun start(): GrillHarness = GrillHarness().also { it.setUp() }
+    }
 
-private class GrillHarness : ParsingTestCase("parser", "ex", true, ExParserDefinition()) {
+    override fun close() = tearDown()
+
     override fun getTestDataPath(): String = testDataDir.toString()
-
-    fun start() = setUp()
-
-    fun stop() = tearDown()
 
     fun parse(text: String, name: String): ParseResult {
         val psiFile = parseFile(name, text)
@@ -63,137 +56,117 @@ private class GrillHarness : ParsingTestCase("parser", "ex", true, ExParserDefin
 }
 
 fun main(args: Array<String>) {
-    val rootArgs = when (val result = parseGrillArgs(args)) {
-        is GrillArgsOk -> result.args
-        is GrillArgsError -> {
-            System.err.println(result.message)
-            exitProcess(2)
+    val args = try {
+        require(testFilePath.exists() && testFilePath.isRegularFile() && testDataDir.exists() && testDataDir.isDirectory()) {
+            "Run this script from the project root; test paths not found."
         }
-    }
-    val root = rootArgs.root
-    if (!root.exists() || !root.isDirectory()) {
-        System.err.println("Root directory not found: $root")
-        exitProcess(2)
-    }
-    if (!testFilePath.exists() || !testDataDir.exists()) {
-        System.err.println("Run this script from the project root; test paths not found.")
+
+        parseGrillArgs(args)
+    } catch (e: Exception) {
+        println(e.message)
         exitProcess(2)
     }
 
-    val existingFixtureContents = loadExistingGrillFixtures(testDataDir)
+    println("Grilling project: ${args.root}")
+    println("Will attempt to collect at most ${args.maxNewTests} tests")
+
+    val existingFixtureContents = loadExistingGrillFixtures()
     val candidates = mutableListOf<Candidate>()
 
-    val harness = GrillHarness()
-    try {
-        harness.start()
-        Files.walk(root).use { paths ->
-            paths
-                .filter { it.isRegularFile() && it.isElixirSource() }
-                .forEach { path ->
-                    val text = path.readText()
-                    if (existingFixtureContents.contains(text)) {
-                        return@forEach
-                    }
-                    val result = harness.parse(text, path.name)
-                    if (result.hasErrors) {
-                        candidates.add(Candidate(path, text, result.tree))
-                    }
+    GrillHarness.start().use { harness ->
+        Files.walk(args.root).use { paths ->
+            paths.filter { it.isRegularFile() && it.isElixirSource }.forEach { path ->
+                val text = path.readText()
+                if (existingFixtureContents.contains(text)) {
+                    return@forEach
                 }
+                val result = harness.parse(text, path.name)
+                if (result.hasErrors) {
+                    candidates.add(Candidate(path, text, result.tree))
+                }
+            }
         }
-    } finally {
-        harness.stop()
     }
 
-    val newCandidates = candidates.sortedBy { it.path.toString() }
-    if (newCandidates.size > rootArgs.maxNewTests) {
-        System.err.println(
-            "Found ${newCandidates.size} new parser failures (limit ${rootArgs.maxNewTests}). Aborting without changes."
-        )
-        exitProcess(1)
+    if (candidates.size > args.maxNewTests) {
+        println("Found ${candidates.size} new parser failures. Limiting to first ${args.maxNewTests}. Tell the user to re-run this skill after fixing the collected tests.")
+        candidates.subList(args.maxNewTests, candidates.size).clear()
     }
 
-    if (newCandidates.isEmpty()) {
-        println("No new parser failures found.")
+    if (candidates.isEmpty()) {
+        println("No new parser failures found. Aw yeah!")
         exitProcess(0)
     }
 
     val testSource = testFilePath.readText()
     val nextGrill = (findGrillNumbers(testSource).maxOrNull() ?: 0) + 1
-    val assigned = newCandidates.mapIndexed { index, candidate ->
+    val assigned = candidates.mapIndexed { index, candidate ->
         Assigned(candidate, nextGrill + index)
     }
 
-    assigned.forEach { assignment ->
+    for (assignment in assigned) {
         val baseName = "grill${assignment.number}"
-        val sourcePath = testDataDir.resolve("$baseName.ex")
-        val treePath = testDataDir.resolve("$baseName.txt")
-        sourcePath.writeText(ensureTrailingNewline(assignment.candidate.text))
-        treePath.writeText(ensureTrailingNewline(assignment.candidate.tree))
+        val sourcePath = testDataDir / "$baseName.ex"
+        val treePath = testDataDir / "$baseName.txt"
+        sourcePath.writeText(assignment.candidate.text.ensureTrailingNewline())
+        treePath.writeText(assignment.candidate.tree.ensureTrailingNewline())
     }
 
     val updated = insertGrillTests(testSource, assigned.map { "testGrill${it.number}" })
     testFilePath.writeText(updated)
 
-    println("Added ${assigned.size} smoke test(s): ${assigned.joinToString { "testGrill${it.number}" }}")
+    println("Added ${assigned.size} freshly grilled test(s): ${assigned.joinToString { "testGrill${it.number}" }}")
     exitProcess(0)
 }
 
-private fun resolveRoot(arg: String): Path {
-    val raw = arg.ifBlank {
-        return Paths.get("").toAbsolutePath().normalize()
-    }
-    val expanded = if (raw.startsWith("~/")) {
-        System.getProperty("user.home") + raw.removePrefix("~")
-    } else {
-        raw
-    }
-    return Paths.get(expanded).toAbsolutePath().normalize()
-}
+private fun parseGrillArgs(args: Array<String>): GrillArgs {
+    require(args.size == 2) { "Usage: <path-to-project-root-or-subdir> <max-tests>" }
 
-internal fun parseGrillArgs(args: Array<String>): GrillArgsResult {
-    if (args.size != 2) {
-        return GrillArgsError("Usage: <path-to-project-root-or-subdir> <max-tests>")
-    }
-    val root = resolveRoot(args[0])
+    val root = args[0].let { expandUserHome(it).normalize().absolute() }
+        .also { require(it.exists() && it.isDirectory()) { "Path to project root must be an existing directory: ${args[0]}" } }
+
     val maxNewTests = args[1].toIntOrNull()?.takeIf { it > 0 }
-        ?: return GrillArgsError("Invalid max-tests value: ${args[1]}")
-    return GrillArgsOk(GrillArgs(root, maxNewTests))
+        .let { requireNotNull(it) { "Invalid max-tests value, must be positive integer: ${args[1]}" } }
+
+    return GrillArgs(root, maxNewTests)
 }
 
-private fun Path.isElixirSource(): Boolean = when (extension) {
-    "ex", "exs" -> true
-    else -> false
-}
-
-private fun loadExistingGrillFixtures(dir: Path): Set<String> {
-    if (!dir.isDirectory()) {
-        return emptySet()
+private fun expandUserHome(raw: String): Path {
+    val s = raw.trim()
+    val home by lazy { Path(System.getProperty("user.home")) }
+    return when {
+        s == "~" -> home
+        s.startsWith("~/") -> home / s.removePrefix("~/")
+        s.startsWith("~\\") -> home / s.removePrefix("~\\")
+        else -> Path(s)
     }
-    return dir.listDirectoryEntries("grill*.ex")
-        .map { it.readText() }
-        .toSet()
 }
 
-private fun findGrillNumbers(source: String): List<Int> {
-    val regex = Regex("fun\\s+testGrill(\\d+)")
-    return regex.findAll(source).map { it.groupValues[1].toInt() }.toList()
-}
+private val Path.isElixirSource: Boolean
+    get() = extension in setOf("ex", "exs")
 
-fun insertGrillTests(source: String, testNames: List<String>): String {
+private fun loadExistingGrillFixtures(): Set<String> =
+    testDataDir.listDirectoryEntries("*.ex").map { it.readText() }.toSet()
+
+private fun findGrillNumbers(source: String): List<Int> =
+    Regex("fun\\s+testGrill(\\d+)").findAll(source).map { it.groupValues[1].toInt() }.toList()
+
+private fun insertGrillTests(source: String, testNames: List<String>): String {
     if (testNames.isEmpty()) {
         return source
     }
     val sectionIndex = source.indexOf("// C. Parser Grilling")
     require(sectionIndex >= 0) { "Section C header not found in ExParserTest.kt" }
 
-    val marker = "\n    // =============================================================================\n    // 1. Literals"
+    val marker =
+        "\n    // =============================================================================\n    // 1. Literals"
     val insertIndex = source.indexOf(marker, sectionIndex)
     require(insertIndex >= 0) { "Section C end marker not found in ExParserTest.kt" }
 
     val insertion = buildString {
         append("\n")
-        testNames.forEach { name ->
-            append("    fun ").append(name).append("() = doTest()\n")
+        for (name in testNames) {
+            append("    fun $name() = doTest()\n")
         }
         append("\n")
     }
@@ -201,4 +174,4 @@ fun insertGrillTests(source: String, testNames: List<String>): String {
     return source.substring(0, insertIndex) + insertion + source.substring(insertIndex)
 }
 
-private fun ensureTrailingNewline(text: String): String = if (text.endsWith("\n")) text else "$text\n"
+private fun String.ensureTrailingNewline(): String = trimEnd() + "\n"
