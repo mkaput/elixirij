@@ -2,8 +2,6 @@ Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExFnExprImpl(FN_EXPR)
       PsiElement(fn)('fn')
-      PsiErrorElement:';', <stab clause> or EOL expected
-        <empty list>
       PsiElement(EOL)('\n')
       PsiWhiteSpace('  ')
       ExStabClauseImpl(STAB_CLAUSE)
