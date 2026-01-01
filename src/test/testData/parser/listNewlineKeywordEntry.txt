@@ -1,0 +1,14 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExListImpl(LIST)
+      PsiElement([)('[')
+      PsiErrorElement:<unary expr> or ']' expected
+        <empty list>
+    PsiElement(EOL)('\n')
+  PsiWhiteSpace('  ')
+  PsiErrorElement:';' or EOL expected, got 'a:'
+    PsiElement(KW_IDENTIFIER)('a:')
+  PsiWhiteSpace(' ')
+  PsiElement(INTEGER)('1')
+  PsiElement(EOL)('\n')
+  PsiElement(])(']')

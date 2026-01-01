@@ -1,0 +1,3 @@
+fn
+  :ok -> :ok
+end

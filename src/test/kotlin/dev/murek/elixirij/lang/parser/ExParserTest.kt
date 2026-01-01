@@ -43,6 +43,11 @@ class ExParserTest : ParsingTestCase(
     // C. Parser Grilling
     // =============================================================================
 
+    fun testMapNewlineEntries() = doTest()
+    fun testListNewlineKeywordEntry() = doTest()
+    fun testModuleAttributeKeywordList() = doTest()
+    fun testPipelineStartsOnNewline() = doTest()
+    fun testFnClauseAfterNewline() = doTest()
     // =============================================================================
     // 1. Literals
     // =============================================================================
