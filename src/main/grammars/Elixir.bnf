@@ -51,7 +51,7 @@ private doRecovery ::= !(EX_ELSE | EX_AFTER | EX_CATCH | EX_RESCUE | EX_END | EX
 private moduleRecovery ::= !(defKeyword | defpKeyword | defmacroKeyword | defmacropKeyword | EX_END | EX_EOL)
 private listRecovery ::= !(EX_COMMA | EX_RBRACKET | EX_PIPE | EX_EOL)
 private tupleRecovery ::= !(EX_COMMA | EX_RBRACE)
-private mapRecovery ::= !(EX_COMMA | EX_RBRACE)
+private mapRecovery ::= !(EX_COMMA | EX_RBRACE | EX_EOL)
 private bitstringRecovery ::= !(EX_COMMA | EX_GT_GT)
 private callArgRecovery ::= !(EX_COMMA | EX_RPAREN)
 private keywordPairRecovery ::= !(EX_COMMA | EX_RBRACKET | EX_RBRACE | EX_RPAREN | EX_END)
@@ -424,7 +424,7 @@ private tupleContents ::= tupleElement (EX_COMMA tupleElement)* EX_COMMA?
 private tupleElement ::= containerExpr { recoverWhile=tupleRecovery }
 
 // Map: %{key: value} or %{"key" => value}
-map ::= EX_PERCENT_LBRACE mapContents? EX_RBRACE { pin=1 }
+map ::= EX_PERCENT_LBRACE opSep mapContents? opSep EX_RBRACE { pin=1 }
 private mapContents ::= mapUpdateContents | mapPairContents
 private mapUpdateContents ::= containerExpr EX_PIPE mapPairContents
 private mapPairContents ::= mapPair (EX_COMMA mapPair)* EX_COMMA?

@@ -2,13 +2,13 @@ Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExMapImpl(MAP)
       PsiElement(%{)('%{')
-      PsiErrorElement:'}' expected
-        <empty list>
-    PsiElement(EOL)('\n')
-  PsiWhiteSpace('  ')
-  PsiErrorElement:';' or EOL expected, got 'a:'
-    PsiElement(KW_IDENTIFIER)('a:')
-  PsiWhiteSpace(' ')
-  PsiElement(INTEGER)('1')
-  PsiElement(EOL)('\n')
-  PsiElement(})('}')
+      PsiElement(EOL)('\n')
+      PsiWhiteSpace('  ')
+      ExKeywordPairImpl(KEYWORD_PAIR)
+        PsiElement(KW_IDENTIFIER)('a:')
+        PsiWhiteSpace(' ')
+        ExLiteralImpl(LITERAL)
+          ExIntegerImpl(INTEGER)
+            PsiElement(INTEGER)('1')
+      PsiElement(EOL)('\n')
+      PsiElement(})('}')
