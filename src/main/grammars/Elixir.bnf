@@ -147,7 +147,7 @@ private captureTarget ::= (atom | alias | identifier) (EX_DOT identifier)*
 
 // Module attributes
 moduleAttr ::= EX_AT identifier attrValue?
-private attrValue ::= expression
+private attrValue ::= expression | keywordList
 
 // @ operator (module attributes)
 atExpr ::= moduleAttr | noParensCall | accessExpr
