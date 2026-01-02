@@ -1,7 +1,8 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExQuoteExprImpl(QUOTE_EXPR)
-      PsiElement(IDENTIFIER)('quote')
+    ExBareDoCallImpl(BARE_DO_CALL)
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('quote')
       PsiWhiteSpace(' ')
       ExDoBlockImpl(DO_BLOCK)
         PsiElement(do)('do')

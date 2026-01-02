@@ -41,7 +41,7 @@ root ::= topLevelExpressions
 topLevelExpressions ::= (eoe? topLevelExpression (eoe topLevelExpression)*)? eoe? {
   pin=1
 }
-private topLevelExpression ::= expression { recoverWhile=topLevelRecovery }
+private topLevelExpression ::= bareDoCall | expression { recoverWhile=topLevelRecovery }
 
 // End of expression: newlines or semicolons
 private eoe ::= (EX_EOL | EX_SEMICOLON)+
@@ -159,6 +159,11 @@ private accessSuffix ::= dotAccess | anonymousCall | bracketAccess | parenCall
 
 // No-parens function call: func arg1, arg2
 noParensCall ::= !literal callTarget &noParensArgStart noParensArgs doBlock?
+
+// Bare do-block call: func do ... end (no arguments before do-block)
+// This is only valid at statement level, not inside expressions
+bareDoCall ::= !literal bareDoCallTarget doBlock
+private bareDoCallTarget ::= (identifier | alias) (EX_DOT identifier)*
 private callTarget ::= accessExpr
 private noParensArgStart ::= !EX_DO (keywordPairItem | expression)
 private noParensArgs ::= noParensKeywordArgs | noParensPositionalArgs
@@ -330,7 +335,7 @@ private doBlockSuffix ::= eoe* blockClauses? eoe*
 private blockClauses ::= blockClause (eoe* blockClause)*
 doContents ::= (eoeWithExpression* doExpression (eoeWithExpression doExpression)*)?
 private eoeWithExpression ::= &(eoe expression) eoe
-private doExpression ::= expression { recoverWhile=doRecovery }
+private doExpression ::= bareDoCall | expression { recoverWhile=doRecovery }
 private blockClause ::= elseClause | afterClause | catchClause | rescueClause
 private elseClause ::= EX_ELSE doContents
 private afterClause ::= EX_AFTER doContents
@@ -341,7 +346,7 @@ private stabClauseList ::= eoe? stabClause (eoe stabClause)* eoe?
 // Module blocks: do ... end with module-specific recovery
 private moduleBlock ::= EX_DO moduleContents eoe* EX_END { pin=1 }
 private moduleContents ::= (eoeWithExpression* moduleExpression (eoeWithExpression moduleExpression)*)?
-private moduleExpression ::= expression { recoverWhile=moduleRecovery }
+private moduleExpression ::= bareDoCall | expression { recoverWhile=moduleRecovery }
 
 // =============================================================================
 // Literals
