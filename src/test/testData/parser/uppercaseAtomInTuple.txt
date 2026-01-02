@@ -1,0 +1,21 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExListImpl(LIST)
+      PsiElement([)('[')
+      ExTupleImpl(TUPLE)
+        PsiElement({)('{')
+        PsiErrorElement:'}' expected, got ':'
+          <empty list>
+      PsiElement(:)(':')
+      PsiElement(ALIAS)('Certificate')
+      PsiElement(,)(',')
+      PsiWhiteSpace(' ')
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('der_bin')
+      PsiElement(,)(',')
+      PsiWhiteSpace(' ')
+      ExAtomImpl(ATOM)
+        PsiElement(ATOM)(':not_encrypted')
+      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', <, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, STRING, '[', and, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected, got '}'
+        PsiElement(})('}')
+      PsiElement(])(']')

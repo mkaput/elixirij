@@ -1,0 +1,33 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExAccessExprImpl(ACCESS_EXPR)
+      ExListImpl(LIST)
+        PsiElement([)('[')
+        PsiElement(EOL)('\n')
+        PsiWhiteSpace('  ')
+        ExIdentifierImpl(IDENTIFIER)
+          PsiElement(IDENTIFIER)('extra_applications')
+        PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', <, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', EOL, '[', and, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected, got ':'
+          PsiElement(:)(':')
+        PsiElement(EOL)('\n')
+      PsiWhiteSpace('    ')
+      ExBracketAccessImpl(BRACKET_ACCESS)
+        PsiElement([)('[')
+        PsiErrorElement:<unary expr> expected
+          <empty list>
+    PsiElement(EOL)('\n')
+    PsiWhiteSpace('      ')
+    ExAtomImpl(ATOM)
+      PsiElement(ATOM)(':logger')
+    PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, STRING, '[', '\\', and, in, not, or, when, '|' and ... expected, got ','
+      PsiElement(,)(',')
+    PsiElement(EOL)('\n')
+    PsiWhiteSpace('      ')
+    ExAtomImpl(ATOM)
+      PsiElement(ATOM)(':runtime_tools')
+    PsiElement(EOL)('\n')
+  PsiWhiteSpace('    ')
+  PsiErrorElement:';' or EOL expected, got ']'
+    PsiElement(])(']')
+  PsiElement(EOL)('\n')
+  PsiElement(])(']')
