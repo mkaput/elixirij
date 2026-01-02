@@ -184,7 +184,7 @@ anonymousCall ::= EX_DOT &EX_LPAREN EX_LPAREN callArgs? EX_RPAREN
 bracketAccess ::= EX_LBRACKET containerExpr EX_RBRACKET { pin=1 }
 
 // Parenthesized function call: func(args)
-parenCall ::= EX_LPAREN callArgs? EX_RPAREN doBlock? { pin=1 }
+parenCall ::= EX_LPAREN opSep callArgs? opSep EX_RPAREN doBlock? { pin=1 }
 
 // =============================================================================
 // Primary expressions
@@ -318,7 +318,7 @@ withExpr ::= withKeyword withClause (EX_COMMA withClause)* doBlock { pin=1 }
 private withClause ::= matchExpr EX_LEFT_ARROW withAccessExpr
 private withAccessExpr ::= primaryExpr withAccessSuffix*
 private withAccessSuffix ::= dotAccess | anonymousCall | bracketAccess | withParenCall
-private withParenCall ::= EX_LPAREN callArgs? EX_RPAREN { pin=1 }
+private withParenCall ::= EX_LPAREN opSep callArgs? opSep EX_RPAREN { pin=1 }
 
 // Try expression: try do ... rescue/catch/after ... end
 tryExpr ::= tryKeyword EX_DO tryContents EX_END { pin=1 }
@@ -454,8 +454,8 @@ private bitstringTypeName ::= EX_IDENTIFIER | EX_INTEGER
 // =============================================================================
 
 // Call arguments: comma-separated expressions or keyword pairs
-private callArgs ::= callArg (EX_COMMA callArg)* EX_COMMA?
-private callArg ::= (keywordPairItem | containerExpr) { recoverWhile=callArgRecovery }
+private callArgs ::= opSep? callArg (EX_COMMA opSep callArg)* (EX_COMMA opSep)? opSep?
+private callArg ::= (keywordPairItem | containerExpr) opSep? { recoverWhile=callArgRecovery }
 
 // Argument list: used in function heads and guards
 private argList ::= argListElement (EX_COMMA argListElement)* EX_COMMA?
