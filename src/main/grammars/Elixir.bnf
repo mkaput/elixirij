@@ -138,8 +138,9 @@ unaryExpr ::= unaryOp unaryExpr | captureExpr
 private unaryOp ::= EX_NOT | EX_EXCLAMATION | EX_CARET | EX_TILDE | EX_PLUS | EX_MINUS
 
 // Capture operator: & (for &func/arity and &(&1 + &2))
-captureExpr ::= captureNamedExpr | capturePlaceholderExpr | captureBareExpr | captureAnonymousExpr | atExpr
+captureExpr ::= captureNamedExpr | capturePlaceholderAccessExpr | capturePlaceholderExpr | captureBareExpr | captureAnonymousExpr | atExpr
 captureNamedExpr ::= EX_AMPERSAND captureTarget EX_SLASH EX_INTEGER
+private capturePlaceholderAccessExpr ::= EX_AMPERSAND EX_INTEGER accessSuffix+
 capturePlaceholderExpr ::= EX_AMPERSAND EX_INTEGER
 private captureBareExpr ::= EX_AMPERSAND captureTarget !EX_LPAREN
 captureAnonymousExpr ::= EX_AMPERSAND accessExpr
@@ -153,8 +154,9 @@ private attrValue ::= expression | keywordList
 atExpr ::= moduleAttr | noParensCall | accessExpr
 
 // Precedence 310: Dot access and calls (left associative)
-// Access expression includes primary expressions, dot access, bracket access, and function calls
-accessExpr ::= primaryExpr accessSuffix*
+// Access expression includes primary expressions, capture placeholders, dot access, bracket access, and function calls
+accessExpr ::= accessBase accessSuffix*
+private accessBase ::= primaryExpr | capturePlaceholderExpr
 private accessSuffix ::= dotAccess | anonymousCall | bracketAccess | parenCall
 
 // No-parens function call: func arg1, arg2
