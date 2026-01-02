@@ -45,7 +45,7 @@ private topLevelExpression ::= bareDoCall | expression { recoverWhile=topLevelRe
 
 // End of expression: newlines or semicolons
 private eoe ::= (EX_EOL | EX_SEMICOLON)+
-private opSep ::= EX_EOL*
+private opSep ::= (EX_EOL | EX_COMMENT)*
 private topLevelRecovery ::= !(EX_EOL | EX_SEMICOLON)
 private doRecovery ::= !(EX_ELSE | EX_AFTER | EX_CATCH | EX_RESCUE | EX_END | EX_EOL)
 private moduleRecovery ::= !(defKeyword | defpKeyword | defmacroKeyword | defmacropKeyword | EX_END | EX_EOL)
@@ -432,7 +432,7 @@ private tupleElement ::= (keywordPairItem | containerExpr) { recoverWhile=tupleR
 map ::= EX_PERCENT_LBRACE opSep mapContents? opSep EX_RBRACE { pin=1 }
 private mapContents ::= mapUpdateContents | mapPairContents
 private mapUpdateContents ::= containerExpr EX_PIPE mapPairContents
-private mapPairContents ::= mapPair (EX_COMMA mapPair)* EX_COMMA?
+private mapPairContents ::= opSep mapPair (EX_COMMA opSep mapPair)* EX_COMMA?
 private mapPair ::= (keywordPairItem | assocPair) { recoverWhile=mapRecovery }
 assocPair ::= containerExpr EX_FAT_ARROW containerExpr
 
