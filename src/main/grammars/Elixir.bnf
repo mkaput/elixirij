@@ -407,7 +407,8 @@ private receiveKeyword ::= "receive"
 
 alias ::= EX_ALIAS (EX_DOT EX_ALIAS)*
 
-atom ::= EX_ATOM | EX_ATOM_QUOTED
+atom ::= EX_ATOM | EX_ATOM_QUOTED | atomAlias
+private atomAlias ::= EX_COLON alias
 
 // =============================================================================
 // Data structures
