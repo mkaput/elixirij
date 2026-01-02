@@ -50,7 +50,7 @@ class ExParserTest : ParsingTestCase(
     fun testFnClauseAfterNewline() = doTest()
     fun testStringKeyInKeywordList() = doTest()
     fun testNoParensCallWithDoBlock() = doTest()
-    fun testDefaultArgInFunctionDef() = doPartialTest()
+    fun testDefaultArgInFunctionDef() = doTest()
     fun testMultiArgAnonymousFunction() = doPartialTest()
     fun testNewlineAfterArrowInFn() = doPartialTest()
     fun testTupleWithKeywordPair() = doPartialTest()

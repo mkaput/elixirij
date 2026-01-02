@@ -457,7 +457,7 @@ private callArg ::= (keywordPairItem | containerExpr) { recoverWhile=callArgReco
 
 // Argument list: used in function heads and guards
 private argList ::= argListElement (EX_COMMA argListElement)* EX_COMMA?
-private argListElement ::= matchExpr { recoverWhile=callArgRecovery }
+private argListElement ::= inMatchExpr { recoverWhile=callArgRecovery }
 
 // Keyword list: comma-separated keyword pairs
 private keywordList ::= keywordPairItem (EX_COMMA eoe* keywordPairItem)* (EX_COMMA eoe*)?
