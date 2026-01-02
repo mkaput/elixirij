@@ -1,0 +1,5 @@
+{My.Check,
+  files: %{
+    excluded: []
+  }
+}

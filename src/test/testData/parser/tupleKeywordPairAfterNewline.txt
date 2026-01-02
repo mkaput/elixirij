@@ -1,0 +1,28 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExTupleImpl(TUPLE)
+      PsiElement({)('{')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('My')
+        PsiElement(.)('.')
+        PsiElement(ALIAS)('Check')
+      PsiElement(,)(',')
+      PsiErrorElement:'}' expected
+        <empty list>
+    PsiElement(EOL)('\n')
+  PsiWhiteSpace('  ')
+  PsiErrorElement:';' or EOL expected, got 'files:'
+    PsiElement(KW_IDENTIFIER)('files:')
+  PsiWhiteSpace(' ')
+  PsiElement(%{)('%{')
+  PsiElement(EOL)('\n')
+  PsiWhiteSpace('    ')
+  PsiElement(KW_IDENTIFIER)('excluded:')
+  PsiWhiteSpace(' ')
+  PsiElement([)('[')
+  PsiElement(])(']')
+  PsiElement(EOL)('\n')
+  PsiWhiteSpace('  ')
+  PsiElement(})('}')
+  PsiElement(EOL)('\n')
+  PsiElement(})('}')
