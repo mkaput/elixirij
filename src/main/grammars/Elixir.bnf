@@ -261,7 +261,7 @@ importExpr ::= importKeyword alias importOpts? { pin=1 }
 private importOpts ::= EX_COMMA eoe* keywordList
 requireExpr ::= requireKeyword alias { pin=1 }
 useExpr ::= useKeyword alias useOpts? { pin=1 }
-private useOpts ::= EX_COMMA eoe* keywordList
+private useOpts ::= EX_COMMA eoe* (keywordList | expression)
 
 // Alias directive
 aliasDirective ::= aliasKeyword alias (aliasMultiTail | aliasOpts)? { pin=1 }

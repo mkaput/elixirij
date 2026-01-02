@@ -5,7 +5,7 @@ Elixir File
       PsiWhiteSpace(' ')
       ExAliasImpl(ALIAS)
         PsiElement(ALIAS)('Module')
-    PsiElement(,)(',')
-    PsiWhiteSpace(' ')
-    PsiErrorElement:':atom' unexpected
-      PsiElement(ATOM)(':atom')
+      PsiElement(,)(',')
+      PsiWhiteSpace(' ')
+      ExAtomImpl(ATOM)
+        PsiElement(ATOM)(':atom')
