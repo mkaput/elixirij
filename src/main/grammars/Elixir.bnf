@@ -437,7 +437,7 @@ private mapContents ::= mapUpdateContents | mapPairContents
 private mapUpdateContents ::= containerExpr EX_PIPE mapPairContents
 private mapPairContents ::= opSep mapPair (EX_COMMA opSep mapPair)* EX_COMMA?
 private mapPair ::= (keywordPairItem | assocPair) { recoverWhile=mapRecovery }
-assocPair ::= containerExpr EX_FAT_ARROW containerExpr
+assocPair ::= containerExpr opSep EX_FAT_ARROW opSep containerExpr
 
 // Struct: %ModuleName{key: value}
 struct ::= EX_PERCENT alias EX_LBRACE mapContents? EX_RBRACE { pin=1 }
