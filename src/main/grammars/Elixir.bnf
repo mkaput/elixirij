@@ -418,10 +418,10 @@ private listContents ::= opSep listElement (EX_COMMA opSep listElement)* EX_COMM
 private listElement ::= (keywordPairItem | containerExpr) { recoverWhile=listRecovery }
 
 // Keyword pair: key: value
-keywordPair ::= keywordKey containerExpr
+keywordPair ::= keywordKey opSep containerExpr
 private keywordPairIncomplete ::= keywordKey { recoverWhile=keywordPairRecovery }
 private keywordPairItem ::= keywordPair | keywordPairIncomplete
-private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON | EX_STRING EX_COLON
+private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON | EX_STRING EX_COLON | EX_IDENTIFIER EX_COLON
 
 // Tuple: {1, 2, 3}
 tuple ::= EX_LBRACE tupleContents? EX_RBRACE { pin=1 }
