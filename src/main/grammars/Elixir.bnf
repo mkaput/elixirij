@@ -104,7 +104,7 @@ relExpr ::= arrowExpr (relOp opSep arrowExpr)*
 private relOp ::= EX_LT_EQ | EX_GT_EQ | EX_LT | EX_GT
 
 // Precedence 160: |>, <<<, >>>, <<~, ~>>, <~, ~>, <~>, <|> (left associative)
-arrowExpr ::= inExpr (opSep arrowOp opSep inExpr)*
+arrowExpr ::= inExpr (opSep &arrowOp arrowOp opSep inExpr)*
 private arrowOp ::= EX_PIPE_GT | EX_LT_LT_LT | EX_GT_GT_GT | EX_LT_LT_TILDE | EX_TILDE_GT_GT | EX_LT_TILDE | EX_TILDE_GT | EX_LT_TILDE_GT | EX_LT_PIPE_GT
 
 // Precedence 170: in, not in (left associative)
@@ -432,9 +432,9 @@ private keywordPairItem ::= keywordPair | keywordPairIncomplete
 private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON | EX_STRING EX_COLON | EX_IDENTIFIER EX_COLON
 
 // Tuple: {1, 2, 3}
-tuple ::= EX_LBRACE tupleContents? EX_RBRACE { pin=1 }
-private tupleContents ::= tupleElement (EX_COMMA tupleElement)* EX_COMMA?
-private tupleElement ::= (keywordPairItem | containerExpr) { recoverWhile=tupleRecovery }
+tuple ::= EX_LBRACE opSep tupleContents? opSep EX_RBRACE { pin=1 }
+private tupleContents ::= tupleElement (EX_COMMA opSep tupleElement)* EX_COMMA?
+private tupleElement ::= (keywordPairItem | containerExpr) eoe* { recoverWhile=tupleRecovery }
 
 // Map: %{key: value} or %{"key" => value}
 map ::= EX_PERCENT_LBRACE opSep mapContents? opSep EX_RBRACE { pin=1 }
