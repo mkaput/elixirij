@@ -297,7 +297,7 @@ private stabNoArgsClause ::= EX_ARROW stabBody { pin=1 }
 private stabArgs ::= stabArgList whenClause?
 private stabArgList ::= stabArg (EX_COMMA stabArg)*
 private stabArg ::= matchExpr
-private stabBody ::= matchExpr (eoe matchExpr !EX_ARROW)*
+private stabBody ::= eoe? matchExpr (eoe matchExpr !EX_ARROW)*
 private whenClause ::= EX_WHEN matchExpr
 
 // Case expression: case expr do ... end

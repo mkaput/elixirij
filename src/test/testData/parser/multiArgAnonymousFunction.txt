@@ -18,14 +18,9 @@ Elixir File
           PsiElement(IDENTIFIER)('other')
         PsiWhiteSpace(' ')
         PsiElement(->)('->')
-        PsiErrorElement:<unary expr> expected
-          <empty list>
-      PsiElement(EOL)('\n')
-      PsiWhiteSpace('  ')
-      ExStabClauseImpl(STAB_CLAUSE)
+        PsiElement(EOL)('\n')
+        PsiWhiteSpace('  ')
         ExIdentifierImpl(IDENTIFIER)
           PsiElement(IDENTIFIER)('value')
-      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', <, <=, <>, <unary expr>, '=', '==', '===', '=~', '>', '>=', EOL, '[', and, in, not, or, when, '||' or '|||' expected
-        <empty list>
       PsiElement(EOL)('\n')
       PsiElement(end)('end')
