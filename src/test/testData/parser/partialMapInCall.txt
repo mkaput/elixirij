@@ -8,9 +8,9 @@ Elixir File
         ExNoParensCallImpl(NO_PARENS_CALL)
           ExMapImpl(MAP)
             PsiElement(%{)('%{')
-            PsiErrorElement:'(', '.', '[' or '}' expected, got 'a'
+            PsiErrorElement:'(', '.', EOL, '[' or '}' expected, got 'a'
               <empty list>
           ExIdentifierImpl(IDENTIFIER)
             PsiElement(IDENTIFIER)('a')
-        PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, KW_IDENTIFIER, '[', '\\', and, do, in, not, or, when, '|', '|>' and ... expected, got ':'
+        PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', '\\', and, do, in, not, or, when, '|' and ... expected, got ':'
           PsiElement(:)(':')

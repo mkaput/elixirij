@@ -12,5 +12,5 @@ Elixir File
         PsiWhiteSpace(' ')
         ExListImpl(LIST)
           PsiElement([)('[')
-          PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '.', '..', '..//', '/', '//', <, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, KW_IDENTIFIER, '[', ']', and, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected
+          PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '.', '..', '..//', '/', '//', <, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', ']', and, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected
             <empty list>

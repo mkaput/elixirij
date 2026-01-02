@@ -1,0 +1,21 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExFnExprImpl(FN_EXPR)
+      PsiElement(fn)('fn')
+      PsiWhiteSpace(' ')
+      ExStabClauseImpl(STAB_CLAUSE)
+        ExIdentifierImpl(IDENTIFIER)
+          PsiElement(IDENTIFIER)('x')
+        PsiWhiteSpace(' ')
+        PsiElement(->)('->')
+        PsiErrorElement:';', <unary expr> or EOL expected
+          <empty list>
+      PsiElement(EOL)('\n')
+      PsiWhiteSpace('  ')
+      ExStabClauseImpl(STAB_CLAUSE)
+        ExIdentifierImpl(IDENTIFIER)
+          PsiElement(IDENTIFIER)('x')
+      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', ';', <, <=, <>, <unary expr>, '=', '==', '===', '=~', '>', '>=', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', and, in, not, or, when, '||' or '|||' expected
+        <empty list>
+      PsiElement(EOL)('\n')
+      PsiElement(end)('end')

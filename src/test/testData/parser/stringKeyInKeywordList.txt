@@ -1,0 +1,12 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExListImpl(LIST)
+      PsiElement([)('[')
+      ExLiteralImpl(LITERAL)
+        ExStringImpl(STRING)
+          PsiElement(STRING)('"key.name"')
+      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', <, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', EOL, '[', and, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected, got ':'
+        PsiElement(:)(':')
+      PsiWhiteSpace(' ')
+      PsiElement(ATOM)(':value')
+      PsiElement(])(']')

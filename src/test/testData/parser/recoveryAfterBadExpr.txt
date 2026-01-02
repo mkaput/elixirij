@@ -2,22 +2,23 @@ Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExListImpl(LIST)
       PsiElement([)('[')
-      PsiErrorElement:<unary expr> or ']' expected
+      PsiElement(EOL)('\n')
+      PsiWhiteSpace('  ')
+      ExLiteralImpl(LITERAL)
+        ExIntegerImpl(INTEGER)
+          PsiElement(INTEGER)('1')
+      PsiElement(,)(',')
+      PsiElement(EOL)('\n')
+      PsiErrorElement:EOL, ']' or '|' expected, got '+'
         <empty list>
+    PsiWhiteSpace('  ')
+    PsiElement(+)('+')
+    PsiElement(,)(',')
     PsiElement(EOL)('\n')
     PsiWhiteSpace('  ')
     ExLiteralImpl(LITERAL)
       ExIntegerImpl(INTEGER)
-        PsiElement(INTEGER)('1')
-    PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', '[', '\\', and, in, not, or, when, '|', '|>', '||', '|||', '~>' or '~>>' expected, got ','
-      PsiElement(,)(',')
+        PsiElement(INTEGER)('2')
     PsiElement(EOL)('\n')
-  PsiWhiteSpace('  ')
-  PsiErrorElement:';' or EOL expected, got '+'
-    PsiElement(+)('+')
-  PsiElement(,)(',')
-  PsiElement(EOL)('\n')
-  PsiWhiteSpace('  ')
-  PsiElement(INTEGER)('2')
-  PsiElement(EOL)('\n')
-  PsiElement(])(']')
+  PsiErrorElement:';' or EOL expected, got ']'
+    PsiElement(])(']')

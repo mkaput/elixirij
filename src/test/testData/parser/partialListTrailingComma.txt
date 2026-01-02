@@ -11,5 +11,5 @@ Elixir File
         ExIntegerImpl(INTEGER)
           PsiElement(INTEGER)('2')
       PsiElement(,)(',')
-      PsiErrorElement:<unary expr>, ATOM_QUOTED, KW_IDENTIFIER, ']' or '|' expected
+      PsiErrorElement:<unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, ']' or '|' expected
         <empty list>

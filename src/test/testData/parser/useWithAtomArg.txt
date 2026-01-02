@@ -1,0 +1,11 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExUseExprImpl(USE_EXPR)
+      PsiElement(IDENTIFIER)('use')
+      PsiWhiteSpace(' ')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('Module')
+    PsiElement(,)(',')
+    PsiWhiteSpace(' ')
+    PsiErrorElement:';', ATOM_QUOTED, EOL or KW_IDENTIFIER expected, got ':atom'
+      PsiElement(ATOM)(':atom')

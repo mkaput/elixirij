@@ -1,0 +1,14 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExIdentifierImpl(IDENTIFIER)
+      PsiElement(IDENTIFIER)('setup')
+    PsiWhiteSpace(' ')
+    PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', EOL, '[', '\\', and, in, not, or, when, '|', '|>', '||', '|||', '~>', '~>>' expected, got 'do'
+      PsiElement(do)('do')
+    PsiElement(EOL)('\n')
+    PsiWhiteSpace('  ')
+    ExAtomImpl(ATOM)
+      PsiElement(ATOM)(':ok')
+    PsiElement(EOL)('\n')
+  PsiErrorElement:';' or EOL expected, got 'end'
+    PsiElement(end)('end')

@@ -15,5 +15,5 @@ Elixir File
       ExLiteralImpl(LITERAL)
         ExIntegerImpl(INTEGER)
           PsiElement(INTEGER)('3')
-      PsiErrorElement:',', ']' or '|' expected
+      PsiErrorElement:',', EOL, ']' or '|' expected
         <empty list>
