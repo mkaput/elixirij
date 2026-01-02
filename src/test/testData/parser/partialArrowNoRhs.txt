@@ -4,5 +4,5 @@ Elixir File
       PsiElement(IDENTIFIER)('x')
     PsiWhiteSpace(' ')
     PsiElement(->)('->')
-    PsiErrorElement:<unary expr> or EOL expected
+    PsiErrorElement:<unary expr>, COMMENT or EOL expected
       <empty list>

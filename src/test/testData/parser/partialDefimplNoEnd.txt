@@ -13,5 +13,5 @@ Elixir File
         PsiElement(ALIAS)('T')
       PsiWhiteSpace(' ')
       PsiElement(do)('do')
-      PsiErrorElement:'(', '.', ';', <bare do call>, <keyword pair>, <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, STRING, '[' or end expected
+      PsiErrorElement:'(', '.', ';', <bare do call>, <keyword pair>, <unary expr>, ATOM_QUOTED, EOL, IDENTIFIER, KW_IDENTIFIER, STRING, '[' or end expected
         <empty list>

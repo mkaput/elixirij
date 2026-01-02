@@ -5,5 +5,5 @@ Elixir File
       PsiWhiteSpace(' ')
       ExAliasImpl(ALIAS)
         PsiElement(ALIAS)('Foo')
-      PsiErrorElement:'(', '.', <keyword pair>, <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, STRING, '[' or do expected
+      PsiErrorElement:'(', '.', <keyword pair>, <unary expr>, ATOM_QUOTED, IDENTIFIER, KW_IDENTIFIER, STRING, '[' or do expected
         <empty list>

@@ -5,7 +5,7 @@ Elixir File
         PsiElement(IDENTIFIER)('foo')
       ExParenCallImpl(PAREN_CALL)
         PsiElement(()('(')
-        ExIdentifierImpl(IDENTIFIER)
-          PsiElement(IDENTIFIER)('a')
-        PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', <, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', EOL, '[', and, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected, got ':'
-          PsiElement(:)(':')
+        PsiElement(IDENTIFIER)('a')
+        PsiElement(:)(':')
+        PsiErrorElement:')', ',', COMMENT or EOL expected
+          <empty list>

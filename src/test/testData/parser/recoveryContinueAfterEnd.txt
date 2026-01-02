@@ -15,7 +15,7 @@ Elixir File
         PsiElement(EOL)('\n')
         PsiElement(end)('end')
     PsiWhiteSpace(' ')
-    PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', EOL, '\\', and, in, not, or, when, '|', '|>', '||', '|||', '~>' or '~>>' expected, got 'end'
+    PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', COMMENT, EOL, '\\', and, in, not, or, when, '|', '|>', '||', '|||', '~>' or '~>>' expected, got 'end'
       PsiElement(end)('end')
     PsiElement(EOL)('\n')
     ExMatchExprImpl(MATCH_EXPR)

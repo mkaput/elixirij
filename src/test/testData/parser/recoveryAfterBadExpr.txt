@@ -9,7 +9,7 @@ Elixir File
           PsiElement(INTEGER)('1')
       PsiElement(,)(',')
       PsiElement(EOL)('\n')
-      PsiErrorElement:EOL, ']' or '|' expected, got '+'
+      PsiErrorElement:COMMENT, EOL, ']' or '|' expected, got '+'
         <empty list>
     PsiWhiteSpace('  ')
     PsiElement(+)('+')

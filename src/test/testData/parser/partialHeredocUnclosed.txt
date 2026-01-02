@@ -3,7 +3,7 @@ Elixir File
     ExLiteralImpl(LITERAL)
       ExStringImpl(STRING)
         PsiElement(STRING)('""')
-    PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', EOL, '[', '\\', and, in, not, or, when, '|', '|>', '||', '|||', '~>', '~>>' expected, got '"'
+    PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', COMMENT, EOL, '[', '\\', and, in, not, or, when, '|', '|>', '||', '|||', '~>' and ... expected, got '"'
       PsiElement(BAD_CHARACTER)('"')
     PsiElement(EOL)('\n')
     ExIdentifierImpl(IDENTIFIER)

@@ -5,5 +5,5 @@ Elixir File
         PsiElement(IDENTIFIER)('list')
       ExBracketAccessImpl(BRACKET_ACCESS)
         PsiElement([)('[')
-        PsiErrorElement:'(', '.', <keyword pair>, <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, STRING, '[' or ']' expected
+        PsiErrorElement:'(', '.', <keyword pair>, <unary expr>, ATOM_QUOTED, IDENTIFIER, KW_IDENTIFIER, STRING, '[' or ']' expected
           <empty list>

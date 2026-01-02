@@ -3,11 +3,11 @@ Elixir File
     ExNoParensCallImpl(NO_PARENS_CALL)
       ExMapImpl(MAP)
         PsiElement(%{)('%{')
-        PsiErrorElement:'(', '.', EOL, '[' or '}' expected, got 'map'
+        PsiErrorElement:'(', '.', COMMENT, EOL, '[' or '}' expected, got 'map'
           <empty list>
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('map')
     PsiWhiteSpace(' ')
     PsiElement(|)('|')
-    PsiErrorElement:<unary expr> or EOL expected
+    PsiErrorElement:<unary expr>, COMMENT or EOL expected
       <empty list>

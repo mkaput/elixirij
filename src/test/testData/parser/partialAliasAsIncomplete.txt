@@ -8,6 +8,7 @@ Elixir File
           PsiElement(ALIAS)('Foo')
     PsiElement(,)(',')
     PsiWhiteSpace(' ')
-    PsiErrorElement:ATOM_QUOTED, KW_IDENTIFIER or STRING expected, got 'as'
-      PsiElement(IDENTIFIER)('as')
+    PsiElement(IDENTIFIER)('as')
     PsiElement(:)(':')
+    PsiErrorElement:ALIAS expected
+      <empty list>

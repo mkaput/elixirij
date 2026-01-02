@@ -3,11 +3,11 @@ Elixir File
     ExNoParensCallImpl(NO_PARENS_CALL)
       ExMapImpl(MAP)
         PsiElement(%{)('%{')
-        PsiErrorElement:'(', '.', EOL, '[' or '}' expected, got '"key"'
+        PsiErrorElement:'(', '.', COMMENT, EOL, '[' or '}' expected, got '"key"'
           <empty list>
       ExLiteralImpl(LITERAL)
         ExStringImpl(STRING)
           PsiElement(STRING)('"key"')
     PsiWhiteSpace(' ')
-    PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', EOL, '[', '\\', and, do, in, not, or, when, '|', '|>', '||', '|||' and ... expected, got '=>'
+    PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', COMMENT, EOL, '[', '\\', and, do, in, not, or, when, '|', '|>', '||' and ... expected, got '=>'
       PsiElement(=>)('=>')

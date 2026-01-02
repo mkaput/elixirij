@@ -8,5 +8,5 @@ Elixir File
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('func')
     PsiElement(/)('/')
-    PsiErrorElement:<unary expr>, EOL or INTEGER expected
+    PsiErrorElement:<unary expr>, COMMENT, EOL or INTEGER expected
       <empty list>
