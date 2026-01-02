@@ -7,12 +7,9 @@ Elixir File
       ExLiteralImpl(LITERAL)
         ExStringImpl(STRING)
           PsiElement(STRING)('"works"')
-    PsiElement(,)(',')
-    PsiErrorElement:unmatched input
-      <empty list>
-    PsiElement(EOL)('\n')
-    PsiWhiteSpace('  ')
-    ExBareDoCallImpl(BARE_DO_CALL)
+      PsiElement(,)(',')
+      PsiElement(EOL)('\n')
+      PsiWhiteSpace('  ')
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('context')
       PsiWhiteSpace(' ')

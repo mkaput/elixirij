@@ -169,9 +169,9 @@ private bareDoCallTarget ::= (identifier | alias) (EX_DOT identifier)*
 private callTarget ::= accessExpr
 private noParensArgStart ::= !EX_DO (keywordPairItem | expression)
 private noParensArgs ::= noParensKeywordArgs | noParensPositionalArgs
-private noParensKeywordArgs ::= keywordPairItem (EX_COMMA keywordPairItem)*
-private noParensPositionalArgs ::= expression (EX_COMMA expression)* keywordTail?
-private keywordTail ::= EX_COMMA keywordPairItem (EX_COMMA keywordPairItem)*
+private noParensKeywordArgs ::= keywordPairItem (EX_COMMA eoe* keywordPairItem)*
+private noParensPositionalArgs ::= expression (EX_COMMA eoe* expression)* keywordTail?
+private keywordTail ::= EX_COMMA eoe* keywordPairItem (EX_COMMA eoe* keywordPairItem)*
 
 // Dot access: expr.field or Mod.Func
 dotAccess ::= EX_DOT &dotTarget dotTarget
