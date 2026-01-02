@@ -52,3 +52,4 @@ JAVA_TOOL_OPTIONS="-Didea.tests.overwrite.data=true" ./gradlew test --tests "dev
     - context behind the changes: what, how and why,
     - manual testing steps,
     - special considerations.
+- if commit is meant to fix an issue, add `fix #123` at the end of the commit message.
