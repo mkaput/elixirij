@@ -426,7 +426,7 @@ private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON | EX_STRING EX
 // Tuple: {1, 2, 3}
 tuple ::= EX_LBRACE tupleContents? EX_RBRACE { pin=1 }
 private tupleContents ::= tupleElement (EX_COMMA tupleElement)* EX_COMMA?
-private tupleElement ::= containerExpr { recoverWhile=tupleRecovery }
+private tupleElement ::= (keywordPairItem | containerExpr) { recoverWhile=tupleRecovery }
 
 // Map: %{key: value} or %{"key" => value}
 map ::= EX_PERCENT_LBRACE opSep mapContents? opSep EX_RBRACE { pin=1 }

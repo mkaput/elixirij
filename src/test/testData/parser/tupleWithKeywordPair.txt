@@ -1,18 +1,14 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExNoParensCallImpl(NO_PARENS_CALL)
-      ExTupleImpl(TUPLE)
-        PsiElement({)('{')
-        ExAtomImpl(ATOM)
-          PsiElement(ATOM)(':ok')
-        PsiElement(,)(',')
-        PsiErrorElement:'}' expected, got 'key:'
-          <empty list>
+    ExTupleImpl(TUPLE)
+      PsiElement({)('{')
+      ExAtomImpl(ATOM)
+        PsiElement(ATOM)(':ok')
+      PsiElement(,)(',')
       PsiWhiteSpace(' ')
       ExKeywordPairImpl(KEYWORD_PAIR)
         PsiElement(KW_IDENTIFIER)('key:')
         PsiWhiteSpace(' ')
         ExIdentifierImpl(IDENTIFIER)
           PsiElement(IDENTIFIER)('value')
-    PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, STRING, '[', '\\', and, do, in, not, or and ... expected, got '}'
       PsiElement(})('}')

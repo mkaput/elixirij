@@ -53,7 +53,7 @@ class ExParserTest : ParsingTestCase(
     fun testDefaultArgInFunctionDef() = doTest()
     fun testMultiArgAnonymousFunction() = doTest()
     fun testNewlineAfterArrowInFn() = doTest()
-    fun testTupleWithKeywordPair() = doPartialTest()
+    fun testTupleWithKeywordPair() = doTest()
     fun testUseWithAtomArg() = doPartialTest()
     // =============================================================================
     // 1. Literals
