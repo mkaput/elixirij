@@ -229,10 +229,15 @@ private primaryExpr ::= literal
                       | receiveExpr
                       | identifier
                       | doBlock
+                      | typeArrowExpr
                       | parenExpr
 
 // Parenthesized expression
 parenExpr ::= EX_LPAREN expression? EX_RPAREN { pin=1 }
+
+// Typespec function type: (args -> return)
+private typeArrowExpr ::= EX_LPAREN opSep typeArrowArgs? opSep EX_ARROW opSep typeExpr opSep EX_RPAREN { pin=1 }
+private typeArrowArgs ::= typeExpr (EX_COMMA opSep typeExpr)*
 
 // Module definitions: defmodule MyApp.Module do ... end
 defmoduleExpr ::= defmoduleKeyword alias moduleBlock { pin=1 }
