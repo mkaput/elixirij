@@ -40,8 +40,6 @@ Elixir File
               PsiElement(nil)('nil')
         PsiElement(EOL)('\n')
         PsiElement(end)('end')
-        PsiErrorElement:'(', '.' or '[' expected
-          <empty list>
       PsiElement(EOL)('\n')
       PsiElement(|>)('|>')
       PsiWhiteSpace(' ')

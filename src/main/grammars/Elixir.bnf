@@ -308,7 +308,7 @@ private stabBody ::= eoe? matchExpr (eoe matchExpr !EX_ARROW)*
 private whenClause ::= EX_WHEN matchExpr
 
 // Case expression: case expr do ... end
-caseExpr ::= caseKeyword caseSubject EX_DO caseClauseList EX_END { pin=1 }
+caseExpr ::= caseKeyword caseSubject? EX_DO caseClauseList EX_END { pin=1 }
 private caseSubject ::= expression &EX_DO
 private caseClauseList ::= eoe? caseClause (eoe caseClause)* eoe?
 private caseClause ::= stabClause
