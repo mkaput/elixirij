@@ -297,7 +297,7 @@ private stabParenClause ::= EX_LPAREN EX_RPAREN EX_ARROW stabBody { pin=1 }
 private stabArgsClause ::= stabArgs EX_ARROW stabBody { pin=1 }
 private stabNoArgsClause ::= EX_ARROW stabBody { pin=1 }
 private stabArgs ::= stabArgList whenClause?
-private stabArgList ::= stabArg (EX_COMMA stabArg)*
+private stabArgList ::= stabArg (EX_COMMA eoe* stabArg)*
 private stabArg ::= matchExpr
 private stabBody ::= eoe? matchExpr (eoe matchExpr !EX_ARROW)*
 private whenClause ::= EX_WHEN matchExpr
