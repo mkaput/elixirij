@@ -1,0 +1,105 @@
+# Elixir bundled dictionary
+# Common Elixir, Erlang, and framework terms
+
+# Elixir core modules
+enum
+enumerable
+genserver
+supervisor
+application
+behaviour
+binary
+bitstring
+keyword
+keylist
+regex
+mapset
+tuple
+struct
+datetime
+charlist
+
+# Elixir standard library modules
+ecto
+phoenix
+plug
+cowboy
+ranch
+jason
+poison
+hackney
+httpoison
+timex
+gettext
+distillery
+exunit
+dialyzer
+dialyxir
+
+# Erlang terms
+erlang
+ets
+dets
+mnesia
+otp
+gen
+proc
+
+# Common function names and terms
+defmodule
+defmacro
+defstruct
+defprotocol
+defimpl
+defexception
+defguard
+defdelegate
+moduledoc
+sigil
+unquote
+rebind
+rebinding
+typespec
+typespecs
+credo
+formatter
+deps
+config
+runtime
+middleware
+endpoint
+repo
+migration
+changeset
+schema
+preload
+preloading
+
+# Testing terms
+doctest
+exunit
+assert
+refute
+flunk
+
+# Build and tooling
+mixfile
+deps
+lockfile
+elixirc
+iex
+erl
+escript
+rebar
+hex
+
+# Common abbreviations
+arg
+args
+env
+impl
+opts
+pid
+pids
+msg
+recv

@@ -5,6 +5,7 @@
   <vendor>Marek Kaput</vendor>
 
   <depends>com.intellij.modules.platform</depends>
+  <depends optional="true" config-file="dev.murek.elixirij-spellchecker.xml">com.intellij.spellchecker</depends>
 
   <resource-bundle>messages.ExBundle</resource-bundle>
 

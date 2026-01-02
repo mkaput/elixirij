@@ -1,0 +1,10 @@
+<!-- Optional spell checking support for Elixir -->
+<idea-plugin>
+  <extensions defaultExtensionNs="com.intellij">
+    <spellchecker.support language="Elixir"
+                          implementationClass="dev.murek.elixirij.lang.spellchecker.ExSpellcheckingStrategy"/>
+
+    <spellchecker.bundledDictionaryProvider
+      implementation="dev.murek.elixirij.lang.spellchecker.ExBundledDictionaryProvider"/>
+  </extensions>
+</idea-plugin>
