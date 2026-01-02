@@ -444,8 +444,9 @@ private mapPairContents ::= opSep mapPair (EX_COMMA opSep mapPair)* EX_COMMA?
 private mapPair ::= (keywordPairItem | assocPair) { recoverWhile=mapRecovery }
 assocPair ::= containerExpr opSep EX_FAT_ARROW opSep containerExpr
 
-// Struct: %ModuleName{key: value}
-struct ::= EX_PERCENT alias EX_LBRACE mapContents? EX_RBRACE { pin=1 }
+// Struct: %ModuleName{key: value} or %module{key: value}
+struct ::= EX_PERCENT structTarget EX_LBRACE mapContents? EX_RBRACE { pin=1 }
+private structTarget ::= alias | identifier
 
 // Bitstring: <<1, 2, 3>> or <<x::binary>>
 bitstring ::= EX_LT_LT bitstringContents? EX_GT_GT { pin=1 }
