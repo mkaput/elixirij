@@ -10,5 +10,5 @@ Elixir File
             PsiElement(IDENTIFIER)('bar')
           ExParenCallImpl(PAREN_CALL)
             PsiElement(()('(')
-            PsiErrorElement:'(', ')', ',', '.', <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, '[' or do expected
+            PsiErrorElement:'(', ')', '.', <keyword pair>, <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, STRING, '[' or do expected
               <empty list>

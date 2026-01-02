@@ -8,7 +8,7 @@ Elixir File
       PsiWhiteSpace(' ')
       PsiElement(do)('do')
       PsiElement(EOL)('\n')
-      PsiErrorElement:'!', '&', '(', '+', '-', '.', ';', <access expr>, '@', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', '^', end, not or '~' expected, got '@'
+      PsiErrorElement:'!', '&', '(', '+', '-', '.', ';', <access expr>, '@', EOL, '[', '^', end, not or '~' expected, got '@'
         <empty list>
     PsiWhiteSpace('  ')
     PsiElement(@)('@')

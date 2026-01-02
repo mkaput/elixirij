@@ -4,5 +4,5 @@ Elixir File
       PsiElement(IDENTIFIER)('func')
     PsiElement(.)('.')
     PsiElement(()('(')
-    PsiErrorElement:')', <unary expr>, ATOM_QUOTED or KW_IDENTIFIER expected
+    PsiErrorElement:')', <keyword pair>, <unary expr>, ATOM_QUOTED, KW_IDENTIFIER or STRING expected
       <empty list>

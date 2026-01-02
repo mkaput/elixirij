@@ -5,5 +5,5 @@ Elixir File
       ExAliasImpl(ALIAS)
         PsiElement(ALIAS)('User')
       PsiElement({)('{')
-      PsiErrorElement:'(', '.', <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, '[' or '}' expected
+      PsiErrorElement:'(', '.', <keyword pair>, <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, STRING, '[' or '}' expected
         <empty list>

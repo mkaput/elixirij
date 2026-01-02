@@ -15,5 +15,5 @@ Elixir File
             PsiElement(IDENTIFIER)('x')
           PsiWhiteSpace(' ')
           PsiElement(|>)('|>')
-          PsiErrorElement:'(', '.', ';', <unary expr>, ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', after, catch, else, end or rescue expected
+          PsiErrorElement:<unary expr> or EOL expected
             <empty list>

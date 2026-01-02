@@ -18,5 +18,5 @@ Elixir File
         ExLiteralImpl(LITERAL)
           ExIntegerImpl(INTEGER)
             PsiElement(INTEGER)('1')
-      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', ';', <, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', and, end, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected
+      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', ';', <, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', EOL, '[', and, end, in, not, or, '|>', '||', '|||', '~>' or '~>>' expected
         <empty list>

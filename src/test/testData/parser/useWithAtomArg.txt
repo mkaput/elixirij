@@ -7,5 +7,5 @@ Elixir File
         PsiElement(ALIAS)('Module')
     PsiElement(,)(',')
     PsiWhiteSpace(' ')
-    PsiErrorElement:';', ATOM_QUOTED, EOL or KW_IDENTIFIER expected, got ':atom'
+    PsiErrorElement:':atom' unexpected
       PsiElement(ATOM)(':atom')

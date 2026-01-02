@@ -26,5 +26,5 @@ Elixir File
                 PsiElement(ATOM)(':c')
               PsiWhiteSpace(' ')
               PsiElement(->)('->')
-              PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', ';', <, <-, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, EOL, KW_IDENTIFIER, '[', '\\', and, end, in, not, or, when, '|' and ... expected
+              PsiErrorElement:<unary expr> expected
                 <empty list>

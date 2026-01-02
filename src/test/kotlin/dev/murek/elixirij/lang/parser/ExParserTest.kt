@@ -48,7 +48,7 @@ class ExParserTest : ParsingTestCase(
     fun testModuleAttributeKeywordList() = doTest()
     fun testPipelineStartsOnNewline() = doTest()
     fun testFnClauseAfterNewline() = doTest()
-    fun testStringKeyInKeywordList() = doPartialTest()
+    fun testStringKeyInKeywordList() = doTest()
     fun testNoParensCallWithDoBlock() = doPartialTest()
     fun testDefaultArgInFunctionDef() = doPartialTest()
     fun testMultiArgAnonymousFunction() = doPartialTest()

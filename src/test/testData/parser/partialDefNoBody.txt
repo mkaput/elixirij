@@ -5,5 +5,5 @@ Elixir File
       PsiWhiteSpace(' ')
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('foo')
-      PsiErrorElement:'(', ',', '.', <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, '[', do or when expected
+      PsiErrorElement:'(', ',', '.', <keyword pair>, <unary expr>, ATOM_QUOTED, KW_IDENTIFIER, STRING, '[', do or when expected
         <empty list>
