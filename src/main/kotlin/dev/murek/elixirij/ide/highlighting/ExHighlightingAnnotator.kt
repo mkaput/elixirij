@@ -18,6 +18,8 @@ import dev.murek.elixirij.lang.psi.*
  */
 class ExHighlightingAnnotator : Annotator, DumbAware {
 
+    private val docAttributeNames = setOf("doc", "moduledoc")
+
     private val specialFormNames = setOf(
         "alias",
         "case",
@@ -70,7 +72,11 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
         // Highlight the attribute name identifier (first ExIdentifier child).
         val attrName = element.childrenOfType<ExIdentifier>().firstOrNull()
         if (attrName != null) {
-            highlight(attrName, ExTextAttributes.MODULE_ATTRIBUTE, holder)
+            if (attrName.text in docAttributeNames) {
+                highlight(element, ExTextAttributes.DOC_COMMENT, holder)
+            } else {
+                highlight(attrName, ExTextAttributes.MODULE_ATTRIBUTE, holder)
+            }
         }
     }
 

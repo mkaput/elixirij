@@ -1,6 +1,10 @@
 package dev.murek.elixirij.ide.highlighting
 
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.childrenOfType
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import dev.murek.elixirij.lang.psi.ExIdentifier
+import dev.murek.elixirij.lang.psi.ExModuleAttr
 /**
  * Tests for [ExHighlightingAnnotator] to verify semantic highlighting.
  */
@@ -58,6 +62,42 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
               @behaviour GenServer
             end
         """.trimIndent())
+    }
+
+    fun `test doc attributes are highlighted as documentation comments`() {
+        val heredoc = "\"\"\""
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule MyModule do
+                  @moduledoc $heredoc
+                  Module docs.
+                  $heredoc
+
+                  @doc "Function docs."
+                  def example, do: :ok
+                end
+            """.trimIndent()
+        )
+
+        val highlights = myFixture.doHighlighting()
+        val moduleAttrs = PsiTreeUtil.findChildrenOfType(myFixture.file, ExModuleAttr::class.java)
+
+        val docAttrs = moduleAttrs.filter { attr ->
+            attr.childrenOfType<ExIdentifier>().firstOrNull()?.text in setOf("doc", "moduledoc")
+        }
+
+        assertTrue("Expected @doc and @moduledoc attributes in the PSI", docAttrs.size >= 2)
+
+        docAttrs.forEach { attr ->
+            val range = attr.textRange
+            val hasDocHighlight = highlights.any { highlight ->
+                highlight.forcedTextAttributesKey == ExTextAttributes.DOC_COMMENT.attribute &&
+                    highlight.startOffset == range.startOffset &&
+                    highlight.endOffset == range.endOffset
+            }
+            assertTrue("Expected doc comment highlight for '${attr.text}'", hasDocHighlight)
+        }
     }
 
     fun `test control flow keywords are highlighted`() {

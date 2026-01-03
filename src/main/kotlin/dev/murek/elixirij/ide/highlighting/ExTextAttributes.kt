@@ -23,6 +23,11 @@ enum class ExTextAttributes(
         DefaultLanguageHighlighterColors.LINE_COMMENT,
         OptionsBundle.messagePointer("options.language.defaults.line.comment")
     ),
+    DOC_COMMENT(
+        "ELIXIR_DOC_COMMENT",
+        DefaultLanguageHighlighterColors.DOC_COMMENT,
+        OptionsBundle.messagePointer("options.language.defaults.doc.comment")
+    ),
     KEYWORD(
         "ELIXIR_KEYWORD",
         DefaultLanguageHighlighterColors.KEYWORD,
