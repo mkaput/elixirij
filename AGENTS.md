@@ -19,6 +19,25 @@ Targets the latest IntelliJ Platform version and modern Elixir language conventi
     fun `test something is happening`() { ... }
     ```
 - prefer `parent / child` instead of `parent.resolve(child)` when glueing `java.nio.file.Path`s together
+- when writing fixture tests, always prefer comparing whole actual and expected fixture states:
+
+  Good example:
+  ```kotlin
+  fun `test double quote typing`() {
+      myFixture.configureByText("test.ex", "x = <caret>")
+      myFixture.type('"')
+      myFixture.checkResult("x = \"<caret>\"")
+  }
+  ```
+
+  Bad example:
+  ```kotlin
+  fun `test double quote typing`() {
+      myFixture.configureByText("test.ex", "x = <caret>")
+      myFixture.type('"')
+      assertTrue("Should have paired quotes", myFixture.editor.document.text.contains("\"<caret>\""))
+  }
+  ```
 
 ## Tools
 
