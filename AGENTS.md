@@ -5,7 +5,8 @@ Targets the latest IntelliJ Platform version and modern Elixir language conventi
 
 ## Rules
 
-- you may be running in parallel with other agents; cooperate to avoid conflicts
+- you may be running in parallel with other agents; cooperate to avoid conflicts, but avoid commiting changes made by
+  others
 - write tests for every change, unless introducing "declarative" features (code commenter etc.)
 - when bugfixing: write minimal reproduction test that fails, then fix, then confirm test passes
 
