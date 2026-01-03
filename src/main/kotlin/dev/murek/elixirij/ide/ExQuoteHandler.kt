@@ -11,6 +11,7 @@ import dev.murek.elixirij.lang.EX_HEREDOC
 import dev.murek.elixirij.lang.EX_SIGIL
 import dev.murek.elixirij.lang.EX_STRING
 import dev.murek.elixirij.lang.BAD_CHARACTER
+import com.intellij.psi.TokenType
 
 /**
  * Provides quote handling for Elixir strings, charlists, heredocs, and sigils.
@@ -21,6 +22,11 @@ import dev.murek.elixirij.lang.BAD_CHARACTER
  * - Heredocs: \"\"\" and '''
  * - Quoted atoms: :"..." and :'...'
  * - Sigils: ~r/.../, ~s"...", etc.
+ *
+ * Note: Auto-completion for heredocs and sigil delimiters is handled by
+ * [ExTypedHandlerDelegate] since these require multi-character handling.
+ * This handler primarily assists with detecting when the caret is inside
+ * a string literal for proper quote behavior.
  */
 class ExQuoteHandler : SimpleTokenSetQuoteHandler(
     EX_STRING,
@@ -32,21 +38,24 @@ class ExQuoteHandler : SimpleTokenSetQuoteHandler(
 ), MultiCharQuoteHandler {
 
     override fun isOpeningQuote(iterator: HighlighterIterator, offset: Int): Boolean =
-        super.isOpeningQuote(iterator, offset) || isDanglingQuote(iterator, offset)
+        super.isOpeningQuote(iterator, offset) || isQuoteAt(iterator, offset)
 
     override fun isClosingQuote(iterator: HighlighterIterator, offset: Int): Boolean =
-        super.isClosingQuote(iterator, offset) || isDanglingQuote(iterator, offset)
+        super.isClosingQuote(iterator, offset)
 
-    override fun hasNonClosedLiteral(editor: Editor, iterator: HighlighterIterator, offset: Int): Boolean =
-        isDanglingQuote(editor, iterator, offset) || super.hasNonClosedLiteral(editor, iterator, offset)
+    override fun hasNonClosedLiteral(editor: Editor, iterator: HighlighterIterator, offset: Int): Boolean {
+        if (super.hasNonClosedLiteral(editor, iterator, offset)) return true
+        if (myLiteralTokenSet.contains(iterator.tokenType) && iterator.start == offset) {
+            val document = editor.document
+            val lineEnd = document.getLineEndOffset(document.getLineNumber(offset))
+            if (iterator.end > lineEnd) return true
+        }
+        val tokenType = iterator.tokenType
+        return (tokenType == TokenType.WHITE_SPACE || tokenType == BAD_CHARACTER) &&
+            isQuoteAt(editor.document.charsSequence, offset)
+    }
 
     override fun getClosingQuote(iterator: HighlighterIterator, offset: Int): CharSequence? = null
-
-    private fun isDanglingQuote(iterator: HighlighterIterator, offset: Int): Boolean =
-        iterator.tokenType == BAD_CHARACTER && isQuoteAt(iterator, offset)
-
-    private fun isDanglingQuote(editor: Editor, iterator: HighlighterIterator, offset: Int): Boolean =
-        iterator.tokenType == BAD_CHARACTER && isQuoteAt(editor.document.charsSequence, offset)
 
     private fun isQuoteAt(iterator: HighlighterIterator, offset: Int): Boolean {
         val document = iterator.document ?: return false

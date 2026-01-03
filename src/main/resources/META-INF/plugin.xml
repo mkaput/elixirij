@@ -31,6 +31,8 @@
     <lang.quoteHandler language="Elixir"
                        implementationClass="dev.murek.elixirij.ide.ExQuoteHandler"/>
 
+    <typedHandler implementation="dev.murek.elixirij.ide.ExTypedHandlerDelegate"/>
+
     <lang.parserDefinition language="Elixir"
                            implementationClass="dev.murek.elixirij.lang.ExParserDefinition"/>
 
