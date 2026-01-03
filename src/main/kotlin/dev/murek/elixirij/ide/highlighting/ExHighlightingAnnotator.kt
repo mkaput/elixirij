@@ -25,6 +25,11 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
         "alias",
         "case",
         "cond",
+        "__CALLER__",
+        "__DIR__",
+        "__ENV__",
+        "__MODULE__",
+        "__STACKTRACE__",
         "def",
         "defexception",
         "defguard",
@@ -65,7 +70,10 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
             is ExNoParensCall -> highlightNoParensCall(element, holder)
             is ExBareDoCall -> highlightBareDoCall(element, holder)
             is ExAccessExpr -> highlightParenCall(element, holder)
-            is ExIdentifier -> highlightUnusedIdentifier(element, holder)
+            is ExIdentifier -> {
+                highlightSpecialForm(element, holder)
+                highlightUnusedIdentifier(element, holder)
+            }
         }
     }
 
