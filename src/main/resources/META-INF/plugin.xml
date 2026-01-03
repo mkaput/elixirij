@@ -25,6 +25,9 @@
     <lang.commenter language="Elixir"
                     implementationClass="dev.murek.elixirij.ide.ExCommenter"/>
 
+    <lang.braceMatcher language="Elixir"
+                       implementationClass="dev.murek.elixirij.ide.ExBraceMatcher"/>
+
     <lang.parserDefinition language="Elixir"
                            implementationClass="dev.murek.elixirij.lang.ExParserDefinition"/>
 
