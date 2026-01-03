@@ -33,6 +33,11 @@
 
     <colorSettingsPage implementation="dev.murek.elixirij.ide.highlighting.ExColorSettingsPage"/>
 
+    <additionalTextAttributes scheme="Default" file="colorSchemes/ElixirDefault.xml"/>
+    <additionalTextAttributes scheme="Darcula" file="colorSchemes/ElixirDarcula.xml"/>
+    <additionalTextAttributes scheme="Dark" file="colorSchemes/ElixirDark.xml"/>
+    <additionalTextAttributes scheme="High contrast" file="colorSchemes/ElixirHighContrast.xml"/>
+
     <annotator language="Elixir"
                implementationClass="dev.murek.elixirij.ide.highlighting.ExHighlightingAnnotator"/>
 
