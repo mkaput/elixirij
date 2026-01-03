@@ -2,7 +2,7 @@
 name: ref-src
 description: >-
     Check out reference codebase sources (IntelliJ Platform, Elixir, Expert, IntelliJ-Elixir, IntelliJ Plugins).
-    Use when asked to fetch/extract any of these sources.
+    Use when explicitly asked or when in need to look up how things are implemented elsewhere.
 ---
 
 When asked to consult the codebase of one of the following projects, run the associated script.
