@@ -1,7 +1,8 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExDefexceptionExprImpl(DEFEXCEPTION_EXPR)
-      PsiElement(IDENTIFIER)('defexception')
+    ExNoParensCallImpl(NO_PARENS_CALL)
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('defexception')
       PsiWhiteSpace(' ')
       ExKeywordPairImpl(KEYWORD_PAIR)
         PsiElement(KW_IDENTIFIER)('message:')

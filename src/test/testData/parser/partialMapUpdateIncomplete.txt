@@ -1,13 +1,9 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExNoParensCallImpl(NO_PARENS_CALL)
-      ExMapImpl(MAP)
-        PsiElement(%{)('%{')
-        PsiErrorElement:'(', '.', COMMENT, EOL, '[' or '}' expected, got 'map'
-          <empty list>
-      ExIdentifierImpl(IDENTIFIER)
-        PsiElement(IDENTIFIER)('map')
+    ExMapImpl(MAP)
+      PsiElement(%{)('%{')
+      PsiErrorElement:COMMENT, EOL or '}' expected, got 'map'
+        <empty list>
+    PsiElement(IDENTIFIER)('map')
     PsiWhiteSpace(' ')
     PsiElement(|)('|')
-    PsiErrorElement:<unary expr>, COMMENT or EOL expected
-      <empty list>

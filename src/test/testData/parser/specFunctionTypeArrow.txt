@@ -12,7 +12,7 @@ Elixir File
               PsiElement(IDENTIFIER)('await!')
             ExParenCallImpl(PAREN_CALL)
               PsiElement(()('(')
-              ExAccessExprImpl(ACCESS_EXPR)
+              ExUnaryExprImpl(UNARY_EXPR)
                 PsiElement(()('(')
                 PsiElement(->)('->')
                 PsiWhiteSpace(' ')

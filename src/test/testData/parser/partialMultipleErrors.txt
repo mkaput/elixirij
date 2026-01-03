@@ -14,15 +14,17 @@ Elixir File
             PsiElement(INTEGER)('2')
         PsiElement(,)(',')
         PsiWhiteSpace(' ')
-        ExDefExprImpl(DEF_EXPR)
-          PsiElement(IDENTIFIER)('def')
-          PsiWhiteSpace(' ')
+        ExNoParensCallImpl(NO_PARENS_CALL)
           ExIdentifierImpl(IDENTIFIER)
-            PsiElement(IDENTIFIER)('foo')
+            PsiElement(IDENTIFIER)('def')
           PsiWhiteSpace(' ')
-          ExDoBlockImpl(DO_BLOCK)
-            PsiElement(do)('do')
-            ExDoContentsImpl(DO_CONTENTS)
-              <empty list>
-            PsiErrorElement:'(', '.', ';', <bare do call>, <keyword pair>, <unary expr>, ATOM_QUOTED, EOL, IDENTIFIER, KW_IDENTIFIER, STRING, '[', after, catch, else, end or rescue expected
-              <empty list>
+          ExNoParensCallImpl(NO_PARENS_CALL)
+            ExIdentifierImpl(IDENTIFIER)
+              PsiElement(IDENTIFIER)('foo')
+            PsiWhiteSpace(' ')
+            ExDoBlockImpl(DO_BLOCK)
+              PsiElement(do)('do')
+              ExDoContentsImpl(DO_CONTENTS)
+                <empty list>
+              PsiErrorElement:';', <bare do call>, <unary expr>, EOL, after, catch, else, end or rescue expected
+                <empty list>

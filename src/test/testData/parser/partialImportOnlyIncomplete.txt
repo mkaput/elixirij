@@ -1,16 +1,18 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExImportExprImpl(IMPORT_EXPR)
-      PsiElement(IDENTIFIER)('import')
+    ExNoParensCallImpl(NO_PARENS_CALL)
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('import')
       PsiWhiteSpace(' ')
-      ExAliasImpl(ALIAS)
-        PsiElement(ALIAS)('Foo')
-      PsiElement(,)(',')
-      PsiWhiteSpace(' ')
-      ExKeywordPairImpl(KEYWORD_PAIR)
-        PsiElement(KW_IDENTIFIER)('only:')
+      ExNoParensCallImpl(NO_PARENS_CALL)
+        ExAliasImpl(ALIAS)
+          PsiElement(ALIAS)('Foo')
+        PsiElement(,)(',')
         PsiWhiteSpace(' ')
-        ExListImpl(LIST)
-          PsiElement([)('[')
-          PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '.', '..', '..//', '/', '//', <, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', ATOM_QUOTED, COMMENT, EOL, IDENTIFIER, KW_IDENTIFIER, STRING, '[', ']', and, in, not, or, '|>', '||' and ... expected
-            <empty list>
+        ExKeywordPairImpl(KEYWORD_PAIR)
+          PsiElement(KW_IDENTIFIER)('only:')
+          PsiWhiteSpace(' ')
+          ExListImpl(LIST)
+            PsiElement([)('[')
+            PsiErrorElement:'(', '.', <keyword pair>, <unary expr>, ATOM_QUOTED, COMMENT, EOL, IDENTIFIER, KW_IDENTIFIER, STRING, '[' or ']' expected
+              <empty list>

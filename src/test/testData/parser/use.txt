@@ -1,7 +1,8 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExUseExprImpl(USE_EXPR)
-      PsiElement(IDENTIFIER)('use')
+    ExNoParensCallImpl(NO_PARENS_CALL)
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('use')
       PsiWhiteSpace(' ')
       ExAliasImpl(ALIAS)
         PsiElement(ALIAS)('Foo')

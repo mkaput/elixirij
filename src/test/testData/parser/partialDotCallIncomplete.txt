@@ -3,5 +3,5 @@ Elixir File
     ExAliasImpl(ALIAS)
       PsiElement(ALIAS)('Mod')
     PsiElement(.)('.')
-    PsiErrorElement:'(', ALIAS or IDENTIFIER expected
+    PsiErrorElement:'(', ALIAS, IDENTIFIER or '{' expected
       <empty list>

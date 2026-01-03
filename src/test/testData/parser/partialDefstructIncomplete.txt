@@ -1,7 +1,8 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExDefstructExprImpl(DEFSTRUCT_EXPR)
-      PsiElement(IDENTIFIER)('defstruct')
+    ExNoParensCallImpl(NO_PARENS_CALL)
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('defstruct')
       PsiWhiteSpace(' ')
       ExListImpl(LIST)
         PsiElement([)('[')

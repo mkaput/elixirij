@@ -1,6 +1,6 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExRaiseExprImpl(RAISE_EXPR)
+    ExNoParensCallImpl(NO_PARENS_CALL)
       PsiElement(raise)('raise')
       PsiWhiteSpace(' ')
       ExAtomImpl(ATOM)

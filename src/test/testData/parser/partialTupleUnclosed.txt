@@ -10,5 +10,5 @@ Elixir File
       ExLiteralImpl(LITERAL)
         ExIntegerImpl(INTEGER)
           PsiElement(INTEGER)('2')
-      PsiErrorElement:',' or '}' expected
+      PsiErrorElement:',', COMMENT, EOL or '}' expected
         <empty list>

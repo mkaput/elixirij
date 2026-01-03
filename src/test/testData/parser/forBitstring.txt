@@ -1,7 +1,8 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExForExprImpl(FOR_EXPR)
-      PsiElement(IDENTIFIER)('for')
+    ExNoParensCallImpl(NO_PARENS_CALL)
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('for')
       PsiWhiteSpace(' ')
       ExInMatchExprImpl(IN_MATCH_EXPR)
         ExIdentifierImpl(IDENTIFIER)

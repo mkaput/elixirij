@@ -1,11 +1,12 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExForExprImpl(FOR_EXPR)
-      PsiElement(IDENTIFIER)('for')
+    ExNoParensCallImpl(NO_PARENS_CALL)
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('for')
       PsiWhiteSpace(' ')
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('x')
-      PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', COMMENT, EOL, '[', '\\', and, do, in, not, or, when, '|', '|>' and ... expected, got '<-'
-        <empty list>
     PsiWhiteSpace(' ')
     PsiElement(<-)('<-')
+    PsiErrorElement:<unary expr>, COMMENT or EOL expected
+      <empty list>

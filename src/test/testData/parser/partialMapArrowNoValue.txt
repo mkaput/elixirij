@@ -1,13 +1,9 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExNoParensCallImpl(NO_PARENS_CALL)
-      ExMapImpl(MAP)
-        PsiElement(%{)('%{')
-        PsiErrorElement:'(', '.', COMMENT, EOL, '[' or '}' expected, got '"key"'
-          <empty list>
-      ExLiteralImpl(LITERAL)
-        ExStringImpl(STRING)
-          PsiElement(STRING)('"key"')
+    ExMapImpl(MAP)
+      PsiElement(%{)('%{')
+      PsiErrorElement:COMMENT, EOL or '}' expected, got '"key"'
+        <empty list>
+    PsiElement(STRING)('"key"')
     PsiWhiteSpace(' ')
-    PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', COMMENT, EOL, '[', '\\', and, do, in, not, or, when, '|', '|>', '||' and ... expected, got '=>'
-      PsiElement(=>)('=>')
+    PsiElement(=>)('=>')

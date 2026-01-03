@@ -1,14 +1,13 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExAccessExprImpl(ACCESS_EXPR)
-      ExAliasDirectiveImpl(ALIAS_DIRECTIVE)
+    ExNoParensCallImpl(NO_PARENS_CALL)
+      ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('alias')
-        PsiWhiteSpace(' ')
+      PsiWhiteSpace(' ')
+      ExNoParensCallImpl(NO_PARENS_CALL)
         ExAliasImpl(ALIAS)
           PsiElement(ALIAS)('Foo')
-    PsiElement(,)(',')
-    PsiWhiteSpace(' ')
-    PsiElement(IDENTIFIER)('as')
-    PsiElement(:)(':')
-    PsiErrorElement:ALIAS expected
-      <empty list>
+        PsiElement(,)(',')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('as')
+        PsiElement(:)(':')
