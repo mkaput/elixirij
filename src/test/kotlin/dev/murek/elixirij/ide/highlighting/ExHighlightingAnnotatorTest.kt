@@ -213,6 +213,7 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
                 <info textAttributesKey="ELIXIR_UNUSED_VARIABLE">_</info> = _arg
                 <info textAttributesKey="ELIXIR_UNUSED_VARIABLE">_unused</info> = _arg
                 <info textAttributesKey="ELIXIR_SPECIAL_FORM">__MODULE__</info> = _arg
+                __using__ = _arg
                 _ARG = _arg
                 _arg
               end

@@ -127,7 +127,7 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
 
     private fun highlightUnusedIdentifier(element: ExIdentifier, holder: AnnotationHolder) {
         val name = element.text
-        if (name.startsWith("_") && !isAllCapsIdentifier(name)) {
+        if (name.startsWith("_") && !isAllCapsIdentifier(name) && !isElixirUnderscoreForm(name)) {
             highlight(element, ExTextAttributes.UNUSED_VARIABLE, holder)
         }
     }
@@ -137,6 +137,9 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
         val allLettersUpper = name.all { !it.isLetter() || it.isUpperCase() }
         return hasLetter && allLettersUpper
     }
+
+    private fun isElixirUnderscoreForm(name: String): Boolean =
+        name.length > 4 && name.startsWith("__") && name.endsWith("__")
 
     private fun findDeclarationName(element: ExNoParensCall, callTarget: ExIdentifier): PsiElement? {
         val doBlock = PsiTreeUtil.findChildOfType(element, ExDoBlock::class.java)
