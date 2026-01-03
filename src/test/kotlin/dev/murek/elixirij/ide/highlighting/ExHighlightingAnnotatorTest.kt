@@ -1,255 +1,228 @@
 package dev.murek.elixirij.ide.highlighting
 
-import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.childrenOfType
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import dev.murek.elixirij.lang.psi.ExIdentifier
-import dev.murek.elixirij.lang.psi.ExModuleAttr
-/**
- * Tests for [ExHighlightingAnnotator] to verify semantic highlighting.
- */
+
 class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
 
     fun `test defmodule keyword is highlighted`() {
-        doTest("defmodule MyModule do\nend")
+        doTest("<info textAttributesKey=\"ELIXIR_SPECIAL_FORM\">defmodule</info> MyModule do\nend")
     }
 
     fun `test def keyword and function name are highlighted`() {
-        doTest("""
-            defmodule MyModule do
-              def my_function do
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">my_function</info> do
                 :ok
               end
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test defp keyword and function name are highlighted`() {
-        doTest("""
-            defmodule MyModule do
-              defp private_function(x, y) do
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">defp</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">private_function</info>(x, y) do
                 x + y
               end
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test defmacro keyword and macro name are highlighted`() {
-        doTest("""
-            defmodule MyModule do
-              defmacro my_macro(expr) do
-                quote do
-                  unquote(expr)
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmacro</info> <info textAttributesKey="ELIXIR_MACRO_DECLARATION">my_macro</info>(expr) do
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">quote</info> do
+                  <info textAttributesKey="ELIXIR_SPECIAL_FORM">unquote</info>(expr)
                 end
               end
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test defguard keyword and guard name are highlighted`() {
-        doTest("""
-            defmodule MyModule do
-              defguard is_positive(x) when x > 0
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">defguard</info> <info textAttributesKey="ELIXIR_MACRO_DECLARATION">is_positive</info>(x) when x > 0
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test module attributes are highlighted`() {
-        doTest("""
-            defmodule MyModule do
-              @moduledoc "Documentation"
-              @version "1.0.0"
-              @behaviour GenServer
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_DOC_COMMENT">@moduledoc "Documentation"</info>
+              @<info textAttributesKey="ELIXIR_MODULE_ATTRIBUTE">version</info> "1.0.0"
+              @<info textAttributesKey="ELIXIR_MODULE_ATTRIBUTE">behaviour</info> GenServer
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test doc attributes are highlighted as documentation comments`() {
         val heredoc = "\"\"\""
-        myFixture.configureByText(
-            "test.ex",
+        doTest(
             """
-                defmodule MyModule do
-                  @moduledoc $heredoc
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+                  <info textAttributesKey="ELIXIR_DOC_COMMENT">@moduledoc $heredoc
                   Module docs.
-                  $heredoc
+                  $heredoc</info>
 
-                  @doc "Function docs."
-                  def example, do: :ok
+                  <info textAttributesKey="ELIXIR_DOC_COMMENT">@doc "Function docs."</info>
+                  <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info>, do: :ok
                 end
             """.trimIndent()
         )
-
-        val highlights = myFixture.doHighlighting()
-        val moduleAttrs = PsiTreeUtil.findChildrenOfType(myFixture.file, ExModuleAttr::class.java)
-
-        val docAttrs = moduleAttrs.filter { attr ->
-            attr.childrenOfType<ExIdentifier>().firstOrNull()?.text in setOf("doc", "moduledoc")
-        }
-
-        assertTrue("Expected @doc and @moduledoc attributes in the PSI", docAttrs.size >= 2)
-
-        docAttrs.forEach { attr ->
-            val range = attr.textRange
-            val hasDocHighlight = highlights.any { highlight ->
-                highlight.forcedTextAttributesKey == ExTextAttributes.DOC_COMMENT.attribute &&
-                    highlight.startOffset == range.startOffset &&
-                    highlight.endOffset == range.endOffset
-            }
-            assertTrue("Expected doc comment highlight for '${attr.text}'", hasDocHighlight)
-        }
     }
 
     fun `test control flow keywords are highlighted`() {
-        doTest("""
-            defmodule MyModule do
-              def example(x) do
-                case x do
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info>(x) do
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">case</info> x do
                   :ok -> :success
                 end
               end
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test with expression is highlighted`() {
-        doTest("""
-            defmodule MyModule do
-              def example do
-                with {:ok, a} <- fetch() do
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info> do
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">with</info> {:ok, a} <- fetch() do
                   a
                 end
               end
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test for comprehension is highlighted`() {
-        doTest("""
-            defmodule MyModule do
-              def example do
-                for i <- 1..10 do
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info> do
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">for</info> i <- 1..10 do
                   i * 2
                 end
               end
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test import require use alias are highlighted`() {
-        doTest("""
-            defmodule MyModule do
-              require Logger
-              import Enum
-              use GenServer
-              alias MyModule.Helper
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">require</info> Logger
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">import</info> Enum
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">use</info> GenServer
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">alias</info> MyModule.Helper
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test quote and unquote are highlighted`() {
-        doTest("""
-            defmodule MyModule do
-              defmacro my_macro(expr) do
-                quote do
-                  unquote(expr) + 1
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmacro</info> <info textAttributesKey="ELIXIR_MACRO_DECLARATION">my_macro</info>(expr) do
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">quote</info> do
+                  <info textAttributesKey="ELIXIR_SPECIAL_FORM">unquote</info>(expr) + 1
                 end
               end
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test defstruct and defexception are highlighted`() {
-        doTest("""
-            defmodule MyStruct do
-              defstruct [:name, :count]
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyStruct do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">defstruct</info> [:name, :count]
             end
 
-            defmodule MyError do
-              defexception [:message]
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyError do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">defexception</info> [:message]
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test defprotocol and defimpl are highlighted`() {
-        doTest("""
-            defprotocol MyProtocol do
-              def my_func(t)
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defprotocol</info> MyProtocol do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">my_func</info>(t)
             end
 
-            defimpl MyProtocol, for: MyStruct do
-              def my_func(t), do: t.name
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defimpl</info> MyProtocol, for: MyStruct do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">my_func</info>(t), do: t.name
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test try receive cond are highlighted`() {
-        doTest("""
-            defmodule MyModule do
-              def example do
-                try do
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info> do
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">try</info> do
                   :ok
                 rescue
                   _ -> :error
                 end
 
-                receive do
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">receive</info> do
                   {:msg, x} -> x
                 end
 
-                cond do
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">cond</info> do
                   true -> :ok
                 end
               end
             end
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     fun `test unused identifiers are highlighted`() {
-        myFixture.configureByText(
-            "test.ex",
+        doTest(
             """
-                defmodule MyModule do
-                  def _private(_arg) do
-                    _ = _arg
-                    _unused = _arg
-                    __MODULE__ = _arg
-                    _ARG = _arg
-                    _arg
-                  end
-                end
-            """.trimIndent()
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">_private</info>(<info textAttributesKey="ELIXIR_UNUSED_VARIABLE">_arg</info>) do
+                <info textAttributesKey="ELIXIR_UNUSED_VARIABLE">_</info> = _arg
+                <info textAttributesKey="ELIXIR_UNUSED_VARIABLE">_unused</info> = _arg
+                __MODULE__ = _arg
+                _ARG = _arg
+                _arg
+              end
+            end
+        """.trimIndent()
         )
-
-        val highlights = myFixture.doHighlighting()
-        val identifiers = PsiTreeUtil.findChildrenOfType(myFixture.file, ExIdentifier::class.java)
-        val unusedIdentifiers = identifiers.filter { it.text.startsWith("_") }
-
-        assertTrue("Expected unused identifiers in the PSI", unusedIdentifiers.isNotEmpty())
-
-        val expectedUnused = setOf("_", "_unused")
-        val expectedNotUnused = setOf("__MODULE__", "_ARG")
-
-        unusedIdentifiers.forEach { identifier ->
-            val range = identifier.textRange
-            val hasUnusedHighlight = highlights.any { highlight ->
-                highlight.forcedTextAttributesKey == ExTextAttributes.UNUSED_VARIABLE.attribute &&
-                    highlight.startOffset == range.startOffset &&
-                    highlight.endOffset == range.endOffset
-            }
-            if (identifier.text in expectedNotUnused) {
-                assertFalse("Did not expect unused variable highlight for '${identifier.text}'", hasUnusedHighlight)
-                return@forEach
-            }
-            if (identifier.text in expectedUnused) {
-                assertTrue("Expected unused variable highlight for '${identifier.text}'", hasUnusedHighlight)
-            }
-        }
     }
 
     private fun doTest(code: String) {
         myFixture.configureByText("test.ex", code)
-        // Run highlighting to ensure the annotator doesn't throw
-        myFixture.doHighlighting()
+        myFixture.checkHighlighting(false, true, false, true)
     }
 }

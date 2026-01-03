@@ -6,6 +6,7 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.project.DumbAware
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.childrenOfType
+import com.intellij.psi.util.PsiTreeUtil
 import dev.murek.elixirij.lang.psi.*
 
 /**
@@ -130,14 +131,14 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
     }
 
     private fun findDeclarationName(element: ExNoParensCall, callTarget: ExIdentifier): PsiElement? {
-        val children = element.children
-        val targetIndex = children.indexOf(callTarget)
-        if (targetIndex == -1) return null
-        for (index in targetIndex + 1 until children.size) {
-            when (val child = children[index]) {
-                is ExAccessExpr -> return child.children.firstOrNull { it is ExIdentifier || it is ExAtom }
-                is ExIdentifier, is ExAtom -> return child
+        val doBlock = PsiTreeUtil.findChildOfType(element, ExDoBlock::class.java)
+        val limitOffset = doBlock?.textRange?.startOffset ?: Int.MAX_VALUE
+        var leaf = PsiTreeUtil.nextLeaf(callTarget, true)
+        while (leaf != null && leaf.textRange.startOffset < limitOffset) {
+            when (val parent = leaf.parent) {
+                is ExIdentifier, is ExAtom -> if (parent != callTarget) return parent
             }
+            leaf = PsiTreeUtil.nextLeaf(leaf, true)
         }
         return null
     }
