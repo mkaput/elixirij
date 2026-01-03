@@ -28,6 +28,9 @@
     <lang.braceMatcher language="Elixir"
                        implementationClass="dev.murek.elixirij.ide.ExBraceMatcher"/>
 
+    <lang.quoteHandler language="Elixir"
+                       implementationClass="dev.murek.elixirij.ide.ExQuoteHandler"/>
+
     <lang.parserDefinition language="Elixir"
                            implementationClass="dev.murek.elixirij.lang.ExParserDefinition"/>
 
