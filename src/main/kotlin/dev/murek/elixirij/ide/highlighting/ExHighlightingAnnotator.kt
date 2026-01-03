@@ -64,6 +64,7 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
             is ExNoParensCall -> highlightNoParensCall(element, holder)
             is ExBareDoCall -> highlightBareDoCall(element, holder)
             is ExAccessExpr -> highlightParenCall(element, holder)
+            is ExIdentifier -> highlightUnusedIdentifier(element, holder)
         }
     }
 
@@ -113,6 +114,19 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
         } ?: return
         val declarationName = findDeclarationName(element, callTarget) ?: return
         highlight(declarationName, declarationAttribute, holder)
+    }
+
+    private fun highlightUnusedIdentifier(element: ExIdentifier, holder: AnnotationHolder) {
+        val name = element.text
+        if (name.startsWith("_") && !isAllCapsIdentifier(name)) {
+            highlight(element, ExTextAttributes.UNUSED_VARIABLE, holder)
+        }
+    }
+
+    private fun isAllCapsIdentifier(name: String): Boolean {
+        val hasLetter = name.any { it.isLetter() }
+        val allLettersUpper = name.all { !it.isLetter() || it.isUpperCase() }
+        return hasLetter && allLettersUpper
     }
 
     private fun findDeclarationName(element: ExNoParensCall, callTarget: ExIdentifier): PsiElement? {

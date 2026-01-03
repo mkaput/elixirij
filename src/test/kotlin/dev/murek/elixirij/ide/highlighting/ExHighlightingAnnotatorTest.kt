@@ -205,6 +205,48 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
         """.trimIndent())
     }
 
+    fun `test unused identifiers are highlighted`() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule MyModule do
+                  def _private(_arg) do
+                    _ = _arg
+                    _unused = _arg
+                    __MODULE__ = _arg
+                    _ARG = _arg
+                    _arg
+                  end
+                end
+            """.trimIndent()
+        )
+
+        val highlights = myFixture.doHighlighting()
+        val identifiers = PsiTreeUtil.findChildrenOfType(myFixture.file, ExIdentifier::class.java)
+        val unusedIdentifiers = identifiers.filter { it.text.startsWith("_") }
+
+        assertTrue("Expected unused identifiers in the PSI", unusedIdentifiers.isNotEmpty())
+
+        val expectedUnused = setOf("_", "_unused")
+        val expectedNotUnused = setOf("__MODULE__", "_ARG")
+
+        unusedIdentifiers.forEach { identifier ->
+            val range = identifier.textRange
+            val hasUnusedHighlight = highlights.any { highlight ->
+                highlight.forcedTextAttributesKey == ExTextAttributes.UNUSED_VARIABLE.attribute &&
+                    highlight.startOffset == range.startOffset &&
+                    highlight.endOffset == range.endOffset
+            }
+            if (identifier.text in expectedNotUnused) {
+                assertFalse("Did not expect unused variable highlight for '${identifier.text}'", hasUnusedHighlight)
+                return@forEach
+            }
+            if (identifier.text in expectedUnused) {
+                assertTrue("Expected unused variable highlight for '${identifier.text}'", hasUnusedHighlight)
+            }
+        }
+    }
+
     private fun doTest(code: String) {
         myFixture.configureByText("test.ex", code)
         // Run highlighting to ensure the annotator doesn't throw

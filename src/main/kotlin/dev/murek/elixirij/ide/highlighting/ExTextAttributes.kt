@@ -2,6 +2,7 @@ package dev.murek.elixirij.ide.highlighting
 
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.HighlighterColors
+import com.intellij.openapi.editor.colors.CodeInsightColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.options.OptionsBundle
 import com.intellij.openapi.options.colors.AttributesDescriptor
@@ -122,6 +123,11 @@ enum class ExTextAttributes(
         "ELIXIR_SPECIAL_FORM",
         DefaultLanguageHighlighterColors.KEYWORD,
         ExBundle.messagePointer("color.settings.specialForm")
+    ),
+    UNUSED_VARIABLE(
+        "ELIXIR_UNUSED_VARIABLE",
+        CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES,
+        ExBundle.messagePointer("color.settings.unusedVariable")
     ),
     BAD_CHARACTER(
         "ELIXIR_BAD_CHARACTER",
