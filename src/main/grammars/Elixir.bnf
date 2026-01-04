@@ -188,7 +188,7 @@ private keywordCallTarget ::= EX_RAISE | EX_THROW | EX_SEND | EX_SUPER
 
 // Dot access: expr.field or Mod.Func
 dotAccess ::= EX_DOT &dotTarget dotTarget
-private dotTarget ::= identifier
+private dotTarget ::= identifier | keywordCallTarget
 
 // Anonymous call: func.()
 private anonymousCall ::= EX_DOT &EX_LPAREN EX_LPAREN callArgs? EX_RPAREN

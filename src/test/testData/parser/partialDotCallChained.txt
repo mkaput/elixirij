@@ -8,5 +8,5 @@ Elixir File
         ExIdentifierImpl(IDENTIFIER)
           PsiElement(IDENTIFIER)('b')
     PsiElement(.)('.')
-    PsiErrorElement:'(' or IDENTIFIER expected
+    PsiErrorElement:'(', IDENTIFIER, raise, send, super or throw expected
       <empty list>
