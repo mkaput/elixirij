@@ -1,16 +1,15 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExNoParensCallImpl(NO_PARENS_CALL)
+    ExCallExprImpl(CALL_EXPR)
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('quote')
       PsiWhiteSpace(' ')
       ExKeywordPairImpl(KEYWORD_PAIR)
         PsiElement(KW_IDENTIFIER)('do:')
         PsiWhiteSpace(' ')
-        ExAccessExprImpl(ACCESS_EXPR)
+        ExCallExprImpl(CALL_EXPR)
           ExIdentifierImpl(IDENTIFIER)
             PsiElement(IDENTIFIER)('unquote')
-          ExParenCallImpl(PAREN_CALL)
-            PsiElement(()('(')
-            PsiErrorElement:'!=', '!==', '&&', '&&&', '(', ')', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', <, <=, <>, <keyword pair>, <unary expr>, '=', '==', '===', '=~', '>', '>=', ATOM_QUOTED, COMMENT, EOL, IDENTIFIER, KW_IDENTIFIER, STRING, '[', and, do, in, not, or, '||' or '|||' expected
-              <empty list>
+          PsiElement(()('(')
+          PsiErrorElement:'!=', '!==', '&&', '&&&', '(', ')', '*', '**', '+', '++', '+++', '-', '--', '---', '.', '..', '..//', '/', '//', <, <=, <>, <keyword pair>, <unary expr>, '=', '==', '===', '=~', '>', '>=', ATOM_QUOTED, COMMENT, EOL, IDENTIFIER, KW_IDENTIFIER, STRING, '[', and, do, in, not, or, '||' or '|||' expected
+            <empty list>

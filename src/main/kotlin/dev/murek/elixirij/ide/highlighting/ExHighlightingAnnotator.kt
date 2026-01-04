@@ -67,9 +67,7 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
 
         when (element) {
             is ExModuleAttr -> highlightModuleAttr(element, holder)
-            is ExNoParensCall -> highlightNoParensCall(element, holder)
-            is ExBareDoCall -> highlightBareDoCall(element, holder)
-            is ExAccessExpr -> highlightParenCall(element, holder)
+            is ExCallExpr -> highlightCall(element, holder)
             is ExIdentifier -> {
                 highlightSpecialForm(element, holder)
                 highlightUnusedIdentifier(element, holder)
@@ -90,21 +88,10 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
         }
     }
 
-    private fun highlightNoParensCall(element: ExNoParensCall, holder: AnnotationHolder) {
-        val callTarget = element.children.firstOrNull { it is ExIdentifier } as? ExIdentifier ?: return
+    private fun highlightCall(element: ExCallExpr, holder: AnnotationHolder) {
+        val callTarget = findCallTarget(element) ?: return
         highlightSpecialForm(callTarget, holder)
         highlightDeclarationName(callTarget.text, element, callTarget, holder)
-    }
-
-    private fun highlightBareDoCall(element: ExBareDoCall, holder: AnnotationHolder) {
-        val callTarget = element.children.firstOrNull { it is ExIdentifier } as? ExIdentifier ?: return
-        highlightSpecialForm(callTarget, holder)
-    }
-
-    private fun highlightParenCall(element: ExAccessExpr, holder: AnnotationHolder) {
-        if (!element.children.any { it is ExParenCall || it is ExAnonymousCall }) return
-        val callTarget = element.children.firstOrNull { it is ExIdentifier } as? ExIdentifier ?: return
-        highlightSpecialForm(callTarget, holder)
     }
 
     private fun highlightSpecialForm(callTarget: ExIdentifier, holder: AnnotationHolder) {
@@ -114,7 +101,7 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
     }
 
     private fun highlightDeclarationName(
-        callName: String, element: ExNoParensCall, callTarget: ExIdentifier, holder: AnnotationHolder
+        callName: String, element: ExCallExpr, callTarget: ExIdentifier, holder: AnnotationHolder
     ) {
         val declarationAttribute = when (callName) {
             in functionDeclarationNames -> ExTextAttributes.FUNCTION_DECLARATION
@@ -123,6 +110,13 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
         } ?: return
         val declarationName = findDeclarationName(element, callTarget) ?: return
         highlight(declarationName, declarationAttribute, holder)
+    }
+
+    private fun findCallTarget(element: ExCallExpr): ExIdentifier? {
+        val children = element.children
+        val firstIdentifier = children.firstOrNull { it is ExIdentifier } as? ExIdentifier ?: return null
+        if (children.any { it is ExDotAccess }) return null
+        return firstIdentifier
     }
 
     private fun highlightUnusedIdentifier(element: ExIdentifier, holder: AnnotationHolder) {
@@ -141,7 +135,7 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
     private fun isElixirUnderscoreForm(name: String): Boolean =
         name.length > 4 && name.startsWith("__") && name.endsWith("__")
 
-    private fun findDeclarationName(element: ExNoParensCall, callTarget: ExIdentifier): PsiElement? {
+    private fun findDeclarationName(element: ExCallExpr, callTarget: ExIdentifier): PsiElement? {
         val doBlock = PsiTreeUtil.findChildOfType(element, ExDoBlock::class.java)
         val limitOffset = doBlock?.textRange?.startOffset ?: Int.MAX_VALUE
         var leaf = PsiTreeUtil.nextLeaf(callTarget, true)

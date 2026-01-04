@@ -1,10 +1,10 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExNoParensCallImpl(NO_PARENS_CALL)
+    ExCallExprImpl(CALL_EXPR)
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('defmodule')
       PsiWhiteSpace(' ')
-      ExNoParensCallImpl(NO_PARENS_CALL)
+      ExCallExprImpl(CALL_EXPR)
         ExAliasImpl(ALIAS)
           PsiElement(ALIAS)('Foo')
         PsiWhiteSpace(' ')
@@ -13,14 +13,13 @@ Elixir File
           ExDoContentsImpl(DO_CONTENTS)
             PsiElement(EOL)('\n')
             PsiWhiteSpace('  ')
-            ExNoParensCallImpl(NO_PARENS_CALL)
+            ExCallExprImpl(CALL_EXPR)
               ExIdentifierImpl(IDENTIFIER)
                 PsiElement(IDENTIFIER)('def')
               PsiWhiteSpace(' ')
-              ExAccessExprImpl(ACCESS_EXPR)
+              ExCallExprImpl(CALL_EXPR)
                 ExIdentifierImpl(IDENTIFIER)
                   PsiElement(IDENTIFIER)('bar')
-                ExParenCallImpl(PAREN_CALL)
-                  PsiElement(()('(')
-                  PsiErrorElement:')', <keyword pair>, <unary expr>, ATOM_QUOTED, COMMENT, EOL, IDENTIFIER, KW_IDENTIFIER or STRING expected
-                    <empty list>
+                PsiElement(()('(')
+                PsiErrorElement:')', <keyword pair>, <unary expr>, ATOM_QUOTED, COMMENT, EOL, IDENTIFIER, KW_IDENTIFIER or STRING expected
+                  <empty list>

@@ -25,7 +25,7 @@
   
   // Expression hierarchy - all expression types extend from expression
   extends(".*Expr")=expression
-  extends("literal|atom|identifier|alias|aliasMulti|list|tuple|map|struct|bitstring|sigil|heredoc|charlistHeredoc|parenExpr|doBlock|noParensCall")=expression
+  extends("literal|atom|identifier|alias|aliasMulti|list|tuple|map|struct|bitstring|sigil|heredoc|charlistHeredoc|parenExpr|doBlock")=expression
   
   // Named rules for binary operators (for better PSI structure)
   name("stabExpr")="stab expression"
@@ -133,16 +133,16 @@ private multOp ::= EX_STAR | EX_SLASH
 powerExpr ::= unaryExpr (EX_STAR_STAR opSep unaryExpr)*
 
 // Precedence 300: Unary operators (right associative / prefix)
-unaryExpr ::= unaryOp unaryExpr | noParensCall | captureExpr | primaryExpr
+unaryExpr ::= unaryOp unaryExpr | callExpr | captureExpr | primaryExpr
 private unaryOp ::= EX_NOT | EX_EXCLAMATION | EX_CARET | EX_TILDE | EX_PLUS | EX_MINUS
 
 // Capture operator: & (for &func/arity and &(&1 + &2))
 captureExpr ::= captureNamedExpr | capturePlaceholderAccessExpr | capturePlaceholderExpr | captureBareExpr | captureAnonymousExpr | atExpr
 captureNamedExpr ::= EX_AMPERSAND captureTarget EX_SLASH EX_INTEGER
-private capturePlaceholderAccessExpr ::= EX_AMPERSAND EX_INTEGER accessSuffix+
+private capturePlaceholderAccessExpr ::= EX_AMPERSAND EX_INTEGER placeholderSuffix+
 capturePlaceholderExpr ::= EX_AMPERSAND EX_INTEGER
 private captureBareExpr ::= EX_AMPERSAND captureTarget !EX_LPAREN
-captureAnonymousExpr ::= EX_AMPERSAND (parenExpr | accessExpr)
+captureAnonymousExpr ::= EX_AMPERSAND (callExpr | parenExpr | accessExpr)
 private captureTarget ::= (atom | alias | identifier) (EX_DOT identifier)*
 
 // Module attributes
@@ -156,20 +156,29 @@ atExpr ::= moduleAttr | accessExpr
 // Access expression includes primary expressions, capture placeholders, dot access, bracket access, and function calls
 accessExpr ::= accessBase &accessSuffixStart accessSuffix+
 private accessBase ::= accessPrimaryExpr | capturePlaceholderExpr
-private accessSuffix ::= dotAccess | anonymousCall | bracketAccess | parenCall
-private accessSuffixStart ::= EX_DOT | EX_LBRACKET | EX_LPAREN
+private accessSuffix ::= dotAccess | bracketAccess
+private accessSuffixStart ::= EX_DOT | EX_LBRACKET
 
 // No-parens function call: func arg1, arg2
-noParensCall ::= !literal callTarget !EX_LPAREN ((&noParensArgStart noParensArgs doBlock?) | doBlock)
+private noParensCall ::= !literal callTarget !EX_LPAREN ((&noParensArgStart noParensArgs doBlock?) | doBlock)
+
+callExpr ::= noParensCall | bareDoCall | parenCallChain | anonymousCallChain
+private parenCallChain ::= callBaseNoParen callAccessSuffix* parenCall callChainTail doBlock?
+private anonymousCallChain ::= callBase callAccessSuffix* anonymousCall callChainTail doBlock?
+private callChainTail ::= (callAccessSuffix* callInvocationSuffix)* callAccessSuffix*
+private callInvocationSuffix ::= parenCall | anonymousCall
+private callAccessSuffix ::= dotAccess | bracketAccess
+private callBase ::= accessExpr | accessPrimaryExpr | capturePlaceholderExpr
+private callBaseNoParen ::= accessExpr | accessPrimaryExprNoParen | capturePlaceholderExpr
 
 // Bare do-block call: func do ... end (no arguments before do-block)
 // This is only valid at statement level, not inside expressions
-bareDoCall ::= !literal bareDoCallTarget doBlock
+private bareDoCall ::= !literal bareDoCallTarget doBlock
 private bareDoCallTarget ::= (identifier | alias) (EX_DOT identifier)*
 private callTarget ::= atom | identifier | alias | keywordCallTarget | accessExpr
-private noParensArgStart ::= !EX_DO (EX_COMMA | keywordPairItem | expression)
+private noParensArgStart ::= !EX_DO (keywordPairItem | expression)
 private noParensArgs ::= noParensKeywordArgs | noParensPositionalArgs
-private noParensKeywordArgs ::= (EX_COMMA eoe*)? keywordPairItem (EX_COMMA eoe* keywordPairItem)*
+private noParensKeywordArgs ::= keywordPairItem (EX_COMMA eoe* keywordPairItem)*
 private noParensPositionalArgs ::= expression (EX_COMMA eoe* expression)* keywordTail?
 private keywordTail ::= EX_COMMA eoe* keywordPairItem (EX_COMMA eoe* keywordPairItem)*
 private keywordCallTarget ::= EX_RAISE | EX_THROW | EX_SEND | EX_SUPER
@@ -179,13 +188,15 @@ dotAccess ::= EX_DOT &dotTarget dotTarget
 private dotTarget ::= identifier | alias
 
 // Anonymous call: func.()
-anonymousCall ::= EX_DOT &EX_LPAREN EX_LPAREN callArgs? EX_RPAREN
+private anonymousCall ::= EX_DOT &EX_LPAREN EX_LPAREN callArgs? EX_RPAREN
 
 // Bracket access: expr[key]
 bracketAccess ::= EX_LBRACKET containerExpr EX_RBRACKET { pin=1 }
 
 // Parenthesized function call: func(args)
-parenCall ::= EX_LPAREN opSep callArgs? opSep EX_RPAREN doBlock? { pin=1 }
+private parenCall ::= EX_LPAREN opSep callArgs? opSep EX_RPAREN { pin=1 }
+
+private placeholderSuffix ::= dotAccess | bracketAccess | parenCall | anonymousCall
 
 // =============================================================================
 // Primary expressions
@@ -226,6 +237,23 @@ private accessPrimaryExpr ::= literal
                            | doBlock
                            | typeArrowExpr
                            | parenExpr
+
+private accessPrimaryExprNoParen ::= literal
+                                  | atom
+                                  | alias
+                                  | keywordCallTarget
+                                  | list
+                                  | tuple
+                                  | map
+                                  | struct
+                                  | bitstring
+                                  | sigil
+                                  | heredoc
+                                  | charlistHeredoc
+                                  | fnExpr
+                                  | identifier
+                                  | doBlock
+                                  | typeArrowExpr
 
 // Parenthesized expression
 parenExpr ::= EX_LPAREN expression? EX_RPAREN { pin=1 }

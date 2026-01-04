@@ -1,7 +1,6 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExAccessExprImpl(ACCESS_EXPR)
+    ExCallExprImpl(CALL_EXPR)
       PsiElement(super)('super')
-      ExParenCallImpl(PAREN_CALL)
-        PsiElement(()('(')
-        PsiElement())(')')
+      PsiElement(()('(')
+      PsiElement())(')')

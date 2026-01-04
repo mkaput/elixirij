@@ -61,9 +61,7 @@ class ExBraceMatcher : PairedBraceMatcher {
             // Traverse up through nested call expressions to find the outermost one
             while (current != null) {
                 val elementType = current.node?.elementType
-                if (elementType == ExTypes.BARE_DO_CALL ||
-                    elementType == ExTypes.NO_PARENS_CALL ||
-                    elementType == ExTypes.PAREN_CALL ||
+                if (elementType == ExTypes.CALL_EXPR ||
                     elementType == ExTypes.ACCESS_EXPR
                 ) {
                     outermostCall = current

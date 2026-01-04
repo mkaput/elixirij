@@ -1,13 +1,12 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExAccessExprImpl(ACCESS_EXPR)
+    ExCallExprImpl(CALL_EXPR)
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('foo')
-      ExParenCallImpl(PAREN_CALL)
-        PsiElement(()('(')
-        ExMapImpl(MAP)
-          PsiElement(%{)('%{')
-          PsiElement(IDENTIFIER)('a')
-          PsiElement(:)(':')
-          PsiErrorElement:',', COMMENT, EOL or '}' expected
-            <empty list>
+      PsiElement(()('(')
+      ExMapImpl(MAP)
+        PsiElement(%{)('%{')
+        PsiElement(IDENTIFIER)('a')
+        PsiElement(:)(':')
+        PsiErrorElement:',', COMMENT, EOL or '}' expected
+          <empty list>

@@ -1,6 +1,6 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExNoParensCallImpl(NO_PARENS_CALL)
+    ExCallExprImpl(CALL_EXPR)
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('if')
       PsiWhiteSpace(' ')
@@ -12,5 +12,5 @@ Elixir File
         PsiElement(do)('do')
         ExDoContentsImpl(DO_CONTENTS)
           <empty list>
-        PsiErrorElement:';', <bare do call>, <unary expr>, EOL, after, catch, else, end or rescue expected
+        PsiErrorElement:';', <unary expr>, ALIAS, EOL, IDENTIFIER, after, catch, else, end or rescue expected
           <empty list>

@@ -1,13 +1,12 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExBareDoCallImpl(BARE_DO_CALL)
-      ExIdentifierImpl(IDENTIFIER)
-        PsiElement(IDENTIFIER)('quote')
-      PsiWhiteSpace(' ')
-      ExDoBlockImpl(DO_BLOCK)
-        PsiElement(do)('do')
-        ExDoContentsImpl(DO_CONTENTS)
-          <empty list>
-        PsiErrorElement:';', EOL, after, catch, else, end or rescue expected, got ':'
-          <empty list>
+    ExIdentifierImpl(IDENTIFIER)
+      PsiElement(IDENTIFIER)('quote')
+    PsiWhiteSpace(' ')
+    ExDoBlockImpl(DO_BLOCK)
+      PsiElement(do)('do')
+      ExDoContentsImpl(DO_CONTENTS)
+        <empty list>
+      PsiErrorElement:';', EOL, after, catch, else, end or rescue expected, got ':'
+        <empty list>
     PsiElement(:)(':')

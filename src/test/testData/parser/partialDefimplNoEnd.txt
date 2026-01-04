@@ -1,24 +1,23 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExNoParensCallImpl(NO_PARENS_CALL)
+    ExCallExprImpl(CALL_EXPR)
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('defimpl')
       PsiWhiteSpace(' ')
-      ExNoParensCallImpl(NO_PARENS_CALL)
-        ExAliasImpl(ALIAS)
-          PsiElement(ALIAS)('P')
-        PsiElement(,)(',')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('P')
+      PsiElement(,)(',')
+      PsiWhiteSpace(' ')
+      ExKeywordPairImpl(KEYWORD_PAIR)
+        PsiElement(KW_IDENTIFIER)('for:')
         PsiWhiteSpace(' ')
-        ExKeywordPairImpl(KEYWORD_PAIR)
-          PsiElement(KW_IDENTIFIER)('for:')
+        ExCallExprImpl(CALL_EXPR)
+          ExAliasImpl(ALIAS)
+            PsiElement(ALIAS)('T')
           PsiWhiteSpace(' ')
-          ExNoParensCallImpl(NO_PARENS_CALL)
-            ExAliasImpl(ALIAS)
-              PsiElement(ALIAS)('T')
-            PsiWhiteSpace(' ')
-            ExDoBlockImpl(DO_BLOCK)
-              PsiElement(do)('do')
-              ExDoContentsImpl(DO_CONTENTS)
-                <empty list>
-              PsiErrorElement:';', <bare do call>, <unary expr>, EOL, after, catch, else, end or rescue expected
-                <empty list>
+          ExDoBlockImpl(DO_BLOCK)
+            PsiElement(do)('do')
+            ExDoContentsImpl(DO_CONTENTS)
+              <empty list>
+            PsiErrorElement:';', <unary expr>, ALIAS, EOL, IDENTIFIER, after, catch, else, end or rescue expected
+              <empty list>

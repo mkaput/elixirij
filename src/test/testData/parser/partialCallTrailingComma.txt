@@ -1,18 +1,17 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExAccessExprImpl(ACCESS_EXPR)
+    ExCallExprImpl(CALL_EXPR)
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('foo')
-      ExParenCallImpl(PAREN_CALL)
-        PsiElement(()('(')
-        ExLiteralImpl(LITERAL)
-          ExIntegerImpl(INTEGER)
-            PsiElement(INTEGER)('1')
-        PsiElement(,)(',')
-        PsiWhiteSpace(' ')
-        ExLiteralImpl(LITERAL)
-          ExIntegerImpl(INTEGER)
-            PsiElement(INTEGER)('2')
-        PsiElement(,)(',')
-        PsiErrorElement:')', <keyword pair>, <unary expr>, ATOM_QUOTED, COMMENT, EOL, IDENTIFIER, KW_IDENTIFIER or STRING expected
-          <empty list>
+      PsiElement(()('(')
+      ExLiteralImpl(LITERAL)
+        ExIntegerImpl(INTEGER)
+          PsiElement(INTEGER)('1')
+      PsiElement(,)(',')
+      PsiWhiteSpace(' ')
+      ExLiteralImpl(LITERAL)
+        ExIntegerImpl(INTEGER)
+          PsiElement(INTEGER)('2')
+      PsiElement(,)(',')
+      PsiErrorElement:')', <keyword pair>, <unary expr>, ATOM_QUOTED, COMMENT, EOL, IDENTIFIER, KW_IDENTIFIER or STRING expected
+        <empty list>

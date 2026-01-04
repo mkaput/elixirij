@@ -243,7 +243,7 @@ class ExFoldingBuilder : FoldingBuilderEx(), DumbAware {
     private fun onlyDoBlockExpression(element: PsiElement): ExExpression? {
         val doBlock = element as? ExDoBlock ?: return null
         val contents = PsiTreeUtil.getChildOfType(doBlock, ExDoContents::class.java) ?: return null
-        if (contents.bareDoCallList.isNotEmpty()) return null
+        if (PsiTreeUtil.findChildOfType(contents, ExDoBlock::class.java) != null) return null
         val expressions = contents.expressionList
         return expressions.singleOrNull()
     }
