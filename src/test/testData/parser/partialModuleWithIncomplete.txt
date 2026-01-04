@@ -21,5 +21,5 @@ Elixir File
                 ExIdentifierImpl(IDENTIFIER)
                   PsiElement(IDENTIFIER)('bar')
                 PsiElement(()('(')
-                PsiErrorElement:'!=', '!==', '&&', '&&&', '(', ')', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', ';', <, <-, <=, <>, <keyword pair>, <unary expr>, '=', '==', '===', '=~', '>', '>=', COMMENT, EOL, '[', '\\', after, and, catch, do, else, end, in, not, or, rescue, when and ... expected
+                PsiErrorElement:'!=', '!==', '&&', '&&&', '(', ')', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', ';', <, <-, <=, <>, <keyword pair>, <unary expr>, '=', '==', '===', '=~', '>', '>=', COMMENT, EOL, '[', '\\', after, and, catch, do, else, end, in, not, or, rescue, when, '|' and ... expected
                   <empty list>

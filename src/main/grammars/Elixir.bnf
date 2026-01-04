@@ -281,8 +281,7 @@ private whenClause ::= EX_WHEN matchExpr
 doBlock ::= EX_DO doContents doBlockSuffix EX_END { pin=1 }
 private doBlockSuffix ::= eoe* blockClauses? eoe*
 private blockClauses ::= blockClause (eoe* blockClause)*
-doContents ::= (eoeWithExpression* doExpression (eoeWithExpression doExpression)*)?
-private eoeWithExpression ::= &(eoe expression) eoe
+doContents ::= (eoe* doExpression (eoe+ doExpression)*)?
 private doExpression ::= bareDoCall | expression { recoverWhile=doRecovery }
 private blockClause ::= elseClause | afterClause | catchClause | rescueClause
 private elseClause ::= EX_ELSE doContents
