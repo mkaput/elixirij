@@ -7,6 +7,10 @@ import dev.murek.elixirij.lang.ExParserDefinition
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import kotlin.io.path.*
 import kotlin.system.exitProcess
 
@@ -23,6 +27,10 @@ private data class GrillArgs(
     val maxNewTests: Int,
 )
 
+private sealed interface DeadlineResult<out T> {
+    data class Completed<T>(val value: T) : DeadlineResult<T>
+    data class TimedOut(val deadlineMillis: Long) : DeadlineResult<Nothing>
+}
 
 @Suppress("JUnitMalformedDeclaration")
 private class GrillHarness private constructor() : ParsingTestCase("parser", "ex", true, ExParserDefinition()),
@@ -75,7 +83,15 @@ fun main(args: Array<String>) {
                 continue
             }
 
-            val result = harness.parse(text, path.name)
+            val result = when (val outcome = runWithDeadline { harness.parse(text, path.name) }) {
+                is DeadlineResult.Completed -> outcome.value
+                is DeadlineResult.TimedOut -> {
+                    println("Parser deadline exceeded (${outcome.deadlineMillis}ms) for $path")
+                    println("Please make a test case out of this file and grill this particular test case urgently to fix performance issues.")
+                    exitProcess(3)
+                }
+            }
+
             if (!result.hasErrors) {
                 continue
             }
@@ -132,6 +148,24 @@ private fun expandUserHome(raw: String): Path {
 
 private val Path.isElixirSource: Boolean
     get() = extension in setOf("ex", "exs")
+
+private fun <T> runWithDeadline(action: () -> T): DeadlineResult<T> {
+    val parseDeadlineMillis = 2_000L
+
+    val executor = Executors.newSingleThreadExecutor { runnable ->
+        Thread(runnable, "parser-grill-deadline").apply { isDaemon = true }
+    }
+    val future = executor.submit(Callable(action))
+
+    return try {
+        DeadlineResult.Completed(future.get(parseDeadlineMillis, TimeUnit.MILLISECONDS))
+    } catch (_: TimeoutException) {
+        future.cancel(true)
+        DeadlineResult.TimedOut(parseDeadlineMillis)
+    } finally {
+        executor.shutdownNow()
+    }
+}
 
 private fun loadExistingGrillFixtures(): Set<String> =
     testDataDir.listDirectoryEntries("*.ex").map { it.readText() }.toSet()
