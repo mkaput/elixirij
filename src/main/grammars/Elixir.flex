@@ -60,6 +60,13 @@ COMMENT=#[^\r\n]*
 // Sigil prefixes
 SIGIL_START=\~[a-zA-Z]
 SIGIL_MODIFIERS=[a-zA-Z]*
+ESCAPED_SLASH=\\\/
+SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
+
+// Interpolation (simplified)
+INTERPOLATION=\#\{[^}]*\}
+STRING_CONTENT=([^\\\"]|\\.|{INTERPOLATION})*
+CHARLIST_CONTENT=([^\\\']|\\.|{INTERPOLATION})*
 
 %%
 
@@ -215,7 +222,7 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     // Sigils - regular delimiters
     {SIGIL_START} "\"" [^\"]* "\"" {SIGIL_MODIFIERS}     { return EX_SIGIL; }
     {SIGIL_START} "\'" [^\']* "\'" {SIGIL_MODIFIERS}     { return EX_SIGIL; }
-    {SIGIL_START} "/" [^/]* "/" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
+    {SIGIL_START} "/" {SIGIL_SLASH_CONTENT} "/" {SIGIL_MODIFIERS} { return EX_SIGIL; }
     {SIGIL_START} "|" [^|]* "|" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
     {SIGIL_START} "(" [^)]* ")" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
     {SIGIL_START} "[" [^\]]* "]" {SIGIL_MODIFIERS}       { return EX_SIGIL; }
@@ -227,8 +234,8 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     "\'\'\'" ~"\'\'\'"                 { return EX_CHARLIST_HEREDOC; }
 
     // Strings - regular (simplified - handle escape sequences inside)
-    "\"" ([^\\\"] | "\\" .)* "\""      { return EX_STRING; }
-    "\'" ([^\\\'] | "\\" .)* "\'"      { return EX_CHARLIST; }
+    "\"" {STRING_CONTENT} "\""         { return EX_STRING; }
+    "\'" {CHARLIST_CONTENT} "\'"       { return EX_CHARLIST; }
 
     // Identifiers and aliases
     {IDENTIFIER} ":" / ({HORIZONTAL_SPACE}|{EOL_CHAR}) { return EX_KW_IDENTIFIER; }
