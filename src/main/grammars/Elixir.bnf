@@ -142,7 +142,8 @@ captureNamedExpr ::= EX_AMPERSAND captureTarget EX_SLASH EX_INTEGER
 private capturePlaceholderAccessExpr ::= EX_AMPERSAND EX_INTEGER placeholderSuffix+
 capturePlaceholderExpr ::= EX_AMPERSAND EX_INTEGER
 private captureBareExpr ::= EX_AMPERSAND captureTarget !EX_LPAREN
-captureAnonymousExpr ::= EX_AMPERSAND (callExpr | parenExpr | accessExpr)
+captureAnonymousExpr ::= EX_AMPERSAND captureAnonymousTarget
+private captureAnonymousTarget ::= callExpr | primaryExpr | capturePlaceholderExpr
 private captureTarget ::= (atom | alias | identifier) (EX_DOT identifier)*
 
 // Module attributes
