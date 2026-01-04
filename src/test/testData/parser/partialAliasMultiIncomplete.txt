@@ -9,6 +9,6 @@ Elixir File
         PsiElement(.)('.')
         PsiElement({)('{')
         PsiElement(ALIAS)('A')
-        PsiErrorElement:',', COMMENT, EOL or '}' expected, got ','
+        PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '..', '..//', '/', '//', '::', <, <-, <=, <>, '=', '==', '===', '=~', '>', '>=', COMMENT, EOL, '\\', and, in, not, or, when, '|', '||', '|||' or '}' expected, got ','
           <empty list>
     PsiElement(,)(',')

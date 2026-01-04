@@ -13,7 +13,7 @@ Elixir File
           ExDoContentsImpl(DO_CONTENTS)
             <empty list>
           PsiElement(EOL)('\n')
-        PsiErrorElement:'!', '%', '%{', '&', '(', '+', '-', ';', <<, <access expr>, <atom>, <call expr>, <literal>, '@', ALIAS, CHARLIST_HEREDOC, EOL, HEREDOC, IDENTIFIER, SIGIL, '[', '^', after, catch, do, else, end, fn, not, rescue, '{' or '~' expected, got '@'
+        PsiErrorElement:'!', '!=', '!==', '%', '%{', '&', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '..', '..//', '/', '//', '::', ';', <, <-, <<, <=, <>, <access expr>, <atom>, <literal>, '=', '==', '===', '=~', '>', '>=', '@', ALIAS, CHARLIST_HEREDOC, COMMENT, EOL, HEREDOC, IDENTIFIER, SIGIL, '[', '\\', '^', after and ... expected, got '@'
           <empty list>
     PsiWhiteSpace('  ')
     PsiElement(@)('@')

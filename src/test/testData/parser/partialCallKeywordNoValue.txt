@@ -4,7 +4,8 @@ Elixir File
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('foo')
       PsiElement(()('(')
-      PsiElement(IDENTIFIER)('a')
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('a')
       PsiElement(:)(':')
-      PsiErrorElement:')', ',', COMMENT or EOL expected
+      PsiErrorElement:<unary expr>, ALIAS, COMMENT or EOL expected
         <empty list>

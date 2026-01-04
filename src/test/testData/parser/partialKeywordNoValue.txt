@@ -10,7 +10,8 @@ Elixir File
             PsiElement(INTEGER)('1')
       PsiElement(,)(',')
       PsiWhiteSpace(' ')
-      PsiElement(IDENTIFIER)('b')
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('b')
       PsiElement(:)(':')
-      PsiErrorElement:',', COMMENT, EOL, ']' or '|' expected
+      PsiErrorElement:<unary expr>, ALIAS, COMMENT or EOL expected
         <empty list>

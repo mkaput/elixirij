@@ -17,5 +17,5 @@ Elixir File
               PsiElement(IDENTIFIER)('x')
             PsiWhiteSpace(' ')
             PsiElement(|>)('|>')
-            PsiErrorElement:<unary expr>, COMMENT or EOL expected
+            PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '..', '..//', '/', '//', '::', ';', <, <-, <=, <>, <unary expr>, '=', '==', '===', '=~', '>', '>=', COMMENT, EOL, '\\', after, and, catch, else, end, in, not, or, rescue, when, '|', '||' or '|||' expected
               <empty list>
