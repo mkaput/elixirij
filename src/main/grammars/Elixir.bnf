@@ -75,7 +75,7 @@ inMatchExpr ::= whenExpr (inMatchOp opSep whenExpr)*
 private inMatchOp ::= EX_LEFT_ARROW | EX_BACK_SLASH_BACK_SLASH
 
 // Precedence 50: when (right associative)
-whenExpr ::= typeExpr (EX_WHEN opSep whenExpr)?
+whenExpr ::= typeExpr (opSep EX_WHEN opSep whenExpr)?
 
 // Precedence 60: :: (right associative) - type operator
 typeExpr ::= pipeExpr (EX_COLON_COLON opSep typeExpr)?
@@ -273,7 +273,7 @@ private stabNoArgsClause ::= EX_ARROW stabBody { pin=1 }
 private stabArgs ::= stabArgList whenClause?
 private stabArgList ::= stabArg (EX_COMMA eoe* stabArg)*
 private stabArg ::= matchExpr
-private stabBody ::= eoe? matchExpr (eoe matchExpr !EX_ARROW)*
+private stabBody ::= eoe? matchExpr (eoe matchExpr !EX_ARROW !EX_COMMA !EX_WHEN)*
 private whenClause ::= EX_WHEN matchExpr
 
 // Do blocks: do ... end (with optional clauses)
