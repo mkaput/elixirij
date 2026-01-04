@@ -74,6 +74,16 @@ class ExParserTest : ParsingTestCase(
     fun testSpecFunctionTypeArrow() = doTest()
     fun testAssertWithMessageComma() = doTest()
     fun testStructWithModuleVar() = doTest()
+    fun testFnClauseInlineArgsAfterBody() = doTest()
+    fun testCaptureTupleLiteral() = doTest()
+    fun testCapturePlaceholderIdentity() = doTest()
+    fun testDotAccessKeywordCallTarget() = doTest()
+    fun testKeywordArgValueOnNextLine() = doTest()
+    fun testMultiClauseFnGuard() = doTest()
+    fun testOperatorAtomMatchRegex() = doTest()
+    fun testSigilRegexEscapedDelimiter() = doTest()
+    fun testStringInterpolationWithNestedQuotes() = doTest()
+    fun testWhenGuardOnNextLine() = doTest()
     // =============================================================================
     // 1. Literals
     // =============================================================================

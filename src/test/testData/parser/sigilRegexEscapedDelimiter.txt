@@ -1,0 +1,10 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExMatchExprImpl(MATCH_EXPR)
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('regex')
+      PsiWhiteSpace(' ')
+      PsiElement(=)('=')
+      PsiWhiteSpace(' ')
+      ExSigilImpl(SIGIL)
+        PsiElement(SIGIL)('~r/<\/?([A-Za-z0-9:_-]+)(?:\s[^>]*)?>/')
