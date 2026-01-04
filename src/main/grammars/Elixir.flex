@@ -200,6 +200,7 @@ SIGIL_MODIFIERS=[a-zA-Z]*
     ":@"                               { return EX_ATOM; }
     ":<"                               { return EX_ATOM; }
     ":>"                               { return EX_ATOM; }
+    ":=~"                              { return EX_ATOM; }
     ":="                               { return EX_ATOM; }
     ":&&"                              { return EX_ATOM; }
     // Atoms - keyword atoms
