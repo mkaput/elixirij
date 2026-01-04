@@ -1,56 +1,46 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# IntelliJ Platform Source Extractor
-# Extracts IntelliJ Platform sources from Gradle cache to /tmp/elixir-refs/intellij-platform
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# Skill lives in .codex/skills/ref-src; project root is 4 levels up.
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+# IntelliJ Platform Source Downloader
+# Downloads JetBrains/intellij-community repository tarball to /tmp/elixir-refs/intellij-platform
 OUTPUT_ROOT="/tmp/elixir-refs"
 OUTPUT_DIR="$OUTPUT_ROOT/intellij-platform"
 
-# If already extracted than just print the output and quit.
+# If already downloaded then just print the output and quit.
 if [ -d "$OUTPUT_DIR" ]; then
     # Print the absolute path to stdout (this is the main output)
     echo "$OUTPUT_DIR"
     exit 0
 fi
 
-# Get platform version from gradle.properties
-PLATFORM_VERSION=$(grep '^platformVersion=' "$PROJECT_ROOT/gradle.properties" | cut -d'=' -f2)
+REPO_TARBALL_URL="https://codeload.github.com/JetBrains/intellij-community/tar.gz/master"
 
-if [ -z "$PLATFORM_VERSION" ]; then
-    echo "Error: Could not find platformVersion in gradle.properties" >&2
+echo "Downloading IntelliJ Platform source tarball..." >&2
+
+# Create output directory if it doesn't exist
+mkdir -p "$OUTPUT_ROOT"
+
+tmp_dir="$(mktemp -d)"
+tarball="$tmp_dir/intellij-platform.tar.gz"
+
+cleanup() {
+    rm -rf "$tmp_dir"
+}
+trap cleanup EXIT
+
+if ! curl -fsSL "$REPO_TARBALL_URL" -o "$tarball" 2>&1 | sed 's/^/  /' >&2; then
+    echo "Error: Failed to download IntelliJ Platform repository tarball" >&2
     exit 1
 fi
 
-echo "Looking for IntelliJ Platform $PLATFORM_VERSION sources..." >&2
-
-# Find the sources JAR in Gradle cache
-SOURCES_JAR=$(find ~/.gradle/caches/modules-2/files-2.1 -type f -name "idea-${PLATFORM_VERSION}-sources.jar" 2>/dev/null | head -n 1)
-
-if [ -z "$SOURCES_JAR" ]; then
-    echo "Error: Could not find idea-${PLATFORM_VERSION}-sources.jar in Gradle cache" >&2
-    echo "Hint: Run './gradlew buildPlugin' first to download dependencies" >&2
-    exit 1
-fi
-
-echo "Found sources JAR: $SOURCES_JAR" >&2
-
-# Create output directory
-echo "Creating output directory..." >&2
 mkdir -p "$OUTPUT_DIR"
-
-# Extract sources
-echo "Extracting sources to $OUTPUT_DIR..." >&2
-cd "$OUTPUT_DIR"
-if ! jar xf "$SOURCES_JAR" 2>&1 | sed 's/^/  /' >&2; then
-    echo "Error: Failed to extract sources" >&2
+if ! tar -xzf "$tarball" -C "$OUTPUT_DIR" --strip-components=1 2>&1 | sed 's/^/  /' >&2; then
+    rm -rf "$OUTPUT_DIR"
+    echo "Error: Failed to extract IntelliJ Platform repository tarball" >&2
     exit 1
 fi
 
-echo "Successfully extracted IntelliJ Platform sources" >&2
+echo "Successfully downloaded IntelliJ Platform source repository" >&2
 
 # Print the absolute path to stdout (this is the main output)
 echo "$OUTPUT_DIR"
