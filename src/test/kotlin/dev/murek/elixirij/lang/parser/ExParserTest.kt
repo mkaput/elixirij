@@ -84,6 +84,11 @@ class ExParserTest : ParsingTestCase(
     fun testSigilRegexEscapedDelimiter() = doTest()
     fun testStringInterpolationWithNestedQuotes() = doTest()
     fun testWhenGuardOnNextLine() = doTest()
+    fun testNestedInterpolationInString() = doTest()
+    fun testCaptureSpecialFormNoParens() = doTest()
+    fun testFnClauseGuardAfterArgsNewline() = doTest()
+    fun testOperatorAtomDot() = doTest()
+    fun testTypeUnionMultiline() = doTest()
     // =============================================================================
     // 1. Literals
     // =============================================================================

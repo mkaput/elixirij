@@ -1,0 +1,17 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExTupleImpl(TUPLE)
+      PsiElement({)('{')
+      PsiErrorElement:COMMENT, EOL or '}' expected, got ':'
+        <empty list>
+    PsiElement(:)(':')
+    PsiElement(.)('.')
+    PsiElement(,)(',')
+    PsiWhiteSpace(' ')
+    PsiElement([)('[')
+    PsiElement(])(']')
+    PsiElement(,)(',')
+    PsiWhiteSpace(' ')
+    PsiElement([)('[')
+    PsiElement(])(']')
+    PsiElement(})('}')

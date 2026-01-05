@@ -1,0 +1,16 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExLiteralImpl(LITERAL)
+      ExStringImpl(STRING)
+        PsiElement(STRING)('"outer #{if enabled, do: "?#{value}"')
+    PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', COMMENT, EOL, '[', '\\', and, in, not, or, when, '|', '|>', '||', '|||', '~>', '~>>' expected, got ','
+      PsiElement(,)(',')
+    PsiWhiteSpace(' ')
+    PsiElement(KW_IDENTIFIER)('else:')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('inspect')
+    PsiElement(()('(')
+    PsiElement(IDENTIFIER)('value')
+    PsiElement())(')')
+    PsiElement(})('}')
+    PsiElement(BAD_CHARACTER)('"')
