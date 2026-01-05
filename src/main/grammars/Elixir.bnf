@@ -81,7 +81,7 @@ whenExpr ::= typeExpr (opSep EX_WHEN opSep whenExpr)?
 typeExpr ::= pipeExpr (EX_COLON_COLON opSep typeExpr)?
 
 // Precedence 70: | (right associative) - pipe operator for patterns
-pipeExpr ::= matchExpr (EX_PIPE opSep pipeExpr)?
+pipeExpr ::= matchExpr (opSep EX_PIPE opSep pipeExpr)?
 
 // Precedence 100: = (right associative)
 matchExpr ::= orExpr (EX_EQ opSep matchExpr)?
