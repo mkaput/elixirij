@@ -187,30 +187,60 @@ CHARLIST_CONTENT=([^\\\']|\\.|{INTERPOLATION})*
     {INTEGER}                          { return EX_INTEGER; }
 
     // Atoms - operator atoms
-    ":..."                             { return EX_ATOM; }
-    ":.."                              { return EX_ATOM; }
+    ":..//"                            { return EX_ATOM; }
     ":<<>>"                            { return EX_ATOM; }
     ":%{}"                             { return EX_ATOM; }
-    ":{}"                              { return EX_ATOM; }
+    ":<~>"                             { return EX_ATOM; }
+    ":<<~"                             { return EX_ATOM; }
+    ":~>>"                             { return EX_ATOM; }
+    ":<<<"                             { return EX_ATOM; }
+    ":>>>"                             { return EX_ATOM; }
+    ":<|>"                             { return EX_ATOM; }
+    ":==="                             { return EX_ATOM; }
+    ":!=="                             { return EX_ATOM; }
+    ":..."                             { return EX_ATOM; }
+    ":+++"                             { return EX_ATOM; }
+    ":---"                             { return EX_ATOM; }
     ":&&&"                             { return EX_ATOM; }
+    ":|||"                             { return EX_ATOM; }
+    ":.."                              { return EX_ATOM; }
+    ":=="                              { return EX_ATOM; }
+    ":!="                              { return EX_ATOM; }
+    ":<="                              { return EX_ATOM; }
+    ":>="                              { return EX_ATOM; }
+    ":=~"                              { return EX_ATOM; }
+    ":&&"                              { return EX_ATOM; }
+    ":||"                              { return EX_ATOM; }
+    ":->"                              { return EX_ATOM; }
+    ":<-"                              { return EX_ATOM; }
+    ":=>"                              { return EX_ATOM; }
+    ":|>"                              { return EX_ATOM; }
+    ":<~"                              { return EX_ATOM; }
+    ":~>"                              { return EX_ATOM; }
+    ":++"                              { return EX_ATOM; }
+    ":--"                              { return EX_ATOM; }
+    ":<>"                              { return EX_ATOM; }
+    ":**"                              { return EX_ATOM; }
+    ":::"                              { return EX_ATOM; }
+    ":\\\\"                            { return EX_ATOM; }
+    "://"                              { return EX_ATOM; }
+    ":<<"                              { return EX_ATOM; }
+    ":>>"                              { return EX_ATOM; }
+    ":{}"                              { return EX_ATOM; }
     ":&"                               { return EX_ATOM; }
-    ":..//"                            { return EX_ATOM; }
+    ":@"                               { return EX_ATOM; }
     ":+"                               { return EX_ATOM; }
     ":-"                               { return EX_ATOM; }
     ":*"                               { return EX_ATOM; }
     ":/"                               { return EX_ATOM; }
     ":!"                               { return EX_ATOM; }
     ":^"                               { return EX_ATOM; }
-    ":|||"                             { return EX_ATOM; }
-    ":||"                              { return EX_ATOM; }
-    ":|"                               { return EX_ATOM; }
-    ":@"                               { return EX_ATOM; }
+    ":~"                               { return EX_ATOM; }
+    ":="                               { return EX_ATOM; }
     ":<"                               { return EX_ATOM; }
     ":>"                               { return EX_ATOM; }
-    ":=~"                              { return EX_ATOM; }
-    ":="                               { return EX_ATOM; }
+    ":|"                               { return EX_ATOM; }
     ":."                               { return EX_ATOM; }
-    ":&&"                              { return EX_ATOM; }
     // Atoms - keyword atoms
     ":" {ATOM_HEAD}                    { return EX_ATOM; }
     // Atoms - quoted
