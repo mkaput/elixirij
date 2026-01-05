@@ -64,7 +64,7 @@ ESCAPED_SLASH=\\\/
 SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 
 // Interpolation (simplified)
-INTERPOLATION=\#\{[^}]*\}
+INTERPOLATION=\#\{([^\\\"']|\\.|\"([^\\\"]|\\.)*\"|'([^\\']|\\.)*')*\}
 STRING_CONTENT=([^\\\"]|\\.|{INTERPOLATION})*
 CHARLIST_CONTENT=([^\\\']|\\.|{INTERPOLATION})*
 
