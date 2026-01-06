@@ -46,7 +46,7 @@ import static dev.murek.elixirij.lang.ElementTypes.*;
 %function advance
 %type IElementType
 %unicode
-%state IN_STRING IN_HEREDOC IN_INTERPOLATION
+%state IN_STRING IN_HEREDOC IN_CHARLIST IN_CHARLIST_HEREDOC IN_INTERPOLATION
 %state IN_SIGIL_PAREN IN_SIGIL_BRACKET IN_SIGIL_BRACE IN_SIGIL_ANGLE IN_SIGIL_SLASH IN_SIGIL_PIPE IN_SIGIL_DQUOTE IN_SIGIL_SQUOTE
 %state IN_SIGIL_HEREDOC_DQUOTE IN_SIGIL_HEREDOC_SQUOTE
 
@@ -95,9 +95,7 @@ SIGIL_MODIFIERS=[a-zA-Z]*
 ESCAPED_SLASH=\\\/
 SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 
-// Interpolation (simplified - used by charlists for now)
-INTERPOLATION=\#\{([^\\\"']|\\.|\"([^\\\"]|\\.)*\"|'([^\\']|\\.)*')*\}
-CHARLIST_CONTENT=([^\\\']|\\.|{INTERPOLATION})*
+// Interpolation (simplified - deprecated patterns)
 
 %%
 
@@ -323,11 +321,11 @@ CHARLIST_CONTENT=([^\\\']|\\.|{INTERPOLATION})*
 
     // Strings - heredocs must be before regular strings
     "\"\"\""                           { stringReturnState = yystate(); yybegin(IN_HEREDOC); return EX_STRING_BEGIN; }
-    "\'\'\'" ~"\'\'\'"                 { return EX_CHARLIST_HEREDOC; }
+    "\'\'\'"                           { stringReturnState = yystate(); yybegin(IN_CHARLIST_HEREDOC); return EX_CHARLIST_BEGIN; }
 
     // Strings - regular
     "\""                               { stringReturnState = yystate(); yybegin(IN_STRING); return EX_STRING_BEGIN; }
-    "\'" {CHARLIST_CONTENT} "\'"       { return EX_CHARLIST; }
+    "\'"                               { stringReturnState = yystate(); yybegin(IN_CHARLIST); return EX_CHARLIST_BEGIN; }
 
     // Identifiers and aliases
     {IDENTIFIER} ":" / ({HORIZONTAL_SPACE}|{EOL_CHAR}) { return EX_KW_IDENTIFIER; }
@@ -360,6 +358,30 @@ CHARLIST_CONTENT=([^\\\']|\\.|{INTERPOLATION})*
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
     .                                  { return EX_STRING_PART; }
+}
+
+<IN_CHARLIST> {
+    \\\\#\{                            { return EX_CHARLIST_PART; }
+    \\#\{                              { return EX_CHARLIST_PART; }
+    "#{"                               { return beginInterpolation(IN_CHARLIST); }
+    "\'"                               { yybegin(stringReturnState); return EX_CHARLIST_END; }
+    [^\'#\\]+                          { return EX_CHARLIST_PART; }
+    \\.                               { return EX_CHARLIST_PART; }
+    "#"                                { return EX_CHARLIST_PART; }
+    "\\"                               { return EX_CHARLIST_PART; }
+    .                                  { return EX_CHARLIST_PART; }
+}
+
+<IN_CHARLIST_HEREDOC> {
+    "\'\'\'"                           { yybegin(stringReturnState); return EX_CHARLIST_END; }
+    \\\\#\{                            { return EX_CHARLIST_PART; }
+    \\#\{                              { return EX_CHARLIST_PART; }
+    "#{"                               { return beginInterpolation(IN_CHARLIST_HEREDOC); }
+    [^\'#]+                            { return EX_CHARLIST_PART; }
+    "\'"                               { return EX_CHARLIST_PART; }
+    "#"                                { return EX_CHARLIST_PART; }
+    "\\"                               { return EX_CHARLIST_PART; }
+    .                                  { return EX_CHARLIST_PART; }
 }
 
 <IN_SIGIL_PAREN> {

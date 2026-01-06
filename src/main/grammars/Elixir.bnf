@@ -300,6 +300,7 @@ literal ::= integer
           | string
           | interpolatedString
           | charlist
+          | interpolatedCharlist
           | booleanLiteral
           | nilLiteral
 
@@ -312,6 +313,9 @@ private interpolatedStringItem ::= stringPart | interpolation
 stringPart ::= EX_STRING_PART
 interpolation ::= EX_INTERPOLATION_START expression EX_INTERPOLATION_END { pin=1 }
 charlist ::= EX_CHARLIST
+interpolatedCharlist ::= EX_CHARLIST_BEGIN interpolatedCharlistItem* EX_CHARLIST_END { pin=1 }
+private interpolatedCharlistItem ::= charlistPart | interpolation
+charlistPart ::= EX_CHARLIST_PART
 heredoc ::= EX_HEREDOC
 charlistHeredoc ::= EX_CHARLIST_HEREDOC
 sigil ::= EX_SIGIL

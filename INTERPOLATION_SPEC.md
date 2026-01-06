@@ -212,7 +212,7 @@ Tests:
 
 Commit: add grammar/PSI changes + parser tests.
 
-### Phase 3: Deprecated charlist interpolation
+### Phase 3: Deprecated charlist interpolation — DONE ✅
 
 Goal: support deprecated interpolation in single-quoted charlists.
 

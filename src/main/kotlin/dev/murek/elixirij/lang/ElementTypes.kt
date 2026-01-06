@@ -47,6 +47,15 @@ val EX_CHARLIST = ExTokenType("CHARLIST")
 val EX_CHARLIST_HEREDOC = ExTokenType("CHARLIST_HEREDOC")
 
 @JvmField
+val EX_CHARLIST_BEGIN = ExTokenType("CHARLIST_BEGIN")
+
+@JvmField
+val EX_CHARLIST_END = ExTokenType("CHARLIST_END")
+
+@JvmField
+val EX_CHARLIST_PART = ExTokenType("CHARLIST_PART")
+
+@JvmField
 val EX_STRING_BEGIN = ExTokenType("STRING_BEGIN")
 
 @JvmField

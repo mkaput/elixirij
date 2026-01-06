@@ -1,4 +1,8 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExCharlistHeredocImpl(CHARLIST_HEREDOC)
-      PsiElement(CHARLIST_HEREDOC)(''''\nhello\nworld\n'''')
+    ExLiteralImpl(LITERAL)
+      ExInterpolatedCharlistImpl(INTERPOLATED_CHARLIST)
+        PsiElement(CHARLIST_BEGIN)(''''')
+        ExCharlistPartImpl(CHARLIST_PART)
+          PsiElement(CHARLIST_PART)('\nhello\nworld\n')
+        PsiElement(CHARLIST_END)(''''')

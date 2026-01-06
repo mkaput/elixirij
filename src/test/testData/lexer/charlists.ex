@@ -1,1 +1,4 @@
-'hello' 'world\n'
+'hello' 'world\n' '#{a}'
+'''
+#{a}
+'''
