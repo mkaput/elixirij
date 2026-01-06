@@ -1,3 +1,5 @@
 ATOM (':foo')
 WHITE_SPACE (' ')
 ATOM (':bar_baz')
+WHITE_SPACE (' ')
+ATOM (':nonode@nohost')
