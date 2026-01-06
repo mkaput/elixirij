@@ -1,6 +1,7 @@
 package dev.murek.elixirij.lang.lexer;
 
 import com.intellij.lexer.FlexLexer;
+import com.intellij.psi.StringEscapesTokenTypes;
 import com.intellij.psi.tree.IElementType;
 import static dev.murek.elixirij.lang.ElementTypes.*;
 
@@ -59,6 +60,12 @@ DIGIT=[0-9]
 DIGITS={DIGIT}(_?{DIGIT})*
 HEX_DIGIT=[0-9a-fA-F]
 HEX_DIGITS={HEX_DIGIT}(_?{HEX_DIGIT})*
+UNICODE_SHORT=\\u{HEX_DIGIT}{4}
+UNICODE_BRACED=\\u\{{HEX_DIGIT}{1,6}\}
+HEX_ESC=\\x{HEX_DIGIT}{2}
+SIMPLE_ESC=\\[0abdefnrstv\\\"']
+ESCAPED_NEWLINE=\\{EOL_CHAR}
+GENERIC_ESC=\\[^\r\n]
 OCTAL_DIGIT=[0-7]
 OCTAL_DIGITS={OCTAL_DIGIT}(_?{OCTAL_DIGIT})*
 BIN_DIGIT=[01]
@@ -337,12 +344,22 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 }
 
 <IN_STRING> {
-    \\\\#\{                            { return EX_STRING_PART; }
-    \\#\{                              { return EX_STRING_PART; }
+    {ESCAPED_NEWLINE}                  { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {UNICODE_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {UNICODE_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {HEX_ESC}                          { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {SIMPLE_ESC}                       { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    \\u\{\}                            { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u\{[^}\r\n]*\}                   { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u{HEX_DIGIT}{0,3}                { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\x[^0-9a-fA-F\r\n\"]              { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x{HEX_DIGIT}?                    { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    {GENERIC_ESC}                      { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     "#{"                               { return beginInterpolation(IN_STRING); }
     "\""                               { yybegin(stringReturnState); return EX_STRING_END; }
     [^\"#\\]+                          { return EX_STRING_PART; }
-    \\.                               { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
     .                                  { return EX_STRING_PART; }
@@ -350,8 +367,19 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 
 <IN_HEREDOC> {
     "\"\"\""                           { yybegin(stringReturnState); return EX_STRING_END; }
-    \\\\#\{                            { return EX_STRING_PART; }
-    \\#\{                              { return EX_STRING_PART; }
+    {ESCAPED_NEWLINE}                  { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {UNICODE_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {UNICODE_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {HEX_ESC}                          { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {SIMPLE_ESC}                       { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    \\u\{\}                            { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u\{[^}\r\n]*\}                   { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u{HEX_DIGIT}{0,3}                { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\x[^0-9a-fA-F\r\n\"]              { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x{HEX_DIGIT}?                    { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    {GENERIC_ESC}                      { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     "#{"                               { return beginInterpolation(IN_HEREDOC); }
     [^\"#]+                            { return EX_STRING_PART; }
     "\""                               { return EX_STRING_PART; }

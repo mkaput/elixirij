@@ -38,6 +38,7 @@ class ExLexerTest : LexerTestCase() {
     fun testInterpolation() = doTest()
     fun testSigils() = doTest()
     fun testHeredocs() = doTest()
+    fun testEscapes_strings() = doTest()
 
     private fun doTest() = doFileTest("ex")
 }

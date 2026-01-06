@@ -53,7 +53,7 @@ defmodule MyModule do
     char = ?a
     atom = :my_atom
     quoted_atom = :"quoted atom"
-    string = "hello world"
+    string = "hello\\nworld \\u00A9 \\xFF"
     charlist = 'charlist'
     list = [1, 2, 3]
     tuple = {1, 2, 3}

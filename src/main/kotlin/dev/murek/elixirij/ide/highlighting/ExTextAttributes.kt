@@ -39,6 +39,16 @@ enum class ExTextAttributes(
         DefaultLanguageHighlighterColors.STRING,
         OptionsBundle.messagePointer("options.language.defaults.string")
     ),
+    STRING_ESCAPE(
+        "ELIXIR_STRING_ESCAPE",
+        DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE,
+        ExBundle.messagePointer("color.settings.stringEscape")
+    ),
+    INVALID_STRING_ESCAPE(
+        "ELIXIR_INVALID_STRING_ESCAPE",
+        DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE,
+        ExBundle.messagePointer("color.settings.invalidStringEscape")
+    ),
     NUMBER(
         "ELIXIR_NUMBER",
         DefaultLanguageHighlighterColors.NUMBER,

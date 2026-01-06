@@ -2,6 +2,7 @@ package dev.murek.elixirij.ide.highlighting
 
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.psi.StringEscapesTokenTypes
 import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
@@ -44,6 +45,9 @@ class ExSyntaxHighlighter : SyntaxHighlighterBase() {
         in EX_KEYWORDS -> pack(ExTextAttributes.KEYWORD)
         in EX_STRINGS -> pack(ExTextAttributes.STRING)
         in EX_NUMBERS -> pack(ExTextAttributes.NUMBER)
+        StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN -> pack(ExTextAttributes.STRING_ESCAPE)
+        StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN,
+        StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN -> pack(ExTextAttributes.INVALID_STRING_ESCAPE)
         EX_ATOM, EX_ATOM_QUOTED, EX_KW_IDENTIFIER -> pack(ExTextAttributes.ATOM)
         EX_ALIAS -> pack(ExTextAttributes.MODULE)
         EX_IDENTIFIER -> pack(ExTextAttributes.IDENTIFIER)
