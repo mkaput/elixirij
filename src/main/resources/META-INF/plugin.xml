@@ -35,6 +35,7 @@
                          implementationClass="dev.murek.elixirij.ide.folding.ExFoldingBuilder"/>
 
     <typedHandler implementation="dev.murek.elixirij.ide.ExTypedHandlerDelegate"/>
+    <backspaceHandlerDelegate implementation="dev.murek.elixirij.ide.ExBackspaceHandlerDelegate"/>
 
     <lang.parserDefinition language="Elixir"
                            implementationClass="dev.murek.elixirij.lang.ExParserDefinition"/>

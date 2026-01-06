@@ -78,6 +78,20 @@ class ExTypedHandlerDelegateTest : BasePlatformTestCase() {
         myFixture.checkResult("~r[<caret>]")
     }
 
+    fun `test interpolation brace auto-pairing in string`() {
+        myFixture.configureByText("test.ex", "\"<caret>\"")
+        myFixture.type('#')
+        myFixture.type('{')
+        myFixture.checkResult("\"#{<caret>}\"")
+    }
+
+    fun `test interpolation brace auto-pairing in sigil`() {
+        myFixture.configureByText("test.ex", "~s(<caret>)")
+        myFixture.type('#')
+        myFixture.type('{')
+        myFixture.checkResult("~s(#{<caret>})")
+    }
+
     fun `test uppercase sigil auto-pairing`() {
         myFixture.configureByText("test.ex", "~R<caret>")
         myFixture.type('[')

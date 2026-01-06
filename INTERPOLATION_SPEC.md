@@ -245,7 +245,7 @@ Tests:
 
 Commit: add highlighting/brace matcher tests + implementation.
 
-### Phase 5: Editor typing behavior
+### Phase 5: Editor typing behavior — DONE ✅
 
 Goal: improve typing UX in interpolated strings.
 

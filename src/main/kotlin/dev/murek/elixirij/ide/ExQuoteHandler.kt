@@ -7,9 +7,15 @@ import com.intellij.openapi.editor.highlighter.HighlighterIterator
 import dev.murek.elixirij.lang.EX_ATOM_QUOTED
 import dev.murek.elixirij.lang.EX_CHARLIST
 import dev.murek.elixirij.lang.EX_CHARLIST_HEREDOC
+import dev.murek.elixirij.lang.EX_CHARLIST_BEGIN
+import dev.murek.elixirij.lang.EX_CHARLIST_END
+import dev.murek.elixirij.lang.EX_CHARLIST_PART
 import dev.murek.elixirij.lang.EX_HEREDOC
 import dev.murek.elixirij.lang.EX_SIGIL
 import dev.murek.elixirij.lang.EX_STRING
+import dev.murek.elixirij.lang.EX_STRING_BEGIN
+import dev.murek.elixirij.lang.EX_STRING_END
+import dev.murek.elixirij.lang.EX_STRING_PART
 import dev.murek.elixirij.lang.BAD_CHARACTER
 import com.intellij.psi.TokenType
 
@@ -30,7 +36,13 @@ import com.intellij.psi.TokenType
  */
 class ExQuoteHandler : SimpleTokenSetQuoteHandler(
     EX_STRING,
+    EX_STRING_BEGIN,
+    EX_STRING_END,
+    EX_STRING_PART,
     EX_CHARLIST,
+    EX_CHARLIST_BEGIN,
+    EX_CHARLIST_END,
+    EX_CHARLIST_PART,
     EX_HEREDOC,
     EX_CHARLIST_HEREDOC,
     EX_SIGIL,

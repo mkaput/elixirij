@@ -7,6 +7,7 @@ import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import dev.murek.elixirij.ExLanguage
+import dev.murek.elixirij.lang.EX_INTERPOLATION_START
 
 /**
  * Provides smart typing behavior for Elixir-specific delimiters.
@@ -124,6 +125,14 @@ class ExTypedHandlerDelegate : TypedHandlerDelegate() {
             }
         }
 
+        if (c == '{' && offset >= 2 && isInterpolationStart(file, offset)) {
+            if (offset < text.length && text[offset] == '}') {
+                return Result.CONTINUE
+            }
+            EditorModificationUtil.insertStringAtCaret(editor, "}", false, false)
+            return Result.STOP
+        }
+
         return Result.CONTINUE
     }
 
@@ -132,5 +141,10 @@ class ExTypedHandlerDelegate : TypedHandlerDelegate() {
      */
     private fun shouldOvertype(typed: Char, charAhead: Char): Boolean =
         typed == charAhead && typed in setOf(')', ']', '}', '"', '\'')
+
+    private fun isInterpolationStart(file: PsiFile, offset: Int): Boolean {
+        val element = file.findElementAt(offset - 1) ?: return false
+        return element.node.elementType == EX_INTERPOLATION_START
+    }
 
 }
