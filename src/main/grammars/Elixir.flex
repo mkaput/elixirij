@@ -14,6 +14,7 @@ import static dev.murek.elixirij.lang.ElementTypes.*;
     private int[] interpolationStateStack = new int[8];
     private int[] interpolationBalanceStack = new int[8];
     private int interpolationStackTop = 0;
+    private char sigilLetter = 0;
 
     public _ExLexer() {
         this((java.io.Reader)null);
@@ -39,6 +40,17 @@ import static dev.murek.elixirij.lang.ElementTypes.*;
         yybegin(IN_INTERPOLATION);
         return EX_INTERPOLATION_START;
     }
+
+    private IElementType beginSigil(int state) {
+        sigilLetter = yytext().charAt(1);
+        stringReturnState = yystate();
+        yybegin(state);
+        return EX_STRING_BEGIN;
+    }
+
+    private boolean sigilAllowsEscapes() {
+        return sigilLetter == 's' || sigilLetter == 'c';
+    }
 %}
 
 %public
@@ -63,6 +75,8 @@ HEX_DIGITS={HEX_DIGIT}(_?{HEX_DIGIT})*
 UNICODE_SHORT=\\u{HEX_DIGIT}{4}
 UNICODE_BRACED=\\u\{{HEX_DIGIT}{1,6}\}
 HEX_ESC=\\x{HEX_DIGIT}{2}
+HEX_ESC_SHORT=\\x{HEX_DIGIT}
+HEX_ESC_BRACED=\\x\{{HEX_DIGIT}{1,6}\}
 SIMPLE_ESC=\\[0abdefnrstv\\\"']
 ESCAPED_NEWLINE=\\{EOL_CHAR}
 GENERIC_ESC=\\[^\r\n]
@@ -303,16 +317,16 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     ":\'" [^\']* "\'"                  { return EX_ATOM_QUOTED; }
 
     // Interpolated sigils (lowercase)
-    {SIGIL_START_INTERP} "\"\"\""      { stringReturnState = yystate(); yybegin(IN_SIGIL_HEREDOC_DQUOTE); return EX_STRING_BEGIN; }
-    {SIGIL_START_INTERP} "\'\'\'"      { stringReturnState = yystate(); yybegin(IN_SIGIL_HEREDOC_SQUOTE); return EX_STRING_BEGIN; }
-    {SIGIL_START_INTERP} "\""          { stringReturnState = yystate(); yybegin(IN_SIGIL_DQUOTE); return EX_STRING_BEGIN; }
-    {SIGIL_START_INTERP} "\'"          { stringReturnState = yystate(); yybegin(IN_SIGIL_SQUOTE); return EX_STRING_BEGIN; }
-    {SIGIL_START_INTERP} "/"           { stringReturnState = yystate(); yybegin(IN_SIGIL_SLASH); return EX_STRING_BEGIN; }
-    {SIGIL_START_INTERP} "|"           { stringReturnState = yystate(); yybegin(IN_SIGIL_PIPE); return EX_STRING_BEGIN; }
-    {SIGIL_START_INTERP} "("           { stringReturnState = yystate(); yybegin(IN_SIGIL_PAREN); return EX_STRING_BEGIN; }
-    {SIGIL_START_INTERP} "["           { stringReturnState = yystate(); yybegin(IN_SIGIL_BRACKET); return EX_STRING_BEGIN; }
-    {SIGIL_START_INTERP} "{"           { stringReturnState = yystate(); yybegin(IN_SIGIL_BRACE); return EX_STRING_BEGIN; }
-    {SIGIL_START_INTERP} "<"           { stringReturnState = yystate(); yybegin(IN_SIGIL_ANGLE); return EX_STRING_BEGIN; }
+    {SIGIL_START_INTERP} "\"\"\""      { return beginSigil(IN_SIGIL_HEREDOC_DQUOTE); }
+    {SIGIL_START_INTERP} "\'\'\'"      { return beginSigil(IN_SIGIL_HEREDOC_SQUOTE); }
+    {SIGIL_START_INTERP} "\""          { return beginSigil(IN_SIGIL_DQUOTE); }
+    {SIGIL_START_INTERP} "\'"          { return beginSigil(IN_SIGIL_SQUOTE); }
+    {SIGIL_START_INTERP} "/"           { return beginSigil(IN_SIGIL_SLASH); }
+    {SIGIL_START_INTERP} "|"           { return beginSigil(IN_SIGIL_PIPE); }
+    {SIGIL_START_INTERP} "("           { return beginSigil(IN_SIGIL_PAREN); }
+    {SIGIL_START_INTERP} "["           { return beginSigil(IN_SIGIL_BRACKET); }
+    {SIGIL_START_INTERP} "{"           { return beginSigil(IN_SIGIL_BRACE); }
+    {SIGIL_START_INTERP} "<"           { return beginSigil(IN_SIGIL_ANGLE); }
 
     // Sigils (non-interpolated, uppercase)
     {SIGIL_START_NO_INTERP} "\"\"\"" ~"\"\"\"" {SIGIL_MODIFIERS}   { return EX_SIGIL; }
@@ -347,15 +361,20 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     {ESCAPED_NEWLINE}                  { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {UNICODE_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {UNICODE_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {HEX_ESC_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {HEX_ESC}                          { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {HEX_ESC_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {SIMPLE_ESC}                       { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     \\u\{\}                            { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
     \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
     \\u\{[^}\r\n]*\}                   { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
     \\u[^0-9a-fA-F\{\r\n\"]            { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
     \\u{HEX_DIGIT}{0,3}                { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\x\{\}                            { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x\{[^}\r\n]*\}                   { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
     \\x[^0-9a-fA-F\r\n\"]              { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
-    \\x{HEX_DIGIT}?                    { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x                                { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
     {GENERIC_ESC}                      { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     "#{"                               { return beginInterpolation(IN_STRING); }
     "\""                               { yybegin(stringReturnState); return EX_STRING_END; }
@@ -370,15 +389,20 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     {ESCAPED_NEWLINE}                  { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {UNICODE_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {UNICODE_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {HEX_ESC_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {HEX_ESC}                          { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {HEX_ESC_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {SIMPLE_ESC}                       { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     \\u\{\}                            { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
     \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
     \\u\{[^}\r\n]*\}                   { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
     \\u[^0-9a-fA-F\{\r\n\"]            { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
     \\u{HEX_DIGIT}{0,3}                { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\x\{\}                            { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x\{[^}\r\n]*\}                   { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
     \\x[^0-9a-fA-F\r\n\"]              { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
-    \\x{HEX_DIGIT}?                    { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x                                { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
     {GENERIC_ESC}                      { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     "#{"                               { return beginInterpolation(IN_HEREDOC); }
     [^\"#]+                            { return EX_STRING_PART; }
@@ -389,12 +413,27 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 }
 
 <IN_CHARLIST> {
-    \\\\#\{                            { return EX_CHARLIST_PART; }
-    \\#\{                              { return EX_CHARLIST_PART; }
+    {ESCAPED_NEWLINE}                  { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {UNICODE_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {UNICODE_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {HEX_ESC_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {HEX_ESC}                          { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {HEX_ESC_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {SIMPLE_ESC}                       { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    \\u\{\}                            { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u\{[^}\r\n]*\}                   { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u{HEX_DIGIT}{0,3}                { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\x\{\}                            { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x\{[^}\r\n]*\}                   { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x[^0-9a-fA-F\r\n\"]              { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x                                { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    {GENERIC_ESC}                      { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     "#{"                               { return beginInterpolation(IN_CHARLIST); }
     "\'"                               { yybegin(stringReturnState); return EX_CHARLIST_END; }
     [^\'#\\]+                          { return EX_CHARLIST_PART; }
-    \\.                               { return EX_CHARLIST_PART; }
     "#"                                { return EX_CHARLIST_PART; }
     "\\"                               { return EX_CHARLIST_PART; }
     .                                  { return EX_CHARLIST_PART; }
@@ -402,8 +441,24 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 
 <IN_CHARLIST_HEREDOC> {
     "\'\'\'"                           { yybegin(stringReturnState); return EX_CHARLIST_END; }
-    \\\\#\{                            { return EX_CHARLIST_PART; }
-    \\#\{                              { return EX_CHARLIST_PART; }
+    {ESCAPED_NEWLINE}                  { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {UNICODE_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {UNICODE_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {HEX_ESC_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {HEX_ESC}                          { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {HEX_ESC_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {SIMPLE_ESC}                       { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    \\u\{\}                            { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u\{[^}\r\n]*\}                   { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\u{HEX_DIGIT}{0,3}                { return StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN; }
+    \\x\{\}                            { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x\{[^}\r\n]*\}                   { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x[^0-9a-fA-F\r\n\"]              { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    \\x                                { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
+    {GENERIC_ESC}                      { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     "#{"                               { return beginInterpolation(IN_CHARLIST_HEREDOC); }
     [^\'#]+                            { return EX_CHARLIST_PART; }
     "\'"                               { return EX_CHARLIST_PART; }
@@ -413,105 +468,241 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 }
 
 <IN_SIGIL_PAREN> {
-    \\\\#\{                            { return EX_STRING_PART; }
-    \\#\{                              { return EX_STRING_PART; }
+    {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC}                          { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {SIMPLE_ESC}                       { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u{HEX_DIGIT}{0,3}                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x[^0-9a-fA-F\r\n\"]              { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_PAREN); }
-    ")" {SIGIL_MODIFIERS}              { yybegin(stringReturnState); return EX_STRING_END; }
+    ")" {SIGIL_MODIFIERS}              { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
     [^\\)#]+                           { return EX_STRING_PART; }
-    \\.                               { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
     .                                  { return EX_STRING_PART; }
 }
 
 <IN_SIGIL_BRACKET> {
-    \\\\#\{                            { return EX_STRING_PART; }
-    \\#\{                              { return EX_STRING_PART; }
+    {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC}                          { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {SIMPLE_ESC}                       { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u{HEX_DIGIT}{0,3}                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x[^0-9a-fA-F\r\n\"]              { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_BRACKET); }
-    "]" {SIGIL_MODIFIERS}              { yybegin(stringReturnState); return EX_STRING_END; }
+    "]" {SIGIL_MODIFIERS}              { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
     [^]#\\]+                           { return EX_STRING_PART; }
-    \\.                               { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
     .                                  { return EX_STRING_PART; }
 }
 
 <IN_SIGIL_BRACE> {
-    \\\\#\{                            { return EX_STRING_PART; }
-    \\#\{                              { return EX_STRING_PART; }
+    {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC}                          { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {SIMPLE_ESC}                       { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u{HEX_DIGIT}{0,3}                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x[^0-9a-fA-F\r\n\"]              { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_BRACE); }
-    "}" {SIGIL_MODIFIERS}              { yybegin(stringReturnState); return EX_STRING_END; }
+    "}" {SIGIL_MODIFIERS}              { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
     [^\\}#]+                           { return EX_STRING_PART; }
-    \\.                               { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
     .                                  { return EX_STRING_PART; }
 }
 
 <IN_SIGIL_ANGLE> {
-    \\\\#\{                            { return EX_STRING_PART; }
-    \\#\{                              { return EX_STRING_PART; }
+    {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC}                          { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {SIMPLE_ESC}                       { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u{HEX_DIGIT}{0,3}                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x[^0-9a-fA-F\r\n\"]              { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_ANGLE); }
-    ">" {SIGIL_MODIFIERS}              { yybegin(stringReturnState); return EX_STRING_END; }
+    ">" {SIGIL_MODIFIERS}              { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
     [^\\>#]+                           { return EX_STRING_PART; }
-    \\.                               { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
     .                                  { return EX_STRING_PART; }
 }
 
 <IN_SIGIL_SLASH> {
-    \\\\#\{                            { return EX_STRING_PART; }
-    \\#\{                              { return EX_STRING_PART; }
+    {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC}                          { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {SIMPLE_ESC}                       { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u{HEX_DIGIT}{0,3}                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x[^0-9a-fA-F\r\n\"]              { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_SLASH); }
-    "/" {SIGIL_MODIFIERS}              { yybegin(stringReturnState); return EX_STRING_END; }
+    "/" {SIGIL_MODIFIERS}              { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
     [^\\/#]+                           { return EX_STRING_PART; }
-    \\.                               { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
     .                                  { return EX_STRING_PART; }
 }
 
 <IN_SIGIL_PIPE> {
-    \\\\#\{                            { return EX_STRING_PART; }
-    \\#\{                              { return EX_STRING_PART; }
+    {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC}                          { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {SIMPLE_ESC}                       { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u{HEX_DIGIT}{0,3}                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x[^0-9a-fA-F\r\n\"]              { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_PIPE); }
-    "|" {SIGIL_MODIFIERS}              { yybegin(stringReturnState); return EX_STRING_END; }
+    "|" {SIGIL_MODIFIERS}              { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
     [^\\|#]+                           { return EX_STRING_PART; }
-    \\.                               { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
     .                                  { return EX_STRING_PART; }
 }
 
 <IN_SIGIL_DQUOTE> {
-    \\\\#\{                            { return EX_STRING_PART; }
-    \\#\{                              { return EX_STRING_PART; }
+    {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC}                          { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {SIMPLE_ESC}                       { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u{HEX_DIGIT}{0,3}                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x[^0-9a-fA-F\r\n\"]              { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_DQUOTE); }
-    "\"" {SIGIL_MODIFIERS}             { yybegin(stringReturnState); return EX_STRING_END; }
+    "\"" {SIGIL_MODIFIERS}             { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
     [^\"#\\]+                          { return EX_STRING_PART; }
-    \\.                               { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
     .                                  { return EX_STRING_PART; }
 }
 
 <IN_SIGIL_SQUOTE> {
-    \\\\#\{                            { return EX_STRING_PART; }
-    \\#\{                              { return EX_STRING_PART; }
+    {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC}                          { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {SIMPLE_ESC}                       { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u{HEX_DIGIT}{0,3}                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x[^0-9a-fA-F\r\n\"]              { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_SQUOTE); }
-    "\'" {SIGIL_MODIFIERS}             { yybegin(stringReturnState); return EX_STRING_END; }
+    "\'" {SIGIL_MODIFIERS}             { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
     [^\'#\\]+                          { return EX_STRING_PART; }
-    \\.                               { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
     .                                  { return EX_STRING_PART; }
 }
 
 <IN_SIGIL_HEREDOC_DQUOTE> {
-    "\"\"\"" {SIGIL_MODIFIERS}         { yybegin(stringReturnState); return EX_STRING_END; }
-    \\\\#\{                            { return EX_STRING_PART; }
-    \\#\{                              { return EX_STRING_PART; }
+    "\"\"\"" {SIGIL_MODIFIERS}         { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
+    {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC}                          { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {SIMPLE_ESC}                       { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u{HEX_DIGIT}{0,3}                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x[^0-9a-fA-F\r\n\"]              { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_HEREDOC_DQUOTE); }
     [^\"#]+                            { return EX_STRING_PART; }
     "\""                               { return EX_STRING_PART; }
@@ -521,9 +712,25 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 }
 
 <IN_SIGIL_HEREDOC_SQUOTE> {
-    "\'\'\'" {SIGIL_MODIFIERS}         { yybegin(stringReturnState); return EX_STRING_END; }
-    \\\\#\{                            { return EX_STRING_PART; }
-    \\#\{                              { return EX_STRING_PART; }
+    "\'\'\'" {SIGIL_MODIFIERS}         { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
+    {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC}                          { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {HEX_ESC_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {SIMPLE_ESC}                       { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u[^0-9a-fA-F\{\r\n\"]            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\u{HEX_DIGIT}{0,3}                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{\}                            { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{{HEX_DIGIT}{7}{HEX_DIGIT}*\}  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x\{[^}\r\n]*\}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x[^0-9a-fA-F\r\n\"]              { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
+    {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_HEREDOC_SQUOTE); }
     [^\'#]+                            { return EX_STRING_PART; }
     "\'"                               { return EX_STRING_PART; }

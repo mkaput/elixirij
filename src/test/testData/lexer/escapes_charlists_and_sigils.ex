@@ -1,0 +1,5 @@
+'\n' '\xF' '\x{1F}' "\xF" "\x{1F}"
+~s(\n \xF \x{1F})
+~c(\n \xF \x{1F})
+~S(\n \xF \x{1F})
+~C(\n \xF \x{1F})

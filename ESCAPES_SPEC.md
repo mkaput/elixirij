@@ -222,7 +222,7 @@ Commit message:
 
 - `add escape sequence tokens and highlighting for strings`
 
-### Phase 2: Charlist, sigil, and deprecated escape support
+### Phase 2: Charlist, sigil, and deprecated escape support (DONE)
 
 Work:
 

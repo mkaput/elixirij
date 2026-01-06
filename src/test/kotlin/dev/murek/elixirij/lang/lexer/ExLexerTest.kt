@@ -39,6 +39,7 @@ class ExLexerTest : LexerTestCase() {
     fun testSigils() = doTest()
     fun testHeredocs() = doTest()
     fun testEscapes_strings() = doTest()
+    fun testEscapes_charlists_and_sigils() = doTest()
 
     private fun doTest() = doFileTest("ex")
 }
