@@ -242,7 +242,7 @@ Commit message:
 
 - `tokenize escapes in charlists and string sigils`
 
-### Phase 3: Invalid escape diagnostics
+### Phase 3: Invalid escape diagnostics (DONE)
 
 Work:
 

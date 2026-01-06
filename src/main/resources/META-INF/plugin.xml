@@ -52,6 +52,8 @@
 
     <annotator language="Elixir"
                implementationClass="dev.murek.elixirij.ide.highlighting.ExHighlightingAnnotator"/>
+    <annotator language="Elixir"
+               implementationClass="dev.murek.elixirij.ide.highlighting.ExEscapeSequenceAnnotator"/>
 
     <postStartupActivity implementation="dev.murek.elixirij.lsp.ExLspServerStartupActivity"/>
 
