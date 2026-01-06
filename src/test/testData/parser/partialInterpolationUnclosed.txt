@@ -1,8 +1,11 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    <empty list>
-  PsiErrorElement:';' or EOL expected, got '"'
-    PsiElement(BAD_CHARACTER)('"')
-  PsiElement(IDENTIFIER)('hello')
-  PsiWhiteSpace(' ')
-  PsiComment(COMMENT)('#{')
+    ExLiteralImpl(LITERAL)
+      ExInterpolatedStringImpl(INTERPOLATED_STRING)
+        PsiElement(STRING_BEGIN)('"')
+        ExStringPartImpl(STRING_PART)
+          PsiElement(STRING_PART)('hello ')
+        ExInterpolationImpl(INTERPOLATION)
+          PsiElement(INTERPOLATION_START)('#{')
+          PsiErrorElement:'.', <unary expr>, INTERPOLATION_END, INTERPOLATION_START, STRING_END, STRING_PART or '[' expected
+            <empty list>

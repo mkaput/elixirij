@@ -298,6 +298,7 @@ literal ::= integer
           | float
           | char
           | string
+          | interpolatedString
           | charlist
           | booleanLiteral
           | nilLiteral
@@ -306,6 +307,10 @@ integer ::= EX_INTEGER
 float ::= EX_FLOAT
 char ::= EX_CHAR
 string ::= EX_STRING
+interpolatedString ::= EX_STRING_BEGIN interpolatedStringItem* EX_STRING_END { pin=1 }
+private interpolatedStringItem ::= stringPart | interpolation
+stringPart ::= EX_STRING_PART
+interpolation ::= EX_INTERPOLATION_START expression EX_INTERPOLATION_END { pin=1 }
 charlist ::= EX_CHARLIST
 heredoc ::= EX_HEREDOC
 charlistHeredoc ::= EX_CHARLIST_HEREDOC
@@ -342,7 +347,8 @@ private listElement ::= (keywordPairItem | containerExpr) { recoverWhile=listRec
 keywordPair ::= keywordKey opSep containerExpr
 private keywordPairIncomplete ::= keywordKey { recoverWhile=keywordPairRecovery }
 private keywordPairItem ::= keywordPair
-private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON | EX_STRING EX_COLON | EX_IDENTIFIER EX_COLON
+private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON | stringKeywordKey | EX_IDENTIFIER EX_COLON
+private stringKeywordKey ::= string EX_COLON | interpolatedString EX_COLON
 
 // Tuple: {1, 2, 3}
 tuple ::= EX_LBRACE opSep tupleContents? opSep EX_RBRACE { pin=1 }

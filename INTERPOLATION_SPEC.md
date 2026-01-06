@@ -192,7 +192,7 @@ Tests:
 
 Commit: add tests and lexer changes.
 
-### Phase 2: Parser support for interpolated strings
+### Phase 2: Parser support for interpolated strings — DONE ✅
 
 Goal: parse interpolations as part of string PSI.
 

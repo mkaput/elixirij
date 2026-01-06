@@ -1,10 +1,9 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExMultExprImpl(MULT_EXPR)
-      ExUnaryExprImpl(UNARY_EXPR)
-        PsiElement(~)('~')
-        ExIdentifierImpl(IDENTIFIER)
-          PsiElement(IDENTIFIER)('r')
-      PsiElement(/)('/')
-      ExIdentifierImpl(IDENTIFIER)
-        PsiElement(IDENTIFIER)('pattern')
+    ExLiteralImpl(LITERAL)
+      ExInterpolatedStringImpl(INTERPOLATED_STRING)
+        PsiElement(STRING_BEGIN)('~r/')
+        ExStringPartImpl(STRING_PART)
+          PsiElement(STRING_PART)('pattern')
+        PsiErrorElement:'.', INTERPOLATION_START, STRING_END, STRING_PART or '[' expected
+          <empty list>

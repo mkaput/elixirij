@@ -1,4 +1,8 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
-    ExSigilImpl(SIGIL)
-      PsiElement(SIGIL)('~w(a b c)')
+    ExLiteralImpl(LITERAL)
+      ExInterpolatedStringImpl(INTERPOLATED_STRING)
+        PsiElement(STRING_BEGIN)('~w(')
+        ExStringPartImpl(STRING_PART)
+          PsiElement(STRING_PART)('a b c')
+        PsiElement(STRING_END)(')')

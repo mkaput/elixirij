@@ -1,10 +1,9 @@
 Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExLiteralImpl(LITERAL)
-      ExStringImpl(STRING)
-        PsiElement(STRING)('""')
-    PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', COMMENT, EOL, '[', '\\', and, in, not, or, when, '|', '|>', '||', '|||', '~>', '~>>' expected, got '"'
-      PsiElement(BAD_CHARACTER)('"')
-    PsiElement(EOL)('\n')
-    ExIdentifierImpl(IDENTIFIER)
-      PsiElement(IDENTIFIER)('hello')
+      ExInterpolatedStringImpl(INTERPOLATED_STRING)
+        PsiElement(STRING_BEGIN)('"""')
+        ExStringPartImpl(STRING_PART)
+          PsiElement(STRING_PART)('\nhello')
+        PsiErrorElement:'.', INTERPOLATION_START, STRING_END, STRING_PART or '[' expected
+          <empty list>

@@ -1,0 +1,17 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExLiteralImpl(LITERAL)
+      ExInterpolatedStringImpl(INTERPOLATED_STRING)
+        PsiElement(STRING_BEGIN)('"')
+        ExStringPartImpl(STRING_PART)
+          PsiElement(STRING_PART)('hello ')
+        ExInterpolationImpl(INTERPOLATION)
+          PsiElement(INTERPOLATION_START)('#{')
+          ExCallExprImpl(CALL_EXPR)
+            ExIdentifierImpl(IDENTIFIER)
+              PsiElement(IDENTIFIER)('name')
+            ExLiteralImpl(LITERAL)
+              ExInterpolatedStringImpl(INTERPOLATED_STRING)
+                PsiElement(STRING_BEGIN)('"')
+                PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', ':', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', COMMENT, EOL, INTERPOLATION_END, INTERPOLATION_START, STRING_END, STRING_PART, '[', '\\', and, do, in, not, or and ... expected
+                  <empty list>
