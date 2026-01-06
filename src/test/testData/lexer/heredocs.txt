@@ -1,1 +1,3 @@
-HEREDOC ('"""\nheredoc string\n"""')
+STRING_BEGIN ('"""')
+STRING_PART ('\nheredoc string\n')
+STRING_END ('"""')

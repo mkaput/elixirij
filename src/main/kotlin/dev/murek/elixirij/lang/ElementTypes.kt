@@ -46,6 +46,21 @@ val EX_CHARLIST = ExTokenType("CHARLIST")
 @JvmField
 val EX_CHARLIST_HEREDOC = ExTokenType("CHARLIST_HEREDOC")
 
+@JvmField
+val EX_STRING_BEGIN = ExTokenType("STRING_BEGIN")
+
+@JvmField
+val EX_STRING_END = ExTokenType("STRING_END")
+
+@JvmField
+val EX_STRING_PART = ExTokenType("STRING_PART")
+
+@JvmField
+val EX_INTERPOLATION_START = ExTokenType("INTERPOLATION_START")
+
+@JvmField
+val EX_INTERPOLATION_END = ExTokenType("INTERPOLATION_END")
+
 // Sigils
 @JvmField
 val EX_SIGIL = ExTokenType("SIGIL")

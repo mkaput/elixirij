@@ -7,8 +7,18 @@ import static dev.murek.elixirij.lang.ElementTypes.*;
 %%
 
 %{
+    private int interpolationBalance = 0;
+    private int interpolationReturnState = YYINITIAL;
+
     public _ExLexer() {
         this((java.io.Reader)null);
+    }
+
+    private IElementType beginInterpolation(int returnState) {
+        interpolationBalance = 1;
+        interpolationReturnState = returnState;
+        yybegin(IN_INTERPOLATION);
+        return EX_INTERPOLATION_START;
     }
 %}
 
@@ -18,6 +28,9 @@ import static dev.murek.elixirij.lang.ElementTypes.*;
 %function advance
 %type IElementType
 %unicode
+%state IN_STRING IN_HEREDOC IN_INTERPOLATION
+%state IN_SIGIL_PAREN IN_SIGIL_BRACKET IN_SIGIL_BRACE IN_SIGIL_ANGLE IN_SIGIL_SLASH IN_SIGIL_PIPE IN_SIGIL_DQUOTE IN_SIGIL_SQUOTE
+%state IN_SIGIL_HEREDOC_DQUOTE IN_SIGIL_HEREDOC_SQUOTE
 
 // Whitespace
 HORIZONTAL_SPACE=[ \t\f]
@@ -58,19 +71,31 @@ ATOM_HEAD={LOWERCASE}{IDENTIFIER_TAIL}
 COMMENT=#[^\r\n]*
 
 // Sigil prefixes
-SIGIL_START=\~[a-zA-Z]
+SIGIL_START_INTERP=\~[a-z]
+SIGIL_START_NO_INTERP=\~[A-Z]
 SIGIL_MODIFIERS=[a-zA-Z]*
 ESCAPED_SLASH=\\\/
 SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 
-// Interpolation (simplified)
+// Interpolation (simplified - used by charlists for now)
 INTERPOLATION=\#\{([^\\\"']|\\.|\"([^\\\"]|\\.)*\"|'([^\\']|\\.)*')*\}
-STRING_CONTENT=([^\\\"]|\\.|{INTERPOLATION})*
 CHARLIST_CONTENT=([^\\\']|\\.|{INTERPOLATION})*
 
 %%
 
-<YYINITIAL> {
+<IN_INTERPOLATION> {
+    "}"                                {
+                                          interpolationBalance--;
+                                          if (interpolationBalance == 0) {
+                                              yybegin(interpolationReturnState);
+                                              return EX_INTERPOLATION_END;
+                                          }
+                                          return EX_RBRACE;
+                                      }
+    "{"                                { interpolationBalance++; return EX_LBRACE; }
+}
+
+<YYINITIAL, IN_INTERPOLATION> {
     // Whitespace
     {HORIZONTAL_SPACE}+                { return WHITE_SPACE; }
     {EOL_CHAR}                         { return EX_EOL; }
@@ -247,25 +272,36 @@ CHARLIST_CONTENT=([^\\\']|\\.|{INTERPOLATION})*
     ":\"" [^\"]* "\""                  { return EX_ATOM_QUOTED; }
     ":\'" [^\']* "\'"                  { return EX_ATOM_QUOTED; }
 
-    // Sigils - heredocs first
-    {SIGIL_START} "\"\"\"" ~"\"\"\"" {SIGIL_MODIFIERS}   { return EX_SIGIL; }
-    {SIGIL_START} "\'\'\'" ~"\'\'\'" {SIGIL_MODIFIERS}   { return EX_SIGIL; }
-    // Sigils - regular delimiters
-    {SIGIL_START} "\"" [^\"]* "\"" {SIGIL_MODIFIERS}     { return EX_SIGIL; }
-    {SIGIL_START} "\'" [^\']* "\'" {SIGIL_MODIFIERS}     { return EX_SIGIL; }
-    {SIGIL_START} "/" {SIGIL_SLASH_CONTENT} "/" {SIGIL_MODIFIERS} { return EX_SIGIL; }
-    {SIGIL_START} "|" [^|]* "|" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
-    {SIGIL_START} "(" [^)]* ")" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
-    {SIGIL_START} "[" [^\]]* "]" {SIGIL_MODIFIERS}       { return EX_SIGIL; }
-    {SIGIL_START} "{" [^}]* "}" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
-    {SIGIL_START} "<" [^>]* ">" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
+    // Interpolated sigils (lowercase)
+    {SIGIL_START_INTERP} "\"\"\""      { yybegin(IN_SIGIL_HEREDOC_DQUOTE); return EX_STRING_BEGIN; }
+    {SIGIL_START_INTERP} "\'\'\'"      { yybegin(IN_SIGIL_HEREDOC_SQUOTE); return EX_STRING_BEGIN; }
+    {SIGIL_START_INTERP} "\""          { yybegin(IN_SIGIL_DQUOTE); return EX_STRING_BEGIN; }
+    {SIGIL_START_INTERP} "\'"          { yybegin(IN_SIGIL_SQUOTE); return EX_STRING_BEGIN; }
+    {SIGIL_START_INTERP} "/"           { yybegin(IN_SIGIL_SLASH); return EX_STRING_BEGIN; }
+    {SIGIL_START_INTERP} "|"           { yybegin(IN_SIGIL_PIPE); return EX_STRING_BEGIN; }
+    {SIGIL_START_INTERP} "("           { yybegin(IN_SIGIL_PAREN); return EX_STRING_BEGIN; }
+    {SIGIL_START_INTERP} "["           { yybegin(IN_SIGIL_BRACKET); return EX_STRING_BEGIN; }
+    {SIGIL_START_INTERP} "{"           { yybegin(IN_SIGIL_BRACE); return EX_STRING_BEGIN; }
+    {SIGIL_START_INTERP} "<"           { yybegin(IN_SIGIL_ANGLE); return EX_STRING_BEGIN; }
+
+    // Sigils (non-interpolated, uppercase)
+    {SIGIL_START_NO_INTERP} "\"\"\"" ~"\"\"\"" {SIGIL_MODIFIERS}   { return EX_SIGIL; }
+    {SIGIL_START_NO_INTERP} "\'\'\'" ~"\'\'\'" {SIGIL_MODIFIERS}   { return EX_SIGIL; }
+    {SIGIL_START_NO_INTERP} "\"" [^\"]* "\"" {SIGIL_MODIFIERS}     { return EX_SIGIL; }
+    {SIGIL_START_NO_INTERP} "\'" [^\']* "\'" {SIGIL_MODIFIERS}     { return EX_SIGIL; }
+    {SIGIL_START_NO_INTERP} "/" {SIGIL_SLASH_CONTENT} "/" {SIGIL_MODIFIERS} { return EX_SIGIL; }
+    {SIGIL_START_NO_INTERP} "|" [^|]* "|" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
+    {SIGIL_START_NO_INTERP} "(" [^)]* ")" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
+    {SIGIL_START_NO_INTERP} "[" [^\]]* "]" {SIGIL_MODIFIERS}       { return EX_SIGIL; }
+    {SIGIL_START_NO_INTERP} "{" [^}]* "}" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
+    {SIGIL_START_NO_INTERP} "<" [^>]* ">" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
 
     // Strings - heredocs must be before regular strings
-    "\"\"\"" ~"\"\"\""                 { return EX_HEREDOC; }
+    "\"\"\""                           { yybegin(IN_HEREDOC); return EX_STRING_BEGIN; }
     "\'\'\'" ~"\'\'\'"                 { return EX_CHARLIST_HEREDOC; }
 
-    // Strings - regular (simplified - handle escape sequences inside)
-    "\"" {STRING_CONTENT} "\""         { return EX_STRING; }
+    // Strings - regular
+    "\""                               { yybegin(IN_STRING); return EX_STRING_BEGIN; }
     "\'" {CHARLIST_CONTENT} "\'"       { return EX_CHARLIST; }
 
     // Identifiers and aliases
@@ -275,4 +311,136 @@ CHARLIST_CONTENT=([^\\\']|\\.|{INTERPOLATION})*
 
     // Catch all bad characters
     [^]                                { return BAD_CHARACTER; }
+}
+
+<IN_STRING> {
+    "\\#\\{"                           { return EX_STRING_PART; }
+    "#{"                               { return beginInterpolation(IN_STRING); }
+    "\""                               { yybegin(YYINITIAL); return EX_STRING_END; }
+    [^\"#\\]+                          { return EX_STRING_PART; }
+    "\\\\."                            { return EX_STRING_PART; }
+    "#"                                { return EX_STRING_PART; }
+    "\\"                               { return EX_STRING_PART; }
+    .                                  { return EX_STRING_PART; }
+}
+
+<IN_HEREDOC> {
+    "\"\"\""                           { yybegin(YYINITIAL); return EX_STRING_END; }
+    "\\#\\{"                           { return EX_STRING_PART; }
+    "#{"                               { return beginInterpolation(IN_HEREDOC); }
+    [^\"#]+                            { return EX_STRING_PART; }
+    "\""                               { return EX_STRING_PART; }
+    "#"                                { return EX_STRING_PART; }
+    "\\"                               { return EX_STRING_PART; }
+    .                                  { return EX_STRING_PART; }
+}
+
+<IN_SIGIL_PAREN> {
+    "\\#\\{"                           { return EX_STRING_PART; }
+    "#{"                               { return beginInterpolation(IN_SIGIL_PAREN); }
+    ")" {SIGIL_MODIFIERS}              { yybegin(YYINITIAL); return EX_STRING_END; }
+    [^\\)#]+                           { return EX_STRING_PART; }
+    "\\\\."                            { return EX_STRING_PART; }
+    "#"                                { return EX_STRING_PART; }
+    "\\"                               { return EX_STRING_PART; }
+    .                                  { return EX_STRING_PART; }
+}
+
+<IN_SIGIL_BRACKET> {
+    "\\#\\{"                           { return EX_STRING_PART; }
+    "#{"                               { return beginInterpolation(IN_SIGIL_BRACKET); }
+    "]" {SIGIL_MODIFIERS}              { yybegin(YYINITIAL); return EX_STRING_END; }
+    [^]#\\]+                           { return EX_STRING_PART; }
+    "\\\\."                            { return EX_STRING_PART; }
+    "#"                                { return EX_STRING_PART; }
+    "\\"                               { return EX_STRING_PART; }
+    .                                  { return EX_STRING_PART; }
+}
+
+<IN_SIGIL_BRACE> {
+    "\\#\\{"                           { return EX_STRING_PART; }
+    "#{"                               { return beginInterpolation(IN_SIGIL_BRACE); }
+    "}" {SIGIL_MODIFIERS}              { yybegin(YYINITIAL); return EX_STRING_END; }
+    [^\\}#]+                           { return EX_STRING_PART; }
+    "\\\\."                            { return EX_STRING_PART; }
+    "#"                                { return EX_STRING_PART; }
+    "\\"                               { return EX_STRING_PART; }
+    .                                  { return EX_STRING_PART; }
+}
+
+<IN_SIGIL_ANGLE> {
+    "\\#\\{"                           { return EX_STRING_PART; }
+    "#{"                               { return beginInterpolation(IN_SIGIL_ANGLE); }
+    ">" {SIGIL_MODIFIERS}              { yybegin(YYINITIAL); return EX_STRING_END; }
+    [^\\>#]+                           { return EX_STRING_PART; }
+    "\\\\."                            { return EX_STRING_PART; }
+    "#"                                { return EX_STRING_PART; }
+    "\\"                               { return EX_STRING_PART; }
+    .                                  { return EX_STRING_PART; }
+}
+
+<IN_SIGIL_SLASH> {
+    "\\#\\{"                           { return EX_STRING_PART; }
+    "#{"                               { return beginInterpolation(IN_SIGIL_SLASH); }
+    "/" {SIGIL_MODIFIERS}              { yybegin(YYINITIAL); return EX_STRING_END; }
+    [^\\/#]+                           { return EX_STRING_PART; }
+    "\\\\."                            { return EX_STRING_PART; }
+    "#"                                { return EX_STRING_PART; }
+    "\\"                               { return EX_STRING_PART; }
+    .                                  { return EX_STRING_PART; }
+}
+
+<IN_SIGIL_PIPE> {
+    "\\#\\{"                           { return EX_STRING_PART; }
+    "#{"                               { return beginInterpolation(IN_SIGIL_PIPE); }
+    "|" {SIGIL_MODIFIERS}              { yybegin(YYINITIAL); return EX_STRING_END; }
+    [^\\|#]+                           { return EX_STRING_PART; }
+    "\\\\."                            { return EX_STRING_PART; }
+    "#"                                { return EX_STRING_PART; }
+    "\\"                               { return EX_STRING_PART; }
+    .                                  { return EX_STRING_PART; }
+}
+
+<IN_SIGIL_DQUOTE> {
+    "\\#\\{"                           { return EX_STRING_PART; }
+    "#{"                               { return beginInterpolation(IN_SIGIL_DQUOTE); }
+    "\"" {SIGIL_MODIFIERS}             { yybegin(YYINITIAL); return EX_STRING_END; }
+    [^\"#\\]+                          { return EX_STRING_PART; }
+    "\\\\."                            { return EX_STRING_PART; }
+    "#"                                { return EX_STRING_PART; }
+    "\\"                               { return EX_STRING_PART; }
+    .                                  { return EX_STRING_PART; }
+}
+
+<IN_SIGIL_SQUOTE> {
+    "\\#\\{"                           { return EX_STRING_PART; }
+    "#{"                               { return beginInterpolation(IN_SIGIL_SQUOTE); }
+    "\'" {SIGIL_MODIFIERS}             { yybegin(YYINITIAL); return EX_STRING_END; }
+    [^\'#\\]+                          { return EX_STRING_PART; }
+    "\\\\."                            { return EX_STRING_PART; }
+    "#"                                { return EX_STRING_PART; }
+    "\\"                               { return EX_STRING_PART; }
+    .                                  { return EX_STRING_PART; }
+}
+
+<IN_SIGIL_HEREDOC_DQUOTE> {
+    "\"\"\"" {SIGIL_MODIFIERS}         { yybegin(YYINITIAL); return EX_STRING_END; }
+    "\\#\\{"                           { return EX_STRING_PART; }
+    "#{"                               { return beginInterpolation(IN_SIGIL_HEREDOC_DQUOTE); }
+    [^\"#]+                            { return EX_STRING_PART; }
+    "\""                               { return EX_STRING_PART; }
+    "#"                                { return EX_STRING_PART; }
+    "\\"                               { return EX_STRING_PART; }
+    .                                  { return EX_STRING_PART; }
+}
+
+<IN_SIGIL_HEREDOC_SQUOTE> {
+    "\'\'\'" {SIGIL_MODIFIERS}         { yybegin(YYINITIAL); return EX_STRING_END; }
+    "\\#\\{"                           { return EX_STRING_PART; }
+    "#{"                               { return beginInterpolation(IN_SIGIL_HEREDOC_SQUOTE); }
+    [^\'#]+                            { return EX_STRING_PART; }
+    "\'"                               { return EX_STRING_PART; }
+    "#"                                { return EX_STRING_PART; }
+    "\\"                               { return EX_STRING_PART; }
+    .                                  { return EX_STRING_PART; }
 }
