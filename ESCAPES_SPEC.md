@@ -258,7 +258,7 @@ Commit message:
 
 - `report invalid escape sequences in strings`
 
-### Phase 4: Spellchecker integration (issue 53)
+### Phase 4: Spellchecker integration (issue 53) (DONE)
 
 Work:
 

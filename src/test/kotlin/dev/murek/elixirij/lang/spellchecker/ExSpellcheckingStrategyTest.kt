@@ -2,10 +2,14 @@ package dev.murek.elixirij.lang.spellchecker
 
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
+import com.intellij.spellchecker.inspections.Splitter
 import com.intellij.spellchecker.tokenizer.SpellcheckingStrategy
+import com.intellij.spellchecker.tokenizer.TokenConsumer
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import dev.murek.elixirij.lang.EX_STRINGS
+import dev.murek.elixirij.lang.EX_CHARLIST_PART
+import dev.murek.elixirij.lang.EX_STRING_PART
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -50,7 +54,7 @@ class ExSpellcheckingStrategyTest : BasePlatformTestCase() {
             """.trimIndent()
         )
 
-        val stringElement = findStringElement(myFixture.file.text.indexOf("\"hello"))
+        val stringElement = findStringPartElement(myFixture.file.text.indexOf("hello"))
         assertNotNull("String element should exist", stringElement)
 
         val tokenizer = strategy.getTokenizer(stringElement!!)
@@ -69,7 +73,7 @@ class ExSpellcheckingStrategyTest : BasePlatformTestCase() {
             """.trimIndent()
         )
 
-        val charlistElement = findStringElement(myFixture.file.text.indexOf("'hello"))
+        val charlistElement = findStringPartElement(myFixture.file.text.indexOf("hello"))
         assertNotNull("Charlist element should exist", charlistElement)
 
         val tokenizer = strategy.getTokenizer(charlistElement!!)
@@ -90,7 +94,7 @@ class ExSpellcheckingStrategyTest : BasePlatformTestCase() {
             """.trimIndent()
         )
 
-        val heredocElement = findStringElement(myFixture.file.text.indexOf("\"\"\""))
+        val heredocElement = findStringPartElement(myFixture.file.text.indexOf("hello"))
         assertNotNull("Heredoc element should exist", heredocElement)
 
         val tokenizer = strategy.getTokenizer(heredocElement!!)
@@ -99,6 +103,28 @@ class ExSpellcheckingStrategyTest : BasePlatformTestCase() {
             SpellcheckingStrategy.EMPTY_TOKENIZER,
             tokenizer
         )
+    }
+
+    fun `test escape sequences are skipped in spell checking`() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                x = "foo\\nbar"
+            """.trimIndent()
+        )
+
+        val firstPart = findStringPartElement(myFixture.file.text.indexOf("foo"))
+        val secondPart = findStringPartElement(myFixture.file.text.indexOf("bar"))
+        assertNotNull("First string part should exist", firstPart)
+        assertNotNull("Second string part should exist", secondPart)
+
+        val combined = buildString {
+            append(collectTokens(firstPart!!))
+            append(collectTokens(secondPart!!))
+        }
+        assertTrue("Should include foo", combined.contains("foo"))
+        assertTrue("Should include bar", combined.contains("bar"))
+        assertFalse("Escapes should be removed", combined.contains("\\"))
     }
 
     // Test that identifiers are NOT spell-checked
@@ -196,7 +222,7 @@ class ExSpellcheckingStrategyTest : BasePlatformTestCase() {
             """.trimIndent()
         )
 
-        val sigil = findElementAtOffset(myFixture.file.text.indexOf("~s"))
+        val sigil = findStringPartElement(myFixture.file.text.indexOf("hello"))
         assertNotNull("Sigil element should exist", sigil)
 
         val tokenizer = strategy.getTokenizer(sigil!!)
@@ -214,12 +240,15 @@ class ExSpellcheckingStrategyTest : BasePlatformTestCase() {
             """.trimIndent()
         )
 
-        val sigil = findElementAtOffset(myFixture.file.text.indexOf("~r"))
+        val sigil = findStringPartElement(myFixture.file.text.indexOf("hello"))
         assertNotNull("Sigil element should exist", sigil)
 
         val tokenizer = strategy.getTokenizer(sigil!!)
-        // Regex sigils should not be spell-checked
-        assertNotNull("Tokenizer should not be null", tokenizer)
+        assertEquals(
+            "Regex sigils should not be spell-checked",
+            SpellcheckingStrategy.EMPTY_TOKENIZER,
+            tokenizer
+        )
     }
 
     // Helper methods
@@ -236,18 +265,40 @@ class ExSpellcheckingStrategyTest : BasePlatformTestCase() {
      * Finds a string literal element at the given offset.
      * Walks up the PSI tree to find the actual string token element.
      */
-    private fun findStringElement(offset: Int): PsiElement? {
+    private fun findStringPartElement(offset: Int): PsiElement? {
         var element = findElementAtOffset(offset)
 
-        // Walk up the tree to find the string element
         while (element != null) {
             val elementType = element.node?.elementType
-            if (elementType != null && EX_STRINGS.contains(elementType)) {
+            if (elementType == EX_STRING_PART || elementType == EX_CHARLIST_PART) {
                 return element
             }
             element = element.parent
         }
 
         return null
+    }
+
+    private fun collectTokens(element: PsiElement): String {
+        @Suppress("UNCHECKED_CAST")
+        val tokenizer = strategy.getTokenizer(element) as com.intellij.spellchecker.tokenizer.Tokenizer<PsiElement>
+        val consumer = CollectingTokenConsumer()
+        tokenizer.tokenize(element, consumer)
+        return consumer.tokens.joinToString("")
+    }
+
+    private class CollectingTokenConsumer : TokenConsumer() {
+        val tokens = mutableListOf<String>()
+
+        override fun consumeToken(
+            element: PsiElement,
+            text: String,
+            useRename: Boolean,
+            offset: Int,
+            rangeToCheck: com.intellij.openapi.util.TextRange,
+            splitter: Splitter
+        ) {
+            tokens.add(text)
+        }
     }
 }
