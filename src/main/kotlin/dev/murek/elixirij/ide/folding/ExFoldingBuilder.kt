@@ -36,6 +36,8 @@ class ExFoldingBuilder : FoldingBuilderEx(), DumbAware {
         is ExStruct -> structPlaceholder(element)
         is ExTuple -> tuplePlaceholder(element)
         is ExBitstring -> bitstringPlaceholder(element)
+        is ExInterpolatedString -> interpolatedStringPlaceholder(element)
+        is ExInterpolatedCharlist -> interpolatedCharlistPlaceholder(element)
         is ExHeredoc -> heredocPlaceholder("\"\"\"", element)
         is ExCharlistHeredoc -> heredocPlaceholder("'''", element)
         is ExSigil -> sigilPlaceholder(element.text)
@@ -52,6 +54,8 @@ class ExFoldingBuilder : FoldingBuilderEx(), DumbAware {
         is ExStruct,
         is ExTuple,
         is ExBitstring,
+        is ExInterpolatedString,
+        is ExInterpolatedCharlist,
         is ExHeredoc,
         is ExCharlistHeredoc,
         is ExSigil,
@@ -134,6 +138,23 @@ class ExFoldingBuilder : FoldingBuilderEx(), DumbAware {
         val content = inline.text ?: "..."
         val ellipsis = if (inline.hasMore) " ..." else ""
         return "$delimiter$content$ellipsis$delimiter"
+    }
+
+    private fun interpolatedStringPlaceholder(element: ExInterpolatedString): String {
+        val text = element.text
+        return when {
+            text.startsWith("~") -> sigilPlaceholder(text)
+            text.startsWith("\"\"\"") -> heredocPlaceholder("\"\"\"", element)
+            else -> "\"...\""
+        }
+    }
+
+    private fun interpolatedCharlistPlaceholder(element: ExInterpolatedCharlist): String {
+        val text = element.text
+        return when {
+            text.startsWith("'''") -> heredocPlaceholder("'''", element)
+            else -> "'...'"
+        }
     }
 
     private fun doBlockPlaceholder(element: PsiElement): String {
