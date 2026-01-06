@@ -8,6 +8,8 @@ import dev.murek.elixirij.lang.EX_DO
 import dev.murek.elixirij.lang.EX_END
 import dev.murek.elixirij.lang.EX_FN
 import dev.murek.elixirij.lang.EX_GT_GT
+import dev.murek.elixirij.lang.EX_INTERPOLATION_END
+import dev.murek.elixirij.lang.EX_INTERPOLATION_START
 import dev.murek.elixirij.lang.EX_LBRACE
 import dev.murek.elixirij.lang.EX_LBRACKET
 import dev.murek.elixirij.lang.EX_LPAREN
@@ -29,6 +31,7 @@ import dev.murek.elixirij.lang.psi.ExTypes
  * - Braces: {}
  * - Map literals: %{}
  * - Binary delimiters: <<>>
+ * - Interpolation braces: #{}
  */
 class ExBraceMatcher : PairedBraceMatcher {
     private val pairs = arrayOf(
@@ -38,7 +41,8 @@ class ExBraceMatcher : PairedBraceMatcher {
         BracePair(EX_LBRACKET, EX_RBRACKET, false),
         BracePair(EX_LBRACE, EX_RBRACE, false),
         BracePair(EX_PERCENT_LBRACE, EX_RBRACE, false),
-        BracePair(EX_LT_LT, EX_GT_GT, false)
+        BracePair(EX_LT_LT, EX_GT_GT, false),
+        BracePair(EX_INTERPOLATION_START, EX_INTERPOLATION_END, false)
     )
 
     override fun getPairs(): Array<BracePair> = pairs

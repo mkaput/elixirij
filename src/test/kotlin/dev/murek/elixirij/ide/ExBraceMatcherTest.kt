@@ -12,7 +12,7 @@ class ExBraceMatcherTest : BasePlatformTestCase() {
     fun `test gets all brace pairs`() {
         val pairs = braceMatcher.pairs
 
-        assertEquals(7, pairs.size)
+        assertEquals(8, pairs.size)
 
         // Structural pairs (do...end, fn...end)
         assertContainsPair(pairs, EX_DO, EX_END, structural = true)
@@ -24,6 +24,7 @@ class ExBraceMatcherTest : BasePlatformTestCase() {
         assertContainsPair(pairs, EX_LBRACE, EX_RBRACE, structural = false)
         assertContainsPair(pairs, EX_PERCENT_LBRACE, EX_RBRACE, structural = false)
         assertContainsPair(pairs, EX_LT_LT, EX_GT_GT, structural = false)
+        assertContainsPair(pairs, EX_INTERPOLATION_START, EX_INTERPOLATION_END, structural = false)
     }
 
     fun `test paired braces allowed before any type`() {

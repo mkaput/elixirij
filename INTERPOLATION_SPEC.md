@@ -229,7 +229,7 @@ Tests:
 
 Commit: add charlist interpolation support + tests.
 
-### Phase 4: Highlighting and brace matching
+### Phase 4: Highlighting and brace matching — DONE ✅
 
 Goal: highlight interpolation delimiters and handle brace matching correctly.
 
