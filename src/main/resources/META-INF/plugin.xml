@@ -34,6 +34,8 @@
     <lang.foldingBuilder language="Elixir"
                          implementationClass="dev.murek.elixirij.ide.folding.ExFoldingBuilder"/>
 
+    <formattingService implementation="dev.murek.elixirij.ide.formatter.ExMixFormatService"/>
+
     <typedHandler implementation="dev.murek.elixirij.ide.ExTypedHandlerDelegate"/>
     <backspaceHandlerDelegate implementation="dev.murek.elixirij.ide.ExBackspaceHandlerDelegate"/>
 
