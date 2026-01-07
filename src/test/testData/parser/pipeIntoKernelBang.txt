@@ -1,0 +1,16 @@
+Elixir File
+  ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
+    ExArrowExprImpl(ARROW_EXPR)
+      ExLiteralImpl(LITERAL)
+        ExBooleanLiteralImpl(BOOLEAN_LITERAL)
+          PsiElement(true)('true')
+      PsiElement(EOL)('\n')
+      PsiElement(|>)('|>')
+      PsiWhiteSpace(' ')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('Kernel')
+    PsiElement(.)('.')
+    PsiErrorElement:'(', ALIAS, IDENTIFIER, raise, send, super, throw or '{' expected, got '!'
+      PsiElement(!)('!')
+    PsiElement(()('(')
+    PsiElement())(')')

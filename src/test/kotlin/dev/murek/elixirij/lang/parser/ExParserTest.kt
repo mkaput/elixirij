@@ -98,6 +98,16 @@ class ExParserTest : ParsingTestCase(
     fun testFnClauseGuardAfterArgsNewline() = doTest()
     fun testOperatorAtomDot() = doTest()
     fun testTypeUnionMultiline() = doTest()
+    fun testPipeIntoKernelBang() = doTest()
+    fun testTypespecListUnion() = doTest()
+    fun testMultilineTupleInKeyword() = doTest()
+    fun testModuleAttributeNestedAliasCall() = doTest()
+    fun testMapStringKey() = doTest()
+    fun testTupleCallElement() = doTest()
+    fun testTupleWithMapElement() = doTest()
+    fun testTuplePipelineElement() = doTest()
+    fun testMapUpdateSyntax() = doTest()
+    fun testLargeNestedDataPerformance() = doTest()
     // =============================================================================
     // 1. Literals
     // =============================================================================
