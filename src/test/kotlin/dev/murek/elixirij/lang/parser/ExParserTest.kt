@@ -111,6 +111,7 @@ class ExParserTest : ParsingTestCase(
     fun testString() = doTest()
     fun testStringInterpolation() = doTest()
     fun testStringEscape() = doTest()
+    fun testStringEscapeInCall() = doTest()
     fun testHeredoc() = doTest()
     fun testCharlist() = doTest()
     fun testCharlistHeredoc() = doTest()

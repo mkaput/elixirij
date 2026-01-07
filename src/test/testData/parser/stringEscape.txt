@@ -6,7 +6,7 @@ Elixir File
         ExStringPartImpl(STRING_PART)
           PsiElement(STRING_PART)('hello')
         ExStringPartImpl(STRING_PART)
-          PsiElement(STRING_PART)('\n')
+          PsiElement(VALID_STRING_ESCAPE_TOKEN)('\n')
         ExStringPartImpl(STRING_PART)
           PsiElement(STRING_PART)('world')
         PsiElement(STRING_END)('"')

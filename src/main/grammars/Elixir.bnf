@@ -15,6 +15,7 @@
   generate=[tokens="no"]
   parserImports=[
     "static dev.murek.elixirij.lang.ElementTypes.*"
+    "static com.intellij.psi.StringEscapesTokenTypes.*"
     "static com.intellij.lang.parser.GeneratedParserUtilBase.*"
   ]
   
@@ -311,11 +312,17 @@ string ::= EX_STRING
 interpolatedString ::= EX_STRING_BEGIN interpolatedStringItem* EX_STRING_END { pin=1 }
 private interpolatedStringItem ::= stringPart | interpolation
 stringPart ::= EX_STRING_PART
+            | VALID_STRING_ESCAPE_TOKEN
+            | INVALID_CHARACTER_ESCAPE_TOKEN
+            | INVALID_UNICODE_ESCAPE_TOKEN
 interpolation ::= EX_INTERPOLATION_START expression EX_INTERPOLATION_END { pin=1 }
 charlist ::= EX_CHARLIST
 interpolatedCharlist ::= EX_CHARLIST_BEGIN interpolatedCharlistItem* EX_CHARLIST_END { pin=1 }
 private interpolatedCharlistItem ::= charlistPart | interpolation
 charlistPart ::= EX_CHARLIST_PART
+              | VALID_STRING_ESCAPE_TOKEN
+              | INVALID_CHARACTER_ESCAPE_TOKEN
+              | INVALID_UNICODE_ESCAPE_TOKEN
 heredoc ::= EX_HEREDOC
 charlistHeredoc ::= EX_CHARLIST_HEREDOC
 sigil ::= EX_SIGIL
