@@ -21,6 +21,8 @@ import dev.murek.elixirij.lang.EX_COMMA
 import dev.murek.elixirij.lang.EX_COMMENTS
 import dev.murek.elixirij.lang.EX_DOT
 import dev.murek.elixirij.lang.EX_IDENTIFIER
+import dev.murek.elixirij.lang.EX_INTERPOLATION_END
+import dev.murek.elixirij.lang.EX_INTERPOLATION_START
 import dev.murek.elixirij.lang.EX_KEYWORDS
 import dev.murek.elixirij.lang.EX_KW_IDENTIFIER
 import dev.murek.elixirij.lang.EX_NUMBERS
@@ -48,6 +50,7 @@ class ExSyntaxHighlighter : SyntaxHighlighterBase() {
         StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN -> pack(ExTextAttributes.STRING_ESCAPE)
         StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN,
         StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN -> pack(ExTextAttributes.INVALID_STRING_ESCAPE)
+        EX_INTERPOLATION_START, EX_INTERPOLATION_END -> pack(ExTextAttributes.INTERPOLATION)
         EX_ATOM, EX_ATOM_QUOTED, EX_KW_IDENTIFIER -> pack(ExTextAttributes.ATOM)
         EX_ALIAS -> pack(ExTextAttributes.MODULE)
         EX_IDENTIFIER -> pack(ExTextAttributes.IDENTIFIER)

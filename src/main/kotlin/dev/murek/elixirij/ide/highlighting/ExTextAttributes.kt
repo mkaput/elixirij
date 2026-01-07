@@ -42,6 +42,11 @@ enum class ExTextAttributes(
         DefaultLanguageHighlighterColors.STRING,
         OptionsBundle.messagePointer("options.language.defaults.string")
     ),
+    INTERPOLATION(
+        "ELIXIR_INTERPOLATION",
+        DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE,
+        ExBundle.messagePointer("color.settings.interpolation")
+    ),
     STRING_ESCAPE(
         "ELIXIR_STRING_ESCAPE",
         DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE,

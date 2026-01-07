@@ -11,7 +11,7 @@ class ExSyntaxHighlighterTest : BasePlatformTestCase() {
     fun `test interpolation tokens are highlighted in strings`() {
         doTest(
             """
-            "<info textAttributesKey="ELIXIR_STRING">a </info><info textAttributesKey="ELIXIR_BRACES">#{</info>b<info textAttributesKey="ELIXIR_BRACES">}</info><info textAttributesKey="ELIXIR_STRING"> c</info>"
+            "<info textAttributesKey="ELIXIR_STRING">a </info><info textAttributesKey="ELIXIR_INTERPOLATION">#{</info>b<info textAttributesKey="ELIXIR_INTERPOLATION">}</info><info textAttributesKey="ELIXIR_STRING"> c</info>"
             """.trimIndent()
         )
     }
@@ -19,7 +19,7 @@ class ExSyntaxHighlighterTest : BasePlatformTestCase() {
     fun `test interpolation tokens are highlighted in sigils`() {
         doTest(
             """
-            ~s(foo <info textAttributesKey="ELIXIR_BRACES">#{</info>bar<info textAttributesKey="ELIXIR_BRACES">}</info>)
+            ~s(foo <info textAttributesKey="ELIXIR_INTERPOLATION">#{</info>bar<info textAttributesKey="ELIXIR_INTERPOLATION">}</info>)
             """.trimIndent()
         )
     }
