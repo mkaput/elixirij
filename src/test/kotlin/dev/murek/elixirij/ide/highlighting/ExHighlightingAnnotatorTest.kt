@@ -8,6 +8,29 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
         doTest("<info textAttributesKey=\"ELIXIR_SPECIAL_FORM\">defmodule</info> MyModule do\nend")
     }
 
+    fun `test spec attribute above private function is highlighted`() {
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              @<info textAttributesKey="ELIXIR_MODULE_ATTRIBUTE">spec</info> <info textAttributesKey="ELIXIR_FUNCTION_CALL">fetch</info>(Ecto.Queryable.<info textAttributesKey="ELIXIR_FUNCTION_CALL">t</info>(), <info textAttributesKey="ELIXIR_FUNCTION_CALL">any</info>(), <info textAttributesKey="ELIXIR_FUNCTION_CALL">keyword</info>()) ::
+                      {:ok, Ecto.Schema.<info textAttributesKey="ELIXIR_FUNCTION_CALL">t</info>()} | {:error, <info textAttributesKey="ELIXIR_FUNCTION_CALL">atom</info>()}
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">defp</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">fetch</info>(
+                    queryable,
+                    id,
+                    opts \\ []
+                  ) do
+                {on_error, opts} = Keyword.<info textAttributesKey="ELIXIR_FUNCTION_CALL">pop</info>(opts, :on_error, :not_found)
+
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">case</info> get(<blank>queryable</blank>, id, opts) do
+                  nil -> {:error, on_error}
+                  record -> {:ok, record}
+                end
+              end
+            end
+        """.trimIndent()
+        )
+    }
+
     fun `test def keyword and function name are highlighted`() {
         doTest(
             """
@@ -25,7 +48,7 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
             """
             <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
               <info textAttributesKey="ELIXIR_SPECIAL_FORM">defp</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">private_function</info>(x, y) do
-                x + y
+                <blank>x</blank> + <blank>y</blank>
               end
             end
         """.trimIndent()
@@ -38,7 +61,7 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
             <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
               <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmacro</info> <info textAttributesKey="ELIXIR_MACRO_DECLARATION">my_macro</info>(expr) do
                 <info textAttributesKey="ELIXIR_SPECIAL_FORM">quote</info> do
-                  <info textAttributesKey="ELIXIR_SPECIAL_FORM">unquote</info>(expr)
+                  <info textAttributesKey="ELIXIR_SPECIAL_FORM">unquote</info>(<blank>expr</blank>)
                 end
               end
             end
@@ -50,7 +73,7 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
         doTest(
             """
             <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
-              <info textAttributesKey="ELIXIR_SPECIAL_FORM">defguard</info> <info textAttributesKey="ELIXIR_MACRO_DECLARATION">is_positive</info>(x) when x > 0
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">defguard</info> <info textAttributesKey="ELIXIR_MACRO_DECLARATION">is_positive</info>(<blank>x</blank>) when x > 0
             end
         """.trimIndent()
         )
@@ -89,8 +112,64 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
             """
             <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
               <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info>(x) do
-                <info textAttributesKey="ELIXIR_SPECIAL_FORM">case</info> x do
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">case</info> <blank>x</blank> do
                   :ok -> :success
+                end
+              end
+            end
+        """.trimIndent()
+        )
+    }
+
+    fun `test function calls are highlighted`() {
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info> do
+                <info textAttributesKey="ELIXIR_FUNCTION_CALL">foo</info>(1)
+                Foo.Bar.<info textAttributesKey="ELIXIR_FUNCTION_CALL">baz</info>(2)
+                <blank>foo</blank>.(3)
+              end
+            end
+        """.trimIndent()
+        )
+    }
+
+    fun `test bracket access does not highlight receiver as a function call`() {
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info>(opts, query) do
+                Ecto.Adapters.SQL.<info textAttributesKey="ELIXIR_FUNCTION_CALL">explain</info>(<blank>opts</blank>[:repo], opts[:query_fn], query, opts)
+              end
+            end
+        """.trimIndent()
+        )
+    }
+
+    fun `test qualified call with predicate suffix is highlighted`() {
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info> do
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">if</info> Code.<info textAttributesKey="ELIXIR_FUNCTION_CALL">ensure_loaded?</info>(Ecto.DevLogger) do
+                  :ok
+                end
+              end
+            end
+        """.trimIndent()
+        )
+    }
+
+    fun `test predicate calls are highlighted`() {
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info>(results, partition_str) do
+                <info textAttributesKey="ELIXIR_FUNCTION_CALL">assert</info> <info textAttributesKey="ELIXIR_FUNCTION_CALL">is_function</info>(<blank>results</blank>)
+
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">if</info> <info textAttributesKey="ELIXIR_FUNCTION_CALL">is_binary</info>(<blank>partition_str</blank>) do
+                  :ok
                 end
               end
             end
@@ -104,8 +183,46 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
             <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
               <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info> do
                 <info textAttributesKey="ELIXIR_SPECIAL_FORM">with</info> {:ok, a} <- fetch() do
-                  a
+                  <blank>a</blank>
                 end
+              end
+            end
+        """.trimIndent()
+        )
+    }
+
+    fun `test bracket access does not highlight atom key`() {
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info>(base_params, tags) do
+                Map.<info textAttributesKey="ELIXIR_FUNCTION_CALL">merge</info>(base_params, tags[<blank>:admin</blank>])
+              end
+            end
+        """.trimIndent()
+        )
+    }
+
+    fun `test bracket access atom key inside calls is not highlighted`() {
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info>(base_params, tags) do
+                <info textAttributesKey="ELIXIR_SPECIAL_FORM">if</info> <info textAttributesKey="ELIXIR_FUNCTION_CALL">is_map</info>(tags[<blank>:admin</blank>]) do
+                  Map.<info textAttributesKey="ELIXIR_FUNCTION_CALL">merge</info>(base_params, tags[<blank>:admin</blank>])
+                end
+              end
+            end
+        """.trimIndent()
+        )
+    }
+
+    fun `test binary expr does not highlight left operand`() {
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info>(<blank>count</blank>, <blank>chunk</blank>) do
+                :ets.insert(processed, {:count, <blank>count</blank> + <info textAttributesKey="ELIXIR_FUNCTION_CALL">length</info>(chunk)})
               end
             end
         """.trimIndent()
@@ -118,7 +235,7 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
             <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
               <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">example</info> do
                 <info textAttributesKey="ELIXIR_SPECIAL_FORM">for</info> i <- 1..10 do
-                  i * 2
+                  <blank>i</blank> * 2
                 end
               end
             end
@@ -171,11 +288,11 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
         doTest(
             """
             <info textAttributesKey="ELIXIR_SPECIAL_FORM">defprotocol</info> MyProtocol do
-              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">my_func</info>(t)
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">my_func</info>(<blank>t</blank>)
             end
 
             <info textAttributesKey="ELIXIR_SPECIAL_FORM">defimpl</info> MyProtocol, for: MyStruct do
-              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">my_func</info>(t), do: t.name
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">def</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">my_func</info>(t), do: <blank>t</blank>.name
             end
         """.trimIndent()
         )
@@ -193,7 +310,7 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
                 end
 
                 <info textAttributesKey="ELIXIR_SPECIAL_FORM">receive</info> do
-                  {:msg, x} -> x
+                  {:msg, <blank>x</blank>} -> x
                 end
 
                 <info textAttributesKey="ELIXIR_SPECIAL_FORM">cond</info> do
@@ -223,7 +340,31 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
     }
 
     private fun doTest(code: String) {
-        myFixture.configureByText("test.ex", code)
+        val blankPattern = Regex("<blank>(.*?)</blank>", setOf(RegexOption.DOT_MATCHES_ALL))
+        val blankRanges = mutableListOf<IntRange>()
+        var stripped = code
+        while (true) {
+            val match = blankPattern.find(stripped) ?: break
+            val content = match.groupValues[1]
+            val start = match.range.first
+            blankRanges.add(start until (start + content.length))
+            stripped = stripped.replaceRange(match.range, content)
+        }
+        myFixture.configureByText("test.ex", stripped)
         myFixture.checkHighlighting(false, true, false, true)
+        if (blankRanges.isNotEmpty()) {
+            val highlights = myFixture.doHighlighting()
+            for (range in blankRanges) {
+                val hasAnyHighlight = highlights.any { info ->
+                    val start = info.startOffset
+                    val end = info.endOffset
+                    start <= range.last && end >= range.first + 1
+                }
+                assertFalse(
+                    "Expected no highlighting for blank range at ${range.first}-${range.last}",
+                    hasAnyHighlight
+                )
+            }
+        }
     }
 }

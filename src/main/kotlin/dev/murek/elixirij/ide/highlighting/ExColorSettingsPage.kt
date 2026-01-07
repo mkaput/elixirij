@@ -29,6 +29,7 @@ class ExColorSettingsPage : ColorSettingsPage {
     override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey> =
         mapOf(
             "SPECIAL_FORM" to ExTextAttributes.SPECIAL_FORM.attribute,
+            "FUNCTION_CALL" to ExTextAttributes.FUNCTION_CALL.attribute,
             "FUNCTION_DECLARATION" to ExTextAttributes.FUNCTION_DECLARATION.attribute,
             "MACRO_DECLARATION" to ExTextAttributes.MACRO_DECLARATION.attribute,
             "MODULE_ATTRIBUTE" to ExTextAttributes.MODULE_ATTRIBUTE.attribute,

@@ -5,8 +5,15 @@ import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.project.DumbAware
 import com.intellij.psi.PsiElement
+import com.intellij.psi.TokenType
+import com.intellij.psi.util.PsiUtilCore
 import com.intellij.psi.util.childrenOfType
 import com.intellij.psi.util.PsiTreeUtil
+import dev.murek.elixirij.lang.EX_DOT
+import dev.murek.elixirij.lang.EX_DO
+import dev.murek.elixirij.lang.EX_LBRACKET
+import dev.murek.elixirij.lang.EX_LPAREN
+import dev.murek.elixirij.lang.ExFile
 import dev.murek.elixirij.lang.psi.*
 
 /**
@@ -67,10 +74,25 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
 
         when (element) {
             is ExModuleAttr -> highlightModuleAttr(element, holder)
+            is ExFile -> highlightCallTokensInFile(element, holder)
             is ExCallExpr -> highlightCall(element, holder)
+            is ExDotAccess -> highlightDotAccessCall(element, holder)
+            is ExParenExpr -> highlightCallBeforeParen(element, holder)
             is ExIdentifier -> {
                 highlightSpecialForm(element, holder)
+                highlightQualifiedCallElement(element, holder)
+                highlightCallLikeElement(element, holder)
                 highlightUnusedIdentifier(element, holder)
+            }
+
+            is ExAtom -> {
+                highlightQualifiedCallElement(element, holder)
+                highlightCallLikeElement(element, holder)
+            }
+
+            else -> {
+                highlightQualifiedCallLeaf(element, holder)
+                highlightCallLikeLeaf(element, holder)
             }
         }
     }
@@ -85,13 +107,23 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
             } else {
                 highlight(attrName, ExTextAttributes.MODULE_ATTRIBUTE, holder)
             }
+            if (attrName.text == "spec") {
+                highlightSpecQualifiedCalls(element, holder)
+            }
         }
     }
 
     private fun highlightCall(element: ExCallExpr, holder: AnnotationHolder) {
-        val callTarget = findCallTarget(element) ?: return
-        highlightSpecialForm(callTarget, holder)
-        highlightDeclarationName(callTarget.text, element, callTarget, holder)
+        if (isInsideSpec(element)) return
+        val specialFormTarget = findSpecialFormTarget(element)
+        if (specialFormTarget != null) {
+            highlightSpecialForm(specialFormTarget, holder)
+            highlightDeclarationName(specialFormTarget.text, element, specialFormTarget, holder)
+        }
+        highlightFunctionCall(element, holder)
+        val skipTarget = findFunctionCallTarget(element)?.element
+        highlightQualifiedCallsInRange(element, holder, skipTarget)
+        highlightNestedCallIdentifiers(element, holder, skipTarget)
     }
 
     private fun highlightSpecialForm(callTarget: ExIdentifier, holder: AnnotationHolder) {
@@ -112,11 +144,255 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
         highlight(declarationName, declarationAttribute, holder)
     }
 
-    private fun findCallTarget(element: ExCallExpr): ExIdentifier? {
+    private fun findSpecialFormTarget(element: ExCallExpr): ExIdentifier? {
         val children = element.children
         val firstIdentifier = children.firstOrNull { it is ExIdentifier } as? ExIdentifier ?: return null
         if (children.any { it is ExDotAccess }) return null
         return firstIdentifier
+    }
+
+    private fun highlightFunctionCall(element: ExCallExpr, holder: AnnotationHolder) {
+        val target = findFunctionCallTarget(element) ?: return
+        if (!target.isQualified && target.element.text in specialFormNames) return
+        if (isDeclarationNameTarget(target.element)) return
+        highlight(target.element, ExTextAttributes.FUNCTION_CALL, holder)
+    }
+
+    private fun highlightQualifiedCallElement(element: PsiElement, holder: AnnotationHolder) {
+        if (isInsideSpec(element)) return
+        val callExpr = PsiTreeUtil.getParentOfType(element, ExCallExpr::class.java)
+        if (callExpr != null) {
+            val callTarget = findFunctionCallTarget(callExpr)
+            if (callTarget?.element == element) return
+        }
+        val prevLeaf = previousNonWhitespaceLeaf(element) ?: return
+        if (PsiUtilCore.getElementType(prevLeaf) != EX_DOT) return
+        val nextLeaf = nextNonWhitespaceLeaf(element) ?: return
+        if (PsiUtilCore.getElementType(nextLeaf) != EX_LPAREN) return
+        if (isDeclarationNameTarget(element)) return
+        highlight(element, ExTextAttributes.FUNCTION_CALL, holder)
+    }
+
+    private fun highlightCallLikeElement(element: PsiElement, holder: AnnotationHolder) {
+        if (isDeclarationNameTarget(element)) return
+        if (element is ExIdentifier && element.text in specialFormNames) return
+        val nextLeaf = nextNonWhitespaceLeaf(element) ?: return
+        if (PsiUtilCore.getElementType(nextLeaf) != EX_LPAREN) return
+        highlight(element, ExTextAttributes.FUNCTION_CALL, holder)
+    }
+
+    private fun highlightNestedCallIdentifiers(
+        element: ExCallExpr,
+        holder: AnnotationHolder,
+        skipTarget: PsiElement?
+    ) {
+        val identifiers = PsiTreeUtil.findChildrenOfType(element, ExIdentifier::class.java)
+        for (identifier in identifiers) {
+            if (identifier.text in specialFormNames) continue
+            val nextLeaf = nextNonWhitespaceLeaf(identifier) ?: continue
+            if (PsiUtilCore.getElementType(nextLeaf) != EX_LPAREN) continue
+            if (isDeclarationNameTarget(identifier)) continue
+            if (skipTarget == null || identifier != skipTarget) {
+                highlight(identifier, ExTextAttributes.FUNCTION_CALL, holder)
+            }
+        }
+        val atoms = PsiTreeUtil.findChildrenOfType(element, ExAtom::class.java)
+        for (atom in atoms) {
+            val nextLeaf = nextNonWhitespaceLeaf(atom) ?: continue
+            if (PsiUtilCore.getElementType(nextLeaf) != EX_LPAREN) continue
+            if (isDeclarationNameTarget(atom)) continue
+            if (skipTarget == null || atom != skipTarget) {
+                highlight(atom, ExTextAttributes.FUNCTION_CALL, holder)
+            }
+        }
+    }
+
+    private fun highlightDotAccessCall(element: ExDotAccess, holder: AnnotationHolder) {
+        if (isInsideSpec(element)) return
+        val target = element.children.lastOrNull { it is ExIdentifier || it is ExAtom } ?: return
+        val nextLeaf = nextNonWhitespaceLeaf(target) ?: return
+        if (PsiUtilCore.getElementType(nextLeaf) != EX_LPAREN) return
+        if (isDeclarationNameTarget(target)) return
+        highlight(target, ExTextAttributes.FUNCTION_CALL, holder)
+    }
+
+    private fun highlightQualifiedCallLeaf(element: PsiElement, holder: AnnotationHolder) {
+        if (isInsideSpec(element)) return
+        if (element.parent is ExIdentifier || element.parent is ExAtom) return
+        val elementType = PsiUtilCore.getElementType(element) ?: return
+        if (elementType != dev.murek.elixirij.lang.EX_IDENTIFIER && elementType != dev.murek.elixirij.lang.EX_ATOM) return
+        highlightQualifiedCallElement(element, holder)
+    }
+
+    private fun highlightCallLikeLeaf(element: PsiElement, holder: AnnotationHolder) {
+        if (isInsideSpec(element)) return
+        if (element.parent is ExIdentifier || element.parent is ExAtom) return
+        val elementType = PsiUtilCore.getElementType(element) ?: return
+        if (elementType != dev.murek.elixirij.lang.EX_IDENTIFIER && elementType != dev.murek.elixirij.lang.EX_ATOM) return
+        val nextLeaf = nextNonWhitespaceLeaf(element) ?: return
+        if (PsiUtilCore.getElementType(nextLeaf) != EX_LPAREN) return
+        val target = element.parent ?: element
+        if (isDeclarationNameTarget(target)) return
+        if (target is ExIdentifier && target.text in specialFormNames) return
+        highlight(target, ExTextAttributes.FUNCTION_CALL, holder)
+    }
+
+    private fun highlightCallBeforeParen(element: ExParenExpr, holder: AnnotationHolder) {
+        val prevLeaf = previousNonWhitespaceLeaf(element) ?: return
+        val elementType = PsiUtilCore.getElementType(prevLeaf) ?: return
+        if (elementType != dev.murek.elixirij.lang.EX_IDENTIFIER && elementType != dev.murek.elixirij.lang.EX_ATOM) return
+        val target = prevLeaf.parent ?: prevLeaf
+        if (isDeclarationNameTarget(target)) return
+        if (target is ExIdentifier && target.text in specialFormNames) return
+        highlight(target, ExTextAttributes.FUNCTION_CALL, holder)
+    }
+
+
+    private fun highlightSpecQualifiedCalls(element: ExModuleAttr, holder: AnnotationHolder) {
+        highlightSpecCallsInRange(element, holder)
+    }
+
+    private fun highlightQualifiedCallsInRange(
+        element: ExCallExpr,
+        holder: AnnotationHolder,
+        skipTarget: PsiElement?
+    ) {
+        val startOffset = element.textRange.startOffset
+        val endOffset = element.textRange.endOffset
+        var leaf: PsiElement? = PsiTreeUtil.getDeepestFirst(element)
+        while (leaf != null && leaf.textRange.startOffset < endOffset) {
+            if (leaf.textRange.endOffset <= startOffset) {
+                leaf = PsiTreeUtil.nextLeaf(leaf, true)
+                continue
+            }
+            val elementType = PsiUtilCore.getElementType(leaf)
+            if (elementType == dev.murek.elixirij.lang.EX_IDENTIFIER || elementType == dev.murek.elixirij.lang.EX_ATOM) {
+                val nextLeaf = nextNonWhitespaceLeaf(leaf)
+                if (nextLeaf != null && PsiUtilCore.getElementType(nextLeaf) == EX_LPAREN) {
+                    val target = leaf.parent ?: leaf
+                    if (!isDeclarationNameTarget(target) && (skipTarget == null || target != skipTarget)) {
+                        highlight(target, ExTextAttributes.FUNCTION_CALL, holder)
+                    }
+                }
+            }
+            leaf = PsiTreeUtil.nextLeaf(leaf, true)
+        }
+    }
+
+    private fun highlightSpecCallsInRange(element: ExModuleAttr, holder: AnnotationHolder) {
+        val startOffset = element.textRange.startOffset
+        val endOffset = element.textRange.endOffset
+        var leaf: PsiElement? = PsiTreeUtil.getDeepestFirst(element)
+        while (leaf != null && leaf.textRange.startOffset < endOffset) {
+            if (leaf.textRange.endOffset <= startOffset) {
+                leaf = PsiTreeUtil.nextLeaf(leaf, true)
+                continue
+            }
+            val elementType = PsiUtilCore.getElementType(leaf)
+            if (elementType == dev.murek.elixirij.lang.EX_IDENTIFIER || elementType == dev.murek.elixirij.lang.EX_ATOM) {
+                val nextLeaf = nextNonWhitespaceLeaf(leaf)
+                if (nextLeaf != null && PsiUtilCore.getElementType(nextLeaf) == EX_LPAREN) {
+                    val target = leaf.parent ?: leaf
+                    highlight(target, ExTextAttributes.FUNCTION_CALL, holder)
+                }
+            }
+            leaf = PsiTreeUtil.nextLeaf(leaf, true)
+        }
+    }
+
+    private fun highlightCallTokensInFile(file: ExFile, holder: AnnotationHolder) {
+        var leaf: PsiElement? = PsiTreeUtil.getDeepestFirst(file)
+        while (leaf != null) {
+            val elementType = PsiUtilCore.getElementType(leaf)
+            if (elementType == dev.murek.elixirij.lang.EX_IDENTIFIER || elementType == dev.murek.elixirij.lang.EX_ATOM) {
+                val nextLeaf = nextNonWhitespaceLeaf(leaf)
+                if (nextLeaf != null && PsiUtilCore.getElementType(nextLeaf) == EX_LPAREN) {
+                    val target = leaf.parent ?: leaf
+                    if (!isDeclarationNameTarget(target) &&
+                        !(target is ExIdentifier && target.text in specialFormNames)
+                    ) {
+                        highlight(target, ExTextAttributes.FUNCTION_CALL, holder)
+                    }
+                }
+            }
+            leaf = PsiTreeUtil.nextLeaf(leaf, true)
+        }
+    }
+
+    private data class CallTarget(val element: PsiElement, val isQualified: Boolean)
+
+    private fun findFunctionCallTarget(element: ExCallExpr): CallTarget? {
+        val start = element.textRange.startOffset
+        val end = element.textRange.endOffset
+        var leaf: PsiElement? = PsiTreeUtil.getDeepestFirst(element)
+        var lastTarget: PsiElement? = null
+        var sawDot = false
+        while (leaf != null && leaf.textRange.startOffset < end) {
+            if (leaf.textRange.endOffset <= start) {
+                leaf = PsiTreeUtil.nextLeaf(leaf, true)
+                continue
+            }
+            when (PsiUtilCore.getElementType(leaf)) {
+                EX_DOT -> {
+                    val nextLeaf = nextNonWhitespaceLeaf(leaf) ?: return null
+                    if (PsiUtilCore.getElementType(nextLeaf) == EX_LPAREN) return null
+                    sawDot = true
+                }
+
+                EX_LPAREN, EX_DO -> return lastTarget?.let { CallTarget(it, sawDot) }
+            }
+            val parent = leaf.parent
+            if (parent is ExIdentifier || parent is ExAtom) {
+                lastTarget = parent
+                val nextLeaf = nextNonWhitespaceLeaf(parent)
+                val nextType = nextLeaf?.let { PsiUtilCore.getElementType(it) }
+                if (nextType != EX_DOT && nextType != EX_LPAREN && nextType != EX_DO && nextType != EX_LBRACKET) {
+                    return CallTarget(parent, sawDot)
+                }
+            }
+            leaf = PsiTreeUtil.nextLeaf(leaf, true)
+        }
+        return lastTarget?.let { CallTarget(it, sawDot) }
+    }
+
+    private fun isDeclarationNameTarget(target: PsiElement): Boolean {
+        var callExpr = PsiTreeUtil.getParentOfType(target, ExCallExpr::class.java)
+        while (callExpr != null) {
+            val callTarget = findSpecialFormTarget(callExpr)
+            if (callTarget != null) {
+                val callName = callTarget.text
+                if (callName in functionDeclarationNames || callName in macroDeclarationNames) {
+                    val declarationName = findDeclarationName(callExpr, callTarget)
+                    if (declarationName != null && PsiTreeUtil.isAncestor(declarationName, target, false)) {
+                        return true
+                    }
+                }
+            }
+            callExpr = PsiTreeUtil.getParentOfType(callExpr, ExCallExpr::class.java, true)
+        }
+        return false
+    }
+
+    private fun isInsideSpec(element: PsiElement): Boolean {
+        val moduleAttr = PsiTreeUtil.getParentOfType(element, ExModuleAttr::class.java) ?: return false
+        val attrName = moduleAttr.childrenOfType<ExIdentifier>().firstOrNull()?.text ?: return false
+        return attrName == "spec"
+    }
+
+    private fun nextNonWhitespaceLeaf(element: PsiElement): PsiElement? {
+        var leaf = PsiTreeUtil.nextLeaf(element, true)
+        while (leaf != null && PsiUtilCore.getElementType(leaf) == TokenType.WHITE_SPACE) {
+            leaf = PsiTreeUtil.nextLeaf(leaf, true)
+        }
+        return leaf
+    }
+
+    private fun previousNonWhitespaceLeaf(element: PsiElement): PsiElement? {
+        var leaf = PsiTreeUtil.prevLeaf(element, true)
+        while (leaf != null && PsiUtilCore.getElementType(leaf) == TokenType.WHITE_SPACE) {
+            leaf = PsiTreeUtil.prevLeaf(leaf, true)
+        }
+        return leaf
     }
 
     private fun highlightUnusedIdentifier(element: ExIdentifier, holder: AnnotationHolder) {

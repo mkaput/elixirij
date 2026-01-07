@@ -1,6 +1,11 @@
 <?xml version='1.0'?>
 <!-- These colors have been shamelessly stolen from RustRover -->
 <list>
+  <option name="ELIXIR_FUNCTION_CALL">
+    <value>
+      <option name="FOREGROUND" value="36666b"/>
+    </value>
+  </option>
   <option name="ELIXIR_MODULE">
     <value>
       <option name="FOREGROUND" value="835dda"/>

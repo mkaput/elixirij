@@ -12,7 +12,7 @@
 
   <SPECIAL_FORM>def</SPECIAL_FORM> <FUNCTION_DECLARATION>greet</FUNCTION_DECLARATION>(name) do
     message = "Hello, #{name}!"
-    IO.puts(message)
+    IO.<FUNCTION_CALL>puts</FUNCTION_CALL>(message)
     :ok
   end
 
@@ -32,12 +32,12 @@
       :error -> :failure
     end
 
-    <SPECIAL_FORM>with</SPECIAL_FORM> {:ok, a} <- fetch_a(),
-         {:ok, b} <- fetch_b(a) do
+    <SPECIAL_FORM>with</SPECIAL_FORM> {:ok, a} <- <FUNCTION_CALL>fetch_a</FUNCTION_CALL>(),
+         {:ok, b} <- <FUNCTION_CALL>fetch_b</FUNCTION_CALL>(a) do
       {:ok, a + b}
     end
 
-    <SPECIAL_FORM>for</SPECIAL_FORM> i <- 1..10, rem(i, 2) == 0, do: i * 2
+    <SPECIAL_FORM>for</SPECIAL_FORM> i <- 1..10, <FUNCTION_CALL>rem</FUNCTION_CALL>(i, 2) == 0, do: i * 2
   end
 
   <SPECIAL_FORM>def</SPECIAL_FORM> <FUNCTION_DECLARATION>using_sigil</FUNCTION_DECLARATION> do
@@ -64,8 +64,10 @@
   <SPECIAL_FORM>def</SPECIAL_FORM> <FUNCTION_DECLARATION>operators</FUNCTION_DECLARATION> do
     result = 1 + 2 - 3 * 4 / 5
     comparison = a == b and c != d
-    pipe = data |> transform() |> output()
+    pipe = data |> <FUNCTION_CALL>transform</FUNCTION_CALL>() |> <FUNCTION_CALL>output</FUNCTION_CALL>()
     range = 1..10
+    <FUNCTION_CALL>foo</FUNCTION_CALL>(1)
+    Foo.Bar.<FUNCTION_CALL>baz</FUNCTION_CALL>(2)
   end
 
   <SPECIAL_FORM>def</SPECIAL_FORM> <FUNCTION_DECLARATION>unused_variable</FUNCTION_DECLARATION> do

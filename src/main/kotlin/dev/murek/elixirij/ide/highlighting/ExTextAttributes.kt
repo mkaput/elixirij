@@ -127,6 +127,11 @@ enum class ExTextAttributes(
         DefaultLanguageHighlighterColors.FUNCTION_DECLARATION,
         ExBundle.messagePointer("color.settings.functionDeclaration")
     ),
+    FUNCTION_CALL(
+        "ELIXIR_FUNCTION_CALL",
+        DefaultLanguageHighlighterColors.FUNCTION_CALL,
+        ExBundle.messagePointer("color.settings.functionCall")
+    ),
     MACRO_DECLARATION(
         "ELIXIR_MACRO_DECLARATION",
         DefaultLanguageHighlighterColors.FUNCTION_DECLARATION,
