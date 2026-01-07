@@ -7,5 +7,5 @@ Elixir File
       PsiElement({)('{')
       PsiElement(IDENTIFIER)('name')
       PsiElement(:)(':')
-      PsiErrorElement:',' or '}' expected
+      PsiErrorElement:',', COMMENT, EOL or '}' expected
         <empty list>

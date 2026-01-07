@@ -376,7 +376,7 @@ private mapPair ::= (assocPair | keywordPairItem | keywordPairIncomplete) { reco
 assocPair ::= containerExpr opSep EX_FAT_ARROW opSep containerExpr
 
 // Struct: %ModuleName{key: value} or %module{key: value}
-struct ::= EX_PERCENT structTarget EX_LBRACE mapContents? EX_RBRACE { pin=1 }
+struct ::= EX_PERCENT structTarget EX_LBRACE opSep mapContents? opSep EX_RBRACE { pin=1 }
 private structTarget ::= alias | identifier
 
 // Bitstring: <<1, 2, 3>> or <<x::binary>>

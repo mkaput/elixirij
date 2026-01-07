@@ -1,0 +1,3 @@
+%Struct{
+    field: :a
+}

@@ -38,6 +38,7 @@ class ExParserTest : ParsingTestCase(
     // =============================================================================
 
     fun testUseKeywordListAllowsNewlines() = doTest()
+    fun testStructNewlineFields() = doTest()
 
     // =============================================================================
     // C. Parser Grilling
