@@ -1,51 +1,51 @@
 # This is a comment
-defmodule MyModule do
-  @moduledoc "Module documentation"
-  @version "1.0.0"
-  @behaviour GenServer
+<SPECIAL_FORM>defmodule</SPECIAL_FORM> MyModule do
+  <DOC_COMMENT>@moduledoc "Module documentation"</DOC_COMMENT>
+  @<MODULE_ATTRIBUTE>version</MODULE_ATTRIBUTE> "1.0.0"
+  @<MODULE_ATTRIBUTE>behaviour</MODULE_ATTRIBUTE> GenServer
 
-  require Logger
-  import Enum, only: [map: 2]
-  alias MyModule.Helper
+  <SPECIAL_FORM>require</SPECIAL_FORM> Logger
+  <SPECIAL_FORM>import</SPECIAL_FORM> Enum, only: [map: 2]
+  <SPECIAL_FORM>alias</SPECIAL_FORM> MyModule.Helper
 
-  defstruct [:name, :count]
+  <SPECIAL_FORM>defstruct</SPECIAL_FORM> [:name, :count]
 
-  def greet(name) do
+  <SPECIAL_FORM>def</SPECIAL_FORM> <FUNCTION_DECLARATION>greet</FUNCTION_DECLARATION>(name) do
     message = "Hello, #{name}!"
     IO.puts(message)
     :ok
   end
 
-  defp private_function(x, y) do
+  <SPECIAL_FORM>defp</SPECIAL_FORM> <FUNCTION_DECLARATION>private_function</FUNCTION_DECLARATION>(x, y) do
     x + y * 2
   end
 
-  defmacro my_macro(expr) do
-    quote do
-      unquote(expr) + 1
+  <SPECIAL_FORM>defmacro</SPECIAL_FORM> <MACRO_DECLARATION>my_macro</MACRO_DECLARATION>(expr) do
+    <SPECIAL_FORM>quote</SPECIAL_FORM> do
+      <SPECIAL_FORM>unquote</SPECIAL_FORM>(expr) + 1
     end
   end
 
-  def control_flow(x) do
-    case x do
+  <SPECIAL_FORM>def</SPECIAL_FORM> <FUNCTION_DECLARATION>control_flow</FUNCTION_DECLARATION>(x) do
+    <SPECIAL_FORM>case</SPECIAL_FORM> x do
       :ok -> :success
       :error -> :failure
     end
 
-    with {:ok, a} <- fetch_a(),
+    <SPECIAL_FORM>with</SPECIAL_FORM> {:ok, a} <- fetch_a(),
          {:ok, b} <- fetch_b(a) do
       {:ok, a + b}
     end
 
-    for i <- 1..10, rem(i, 2) == 0, do: i * 2
+    <SPECIAL_FORM>for</SPECIAL_FORM> i <- 1..10, rem(i, 2) == 0, do: i * 2
   end
 
-  def using_sigil do
+  <SPECIAL_FORM>def</SPECIAL_FORM> <FUNCTION_DECLARATION>using_sigil</FUNCTION_DECLARATION> do
     ~r/pattern/i
     ~s(string sigil)
   end
 
-  def literals do
+  <SPECIAL_FORM>def</SPECIAL_FORM> <FUNCTION_DECLARATION>literals</FUNCTION_DECLARATION> do
     integer = 42
     float = 3.14
     hex = 0xFF
@@ -61,10 +61,15 @@ defmodule MyModule do
     bitstring = <<1, 2, 3>>
   end
 
-  def operators do
+  <SPECIAL_FORM>def</SPECIAL_FORM> <FUNCTION_DECLARATION>operators</FUNCTION_DECLARATION> do
     result = 1 + 2 - 3 * 4 / 5
     comparison = a == b and c != d
     pipe = data |> transform() |> output()
     range = 1..10
+  end
+
+  <SPECIAL_FORM>def</SPECIAL_FORM> <FUNCTION_DECLARATION>unused_variable</FUNCTION_DECLARATION> do
+    <UNUSED_VARIABLE>_unused</UNUSED_VARIABLE> = 1
+    :ok
   end
 end

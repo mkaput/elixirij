@@ -26,5 +26,13 @@ class ExColorSettingsPage : ColorSettingsPage {
         return ExTextAttributes.entries.map { it.descriptor }.toTypedArray()
     }
 
-    override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey>? = null
+    override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey> =
+        mapOf(
+            "SPECIAL_FORM" to ExTextAttributes.SPECIAL_FORM.attribute,
+            "FUNCTION_DECLARATION" to ExTextAttributes.FUNCTION_DECLARATION.attribute,
+            "MACRO_DECLARATION" to ExTextAttributes.MACRO_DECLARATION.attribute,
+            "MODULE_ATTRIBUTE" to ExTextAttributes.MODULE_ATTRIBUTE.attribute,
+            "DOC_COMMENT" to ExTextAttributes.DOC_COMMENT.attribute,
+            "UNUSED_VARIABLE" to ExTextAttributes.UNUSED_VARIABLE.attribute
+        )
 }

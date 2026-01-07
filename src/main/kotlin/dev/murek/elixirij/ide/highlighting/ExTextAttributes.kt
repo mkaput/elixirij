@@ -13,6 +13,9 @@ import java.util.function.Supplier
  * Defines text attributes for Elixir syntax highlighting.
  * Each attribute maps to a specific token type and provides a fallback to
  * standard IntelliJ colors for consistent appearance across themes.
+ *
+ * When adding a new attribute here, update [ExColorSettingsPage] and
+ * `ColorSettingsPageDemo.exs` to keep the demo tags in sync.
  */
 enum class ExTextAttributes(
     externalName: String,
