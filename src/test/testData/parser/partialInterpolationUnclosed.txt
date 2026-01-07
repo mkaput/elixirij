@@ -7,5 +7,5 @@ Elixir File
           PsiElement(STRING_PART)('hello ')
         ExInterpolationImpl(INTERPOLATION)
           PsiElement(INTERPOLATION_START)('#{')
-          PsiErrorElement:'.', <unary expr>, INTERPOLATION_END, INTERPOLATION_START, STRING_END, STRING_PART or '[' expected
+          PsiErrorElement:'.', <string part>, <unary expr>, INTERPOLATION_END, INTERPOLATION_START, STRING_END or '[' expected
             <empty list>

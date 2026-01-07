@@ -13,5 +13,5 @@ Elixir File
             ExLiteralImpl(LITERAL)
               ExInterpolatedStringImpl(INTERPOLATED_STRING)
                 PsiElement(STRING_BEGIN)('"')
-                PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', ':', '::', <, <-, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', COMMENT, EOL, INTERPOLATION_END, INTERPOLATION_START, STRING_END, STRING_PART, '[', '\\', and, do, in, not, or and ... expected
+                PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '->', '.', '..', '..//', '/', '//', ':', '::', <, <-, <<<, <<~, <=, <>, <string part>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', COMMENT, EOL, INTERPOLATION_END, INTERPOLATION_START, STRING_END, '[', '\\', and, do, in, not, or and ... expected
                   <empty list>

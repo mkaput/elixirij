@@ -5,5 +5,5 @@ Elixir File
         PsiElement(STRING_BEGIN)('"')
         ExStringPartImpl(STRING_PART)
           PsiElement(STRING_PART)('hello')
-        PsiErrorElement:'.', INTERPOLATION_START, STRING_END, STRING_PART or '[' expected
+        PsiErrorElement:'.', <string part>, INTERPOLATION_START, STRING_END or '[' expected
           <empty list>
