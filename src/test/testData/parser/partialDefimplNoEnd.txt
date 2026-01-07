@@ -8,16 +8,14 @@ Elixir File
         PsiElement(ALIAS)('P')
       PsiElement(,)(',')
       PsiWhiteSpace(' ')
-      ExKeywordPairImpl(KEYWORD_PAIR)
-        PsiElement(KW_IDENTIFIER)('for:')
-        PsiWhiteSpace(' ')
-        ExCallExprImpl(CALL_EXPR)
-          ExAliasImpl(ALIAS)
-            PsiElement(ALIAS)('T')
-          PsiWhiteSpace(' ')
-          ExDoBlockImpl(DO_BLOCK)
-            PsiElement(do)('do')
-            ExDoContentsImpl(DO_CONTENTS)
-              <empty list>
-            PsiErrorElement:';', <unary expr>, ALIAS, EOL, IDENTIFIER, after, catch, else, end or rescue expected
-              <empty list>
+      PsiElement(KW_IDENTIFIER)('for:')
+      PsiWhiteSpace(' ')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('T')
+      PsiWhiteSpace(' ')
+      ExDoBlockImpl(DO_BLOCK)
+        PsiElement(do)('do')
+        ExDoContentsImpl(DO_CONTENTS)
+          <empty list>
+        PsiErrorElement:';', <unary expr>, ALIAS, EOL, IDENTIFIER, after, catch, else, end or rescue expected
+          <empty list>

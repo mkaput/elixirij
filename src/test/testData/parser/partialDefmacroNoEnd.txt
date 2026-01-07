@@ -4,13 +4,12 @@ Elixir File
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('defmacro')
       PsiWhiteSpace(' ')
-      ExCallExprImpl(CALL_EXPR)
-        ExIdentifierImpl(IDENTIFIER)
-          PsiElement(IDENTIFIER)('foo')
-        PsiWhiteSpace(' ')
-        ExDoBlockImpl(DO_BLOCK)
-          PsiElement(do)('do')
-          ExDoContentsImpl(DO_CONTENTS)
-            <empty list>
-          PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '..', '..//', '/', '//', '::', ';', <, <-, <=, <>, <unary expr>, '=', '==', '===', '=~', '>', '>=', ALIAS, COMMENT, EOL, IDENTIFIER, '\\', after, and, catch, else, end, in, not, or, rescue, when, '|', '||' or '|||' expected
-            <empty list>
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('foo')
+      PsiWhiteSpace(' ')
+      ExDoBlockImpl(DO_BLOCK)
+        PsiElement(do)('do')
+        ExDoContentsImpl(DO_CONTENTS)
+          <empty list>
+        PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '..', '..//', '/', '//', '::', ';', <, <-, <=, <>, <unary expr>, '=', '==', '===', '=~', '>', '>=', ALIAS, COMMENT, EOL, IDENTIFIER, '\\', after, and, catch, else, end, in, not, or, rescue, when, '|', '||' or '|||' expected
+          <empty list>

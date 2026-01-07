@@ -162,7 +162,9 @@ private accessSuffix ::= dotAccess | bracketAccess
 private accessSuffixStart ::= EX_DOT | EX_LBRACKET
 
 // No-parens function call: func arg1, arg2
-private noParensCall ::= !literal callTarget !EX_LPAREN ((&noParensArgStart noParensArgs doBlock?) | doBlock)
+private noParensCall ::= !literal callTarget !EX_LPAREN ((&noParensArgStart noParensArgsNoDoBlock doBlock)
+                    | (&noParensArgStart noParensArgs doBlock?)
+                    | doBlock)
 
 callExpr ::= &callStart (noParensCall | bareDoCall | parenCallChain | anonymousCallChain)
 private parenCallChain ::= callBaseNoParen callAccessSuffix* parenCall callChainTail doBlock?
@@ -172,6 +174,12 @@ private callInvocationSuffix ::= parenCall | anonymousCall
 private callAccessSuffix ::= dotAccess | bracketAccess
 private callBase ::= accessExpr | accessPrimaryExpr | capturePlaceholderExpr
 private callBaseNoParen ::= accessExpr | accessPrimaryExprNoParen | capturePlaceholderExpr
+
+// Call expression variants that disallow attaching do-blocks.
+private callExprNoDoBlock ::= &callStart (noParensCallNoDoBlock | parenCallChainNoDoBlock | anonymousCallChainNoDoBlock)
+private noParensCallNoDoBlock ::= !literal callTarget !EX_LPAREN &noParensArgStart noParensArgsNoDoBlock
+private parenCallChainNoDoBlock ::= callBaseNoParen callAccessSuffix* parenCall callChainTail
+private anonymousCallChainNoDoBlock ::= callBase callAccessSuffix* anonymousCall callChainTail
 
 // Bare do-block call: func do ... end (no arguments before do-block)
 // This is only valid at statement level, not inside expressions
@@ -201,6 +209,39 @@ bracketAccess ::= EX_LBRACKET containerExpr EX_RBRACKET { pin=1 }
 private parenCall ::= EX_LPAREN opSep callArgs? opSep EX_RPAREN { pin=1 }
 
 private placeholderSuffix ::= dotAccess | bracketAccess | parenCall | anonymousCall
+
+// =============================================================================
+// Expressions without do-block calls (used for no-parens args before a do-block)
+// =============================================================================
+
+private noDoBlockExpr ::= noDoBlockStabExpr
+private noDoBlockContainerExpr ::= noDoBlockMatchExpr
+private noDoBlockStabExpr ::= noDoBlockInMatchExpr (EX_ARROW opSep noDoBlockStabExpr)?
+private noDoBlockInMatchExpr ::= noDoBlockWhenExpr (inMatchOp opSep noDoBlockWhenExpr)*
+private noDoBlockWhenExpr ::= noDoBlockTypeExpr (opSep EX_WHEN opSep noDoBlockWhenExpr)?
+private noDoBlockTypeExpr ::= noDoBlockPipeExpr (EX_COLON_COLON opSep noDoBlockTypeExpr)?
+private noDoBlockPipeExpr ::= noDoBlockMatchExpr (opSep EX_PIPE opSep noDoBlockPipeExpr)?
+private noDoBlockMatchExpr ::= noDoBlockOrExpr (EX_EQ opSep noDoBlockMatchExpr)?
+private noDoBlockOrExpr ::= noDoBlockAndExpr (orOp opSep noDoBlockAndExpr)*
+private noDoBlockAndExpr ::= noDoBlockCompExpr (andOp opSep noDoBlockCompExpr)*
+private noDoBlockCompExpr ::= noDoBlockRelExpr (compOp opSep noDoBlockRelExpr)*
+private noDoBlockRelExpr ::= noDoBlockArrowExpr (relOp opSep noDoBlockArrowExpr)*
+private noDoBlockArrowExpr ::= noDoBlockInExpr (opSep &arrowOp arrowOp opSep noDoBlockInExpr)*
+private noDoBlockInExpr ::= noDoBlockXorExpr (inOp opSep noDoBlockXorExpr)*
+private noDoBlockXorExpr ::= noDoBlockConcatExpr (EX_SLASH_SLASH opSep noDoBlockXorExpr)?
+private noDoBlockConcatExpr ::= noDoBlockRangeExpr (concatOp opSep noDoBlockConcatExpr)?
+private noDoBlockRangeExpr ::= noDoBlockDualExpr (rangeOp opSep noDoBlockRangeExpr)?
+private noDoBlockDualExpr ::= noDoBlockMultExpr (dualOp opSep noDoBlockMultExpr)*
+private noDoBlockMultExpr ::= noDoBlockPowerExpr (multOp opSep noDoBlockPowerExpr)*
+private noDoBlockPowerExpr ::= noDoBlockUnaryExpr (EX_STAR_STAR opSep noDoBlockUnaryExpr)*
+private noDoBlockUnaryExpr ::= unaryOp noDoBlockUnaryExpr | callExprNoDoBlock | captureExpr | primaryExpr
+
+private noParensArgsNoDoBlock ::= noParensKeywordArgsNoDoBlock | noParensPositionalArgsNoDoBlock
+private noParensKeywordArgsNoDoBlock ::= keywordPairItemNoDoBlock (EX_COMMA eoe* keywordPairItemNoDoBlock)*
+private noParensPositionalArgsNoDoBlock ::= noDoBlockExpr (EX_COMMA eoe* noDoBlockExpr)* keywordTailNoDoBlock?
+private keywordTailNoDoBlock ::= EX_COMMA eoe* keywordPairItemNoDoBlock (EX_COMMA eoe* keywordPairItemNoDoBlock)*
+private keywordPairItemNoDoBlock ::= keywordPairNoDoBlock
+private keywordPairNoDoBlock ::= keywordKey opSep noDoBlockContainerExpr
 
 // =============================================================================
 // Primary expressions

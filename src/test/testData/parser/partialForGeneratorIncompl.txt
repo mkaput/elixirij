@@ -8,5 +8,5 @@ Elixir File
         PsiElement(IDENTIFIER)('x')
     PsiWhiteSpace(' ')
     PsiElement(<-)('<-')
-    PsiErrorElement:<unary expr>, COMMENT or EOL expected
+    PsiErrorElement:'!', '%', '%{', '&', '(', '+', '-', <<, <access expr>, <atom>, <capture expr>, <literal>, <unary expr>, ALIAS, ATOM, ATOM_QUOTED, CHARLIST_HEREDOC, COMMENT, EOL, HEREDOC, IDENTIFIER, SIGIL, '[', '^', do, fn, not, raise, send, super, throw, '{' or '~' expected
       <empty list>

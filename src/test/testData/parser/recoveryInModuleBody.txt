@@ -4,17 +4,16 @@ Elixir File
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('defmodule')
       PsiWhiteSpace(' ')
-      ExCallExprImpl(CALL_EXPR)
-        ExAliasImpl(ALIAS)
-          PsiElement(ALIAS)('F')
-        PsiWhiteSpace(' ')
-        ExDoBlockImpl(DO_BLOCK)
-          PsiElement(do)('do')
-          ExDoContentsImpl(DO_CONTENTS)
-            <empty list>
-          PsiElement(EOL)('\n')
-          PsiErrorElement:';', EOL, after, catch, else, end or rescue expected, got '@'
-            <empty list>
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('F')
+      PsiWhiteSpace(' ')
+      ExDoBlockImpl(DO_BLOCK)
+        PsiElement(do)('do')
+        ExDoContentsImpl(DO_CONTENTS)
+          <empty list>
+        PsiElement(EOL)('\n')
+        PsiErrorElement:';', EOL, after, catch, else, end or rescue expected, got '@'
+          <empty list>
     PsiWhiteSpace('  ')
     PsiElement(@)('@')
     PsiComment(COMMENT)('#$')

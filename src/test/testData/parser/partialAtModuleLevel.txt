@@ -4,28 +4,26 @@ Elixir File
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('defmodule')
       PsiWhiteSpace(' ')
-      ExCallExprImpl(CALL_EXPR)
-        ExAliasImpl(ALIAS)
-          PsiElement(ALIAS)('A')
-        PsiWhiteSpace(' ')
-        ExDoBlockImpl(DO_BLOCK)
-          PsiElement(do)('do')
-          ExDoContentsImpl(DO_CONTENTS)
-            <empty list>
-          PsiElement(EOL)('\n')
-          PsiElement(end)('end')
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('A')
+      PsiWhiteSpace(' ')
+      ExDoBlockImpl(DO_BLOCK)
+        PsiElement(do)('do')
+        ExDoContentsImpl(DO_CONTENTS)
+          <empty list>
+        PsiElement(EOL)('\n')
+        PsiElement(end)('end')
     PsiElement(EOL)('\n')
     ExCallExprImpl(CALL_EXPR)
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('defmodule')
       PsiWhiteSpace(' ')
-      ExCallExprImpl(CALL_EXPR)
-        ExAliasImpl(ALIAS)
-          PsiElement(ALIAS)('B')
-        PsiWhiteSpace(' ')
-        ExDoBlockImpl(DO_BLOCK)
-          PsiElement(do)('do')
-          ExDoContentsImpl(DO_CONTENTS)
-            <empty list>
-          PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '..', '..//', '/', '//', '::', ';', <, <-, <=, <>, <unary expr>, '=', '==', '===', '=~', '>', '>=', ALIAS, COMMENT, EOL, IDENTIFIER, '\\', after, and, catch, else, end, in, not, or, rescue, when, '|', '||' or '|||' expected
-            <empty list>
+      ExAliasImpl(ALIAS)
+        PsiElement(ALIAS)('B')
+      PsiWhiteSpace(' ')
+      ExDoBlockImpl(DO_BLOCK)
+        PsiElement(do)('do')
+        ExDoContentsImpl(DO_CONTENTS)
+          <empty list>
+        PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '..', '..//', '/', '//', '::', ';', <, <-, <=, <>, <unary expr>, '=', '==', '===', '=~', '>', '>=', ALIAS, COMMENT, EOL, IDENTIFIER, '\\', after, and, catch, else, end, in, not, or, rescue, when, '|', '||' or '|||' expected
+          <empty list>

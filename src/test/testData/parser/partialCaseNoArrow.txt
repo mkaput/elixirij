@@ -4,16 +4,15 @@ Elixir File
       ExIdentifierImpl(IDENTIFIER)
         PsiElement(IDENTIFIER)('case')
       PsiWhiteSpace(' ')
-      ExCallExprImpl(CALL_EXPR)
-        ExIdentifierImpl(IDENTIFIER)
-          PsiElement(IDENTIFIER)('x')
-        PsiWhiteSpace(' ')
-        ExDoBlockImpl(DO_BLOCK)
-          PsiElement(do)('do')
-          ExDoContentsImpl(DO_CONTENTS)
-            PsiElement(EOL)('\n')
-            PsiWhiteSpace('  ')
-            ExAtomImpl(ATOM)
-              PsiElement(ATOM)(':a')
-          PsiErrorElement:';', EOL, after, catch, else, end or rescue expected
-            <empty list>
+      ExIdentifierImpl(IDENTIFIER)
+        PsiElement(IDENTIFIER)('x')
+      PsiWhiteSpace(' ')
+      ExDoBlockImpl(DO_BLOCK)
+        PsiElement(do)('do')
+        ExDoContentsImpl(DO_CONTENTS)
+          PsiElement(EOL)('\n')
+          PsiWhiteSpace('  ')
+          ExAtomImpl(ATOM)
+            PsiElement(ATOM)(':a')
+        PsiErrorElement:';', EOL, after, catch, else, end or rescue expected
+          <empty list>

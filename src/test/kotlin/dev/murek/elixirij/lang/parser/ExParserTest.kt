@@ -37,6 +37,7 @@ class ExParserTest : ParsingTestCase(
     // B. Past Bugs
     // =============================================================================
 
+    fun testDoBlockAttachesToOuterCall() = doTest()
     fun testUseKeywordListAllowsNewlines() = doTest()
     fun testStructNewlineFields() = doTest()
 
