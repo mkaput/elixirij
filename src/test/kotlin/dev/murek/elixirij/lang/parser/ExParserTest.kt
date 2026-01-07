@@ -90,6 +90,7 @@ class ExParserTest : ParsingTestCase(
     fun testInterpolatedSigil() = doTest()
     fun testCharlistInterpolation() = doTest()
     fun testCharlistHeredocInterpolation() = doTest()
+    fun testInterpolationHeredocNested() = doTest()
     fun testInterpolationUnclosedInString() = doPartialTest()
     fun testCaptureSpecialFormNoParens() = doTest()
     fun testFnClauseGuardAfterArgsNewline() = doTest()

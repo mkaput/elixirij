@@ -14,6 +14,8 @@ import static dev.murek.elixirij.lang.ElementTypes.*;
     private int[] interpolationStateStack = new int[8];
     private int[] interpolationBalanceStack = new int[8];
     private int interpolationStackTop = 0;
+    private int[] stringStateStack = new int[8];
+    private int stringStackTop = 0;
     private char sigilLetter = 0;
 
     public _ExLexer() {
@@ -42,10 +44,41 @@ import static dev.murek.elixirij.lang.ElementTypes.*;
     }
 
     private IElementType beginSigil(int state) {
+        pushStringReturnState();
         sigilLetter = yytext().charAt(1);
         stringReturnState = yystate();
         yybegin(state);
         return EX_STRING_BEGIN;
+    }
+
+    private IElementType beginString(int state, IElementType tokenType) {
+        pushStringReturnState();
+        stringReturnState = yystate();
+        yybegin(state);
+        return tokenType;
+    }
+
+    private IElementType endString(IElementType tokenType) {
+        int returnState = stringReturnState;
+        if (stringStackTop > 0) {
+            stringStackTop--;
+            stringReturnState = stringStateStack[stringStackTop];
+        } else {
+            stringReturnState = YYINITIAL;
+        }
+        yybegin(returnState);
+        return tokenType;
+    }
+
+    private void pushStringReturnState() {
+        if (stringStackTop == stringStateStack.length) {
+            int newSize = stringStateStack.length * 2;
+            int[] newStateStack = new int[newSize];
+            System.arraycopy(stringStateStack, 0, newStateStack, 0, stringStateStack.length);
+            stringStateStack = newStateStack;
+        }
+        stringStateStack[stringStackTop] = stringReturnState;
+        stringStackTop++;
     }
 
     private boolean sigilAllowsEscapes() {
@@ -342,12 +375,12 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     {SIGIL_START_NO_INTERP} "<" [^>]* ">" {SIGIL_MODIFIERS}        { return EX_SIGIL; }
 
     // Strings - heredocs must be before regular strings
-    "\"\"\""                           { stringReturnState = yystate(); yybegin(IN_HEREDOC); return EX_STRING_BEGIN; }
-    "\'\'\'"                           { stringReturnState = yystate(); yybegin(IN_CHARLIST_HEREDOC); return EX_CHARLIST_BEGIN; }
+    "\"\"\""                           { return beginString(IN_HEREDOC, EX_STRING_BEGIN); }
+    "\'\'\'"                           { return beginString(IN_CHARLIST_HEREDOC, EX_CHARLIST_BEGIN); }
 
     // Strings - regular
-    "\""                               { stringReturnState = yystate(); yybegin(IN_STRING); return EX_STRING_BEGIN; }
-    "\'"                               { stringReturnState = yystate(); yybegin(IN_CHARLIST); return EX_CHARLIST_BEGIN; }
+    "\""                               { return beginString(IN_STRING, EX_STRING_BEGIN); }
+    "\'"                               { return beginString(IN_CHARLIST, EX_CHARLIST_BEGIN); }
 
     // Identifiers and aliases
     {IDENTIFIER} ":" / ({HORIZONTAL_SPACE}|{EOL_CHAR}) { return EX_KW_IDENTIFIER; }
@@ -378,7 +411,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
     {GENERIC_ESC}                      { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     "#{"                               { return beginInterpolation(IN_STRING); }
-    "\""                               { yybegin(stringReturnState); return EX_STRING_END; }
+    "\""                               { return endString(EX_STRING_END); }
     [^\"#\\]+                          { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
@@ -386,7 +419,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 }
 
 <IN_HEREDOC> {
-    "\"\"\""                           { yybegin(stringReturnState); return EX_STRING_END; }
+    "\"\"\""                           { return endString(EX_STRING_END); }
     {ESCAPED_NEWLINE}                  { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {UNICODE_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {UNICODE_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
@@ -433,7 +466,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
     {GENERIC_ESC}                      { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     "#{"                               { return beginInterpolation(IN_CHARLIST); }
-    "\'"                               { yybegin(stringReturnState); return EX_CHARLIST_END; }
+    "\'"                               { return endString(EX_CHARLIST_END); }
     [^\'#\\]+                          { return EX_CHARLIST_PART; }
     "#"                                { return EX_CHARLIST_PART; }
     "\\"                               { return EX_CHARLIST_PART; }
@@ -441,7 +474,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 }
 
 <IN_CHARLIST_HEREDOC> {
-    "\'\'\'"                           { yybegin(stringReturnState); return EX_CHARLIST_END; }
+    "\'\'\'"                           { return endString(EX_CHARLIST_END); }
     {ESCAPED_NEWLINE}                  { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {UNICODE_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {UNICODE_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
@@ -488,7 +521,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
     {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_PAREN); }
-    ")" {SIGIL_MODIFIERS}              { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
+    ")" {SIGIL_MODIFIERS}              { sigilLetter = 0; return endString(EX_STRING_END); }
     [^\\)#]+                           { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
@@ -515,7 +548,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
     {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_BRACKET); }
-    "]" {SIGIL_MODIFIERS}              { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
+    "]" {SIGIL_MODIFIERS}              { sigilLetter = 0; return endString(EX_STRING_END); }
     [^]#\\]+                           { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
@@ -542,7 +575,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
     {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_BRACE); }
-    "}" {SIGIL_MODIFIERS}              { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
+    "}" {SIGIL_MODIFIERS}              { sigilLetter = 0; return endString(EX_STRING_END); }
     [^\\}#]+                           { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
@@ -569,7 +602,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
     {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_ANGLE); }
-    ">" {SIGIL_MODIFIERS}              { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
+    ">" {SIGIL_MODIFIERS}              { sigilLetter = 0; return endString(EX_STRING_END); }
     [^\\>#]+                           { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
@@ -596,7 +629,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
     {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_SLASH); }
-    "/" {SIGIL_MODIFIERS}              { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
+    "/" {SIGIL_MODIFIERS}              { sigilLetter = 0; return endString(EX_STRING_END); }
     [^\\/#]+                           { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
@@ -623,7 +656,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
     {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_PIPE); }
-    "|" {SIGIL_MODIFIERS}              { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
+    "|" {SIGIL_MODIFIERS}              { sigilLetter = 0; return endString(EX_STRING_END); }
     [^\\|#]+                           { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
@@ -650,7 +683,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
     {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_DQUOTE); }
-    "\"" {SIGIL_MODIFIERS}             { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
+    "\"" {SIGIL_MODIFIERS}             { sigilLetter = 0; return endString(EX_STRING_END); }
     [^\"#\\]+                          { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
@@ -677,7 +710,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
     {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_SQUOTE); }
-    "\'" {SIGIL_MODIFIERS}             { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
+    "\'" {SIGIL_MODIFIERS}             { sigilLetter = 0; return endString(EX_STRING_END); }
     [^\'#\\]+                          { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
@@ -685,7 +718,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 }
 
 <IN_SIGIL_HEREDOC_DQUOTE> {
-    "\"\"\"" {SIGIL_MODIFIERS}         { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
+    "\"\"\"" {SIGIL_MODIFIERS}         { sigilLetter = 0; return endString(EX_STRING_END); }
     {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
@@ -713,7 +746,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 }
 
 <IN_SIGIL_HEREDOC_SQUOTE> {
-    "\'\'\'" {SIGIL_MODIFIERS}         { sigilLetter = 0; yybegin(stringReturnState); return EX_STRING_END; }
+    "\'\'\'" {SIGIL_MODIFIERS}         { sigilLetter = 0; return endString(EX_STRING_END); }
     {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
