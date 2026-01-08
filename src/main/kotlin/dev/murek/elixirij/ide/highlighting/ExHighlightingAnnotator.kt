@@ -231,10 +231,9 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
         if (elementType != dev.murek.elixirij.lang.EX_IDENTIFIER && elementType != dev.murek.elixirij.lang.EX_ATOM) return
         val nextLeaf = nextNonWhitespaceLeaf(element) ?: return
         if (PsiUtilCore.getElementType(nextLeaf) != EX_LPAREN) return
-        val target = element.parent ?: element
-        if (isDeclarationNameTarget(target)) return
-        if (target is ExIdentifier && target.text in specialFormNames) return
-        highlight(target, ExTextAttributes.FUNCTION_CALL, holder)
+        if (isDeclarationNameTarget(element)) return
+        if (element is ExIdentifier && element.text in specialFormNames) return
+        highlight(element, ExTextAttributes.FUNCTION_CALL, holder)
     }
 
     private fun highlightCallBeforeParen(element: ExParenExpr, holder: AnnotationHolder) {
@@ -242,6 +241,7 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
         val elementType = PsiUtilCore.getElementType(prevLeaf) ?: return
         if (elementType != dev.murek.elixirij.lang.EX_IDENTIFIER && elementType != dev.murek.elixirij.lang.EX_ATOM) return
         val target = prevLeaf.parent ?: prevLeaf
+        if (!element.textRange.contains(target.textRange)) return
         if (isDeclarationNameTarget(target)) return
         if (target is ExIdentifier && target.text in specialFormNames) return
         highlight(target, ExTextAttributes.FUNCTION_CALL, holder)

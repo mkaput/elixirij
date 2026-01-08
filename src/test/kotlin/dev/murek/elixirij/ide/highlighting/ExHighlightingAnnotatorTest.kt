@@ -339,6 +339,18 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
         )
     }
 
+    fun `test incomplete call highlighting does not throw`() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+            defmodule MyModule do
+              foo.(
+            end
+            """.trimIndent()
+        )
+        myFixture.doHighlighting()
+    }
+
     private fun doTest(code: String) {
         val blankPattern = Regex("<blank>(.*?)</blank>", setOf(RegexOption.DOT_MATCHES_ALL))
         val blankRanges = mutableListOf<IntRange>()
