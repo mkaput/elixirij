@@ -47,6 +47,8 @@ private topLevelExpression ::= bareDoCall | expression { recoverWhile=topLevelRe
 // End of expression: newlines or semicolons
 private eoe ::= (EX_EOL | EX_SEMICOLON)+
 private opSep ::= (EX_EOL | EX_COMMENT)*
+private arrowOpLookahead ::= &((EX_EOL | EX_COMMENT)* arrowOp)
+private arrowOpContinuation ::= (EX_EOL | EX_COMMENT)* arrowOp opSep inExpr
 private topLevelRecovery ::= !(EX_EOL | EX_SEMICOLON)
 private doRecovery ::= !(EX_ELSE | EX_AFTER | EX_CATCH | EX_RESCUE | EX_END | EX_EOL)
 private listRecovery ::= !(EX_COMMA | EX_RBRACKET | EX_PIPE | EX_EOL)
@@ -104,7 +106,7 @@ relExpr ::= arrowExpr (relOp opSep arrowExpr)*
 private relOp ::= EX_LT_EQ | EX_GT_EQ | EX_LT | EX_GT
 
 // Precedence 160: |>, <<<, >>>, <<~, ~>>, <~, ~>, <~>, <|> (left associative)
-arrowExpr ::= inExpr (opSep &arrowOp arrowOp opSep inExpr)*
+arrowExpr ::= inExpr (arrowOpLookahead arrowOpContinuation)*
 private arrowOp ::= EX_PIPE_GT | EX_LT_LT_LT | EX_GT_GT_GT | EX_LT_LT_TILDE | EX_TILDE_GT_GT | EX_LT_TILDE | EX_TILDE_GT | EX_LT_TILDE_GT | EX_LT_PIPE_GT
 
 // Precedence 170: in, not in (left associative)
@@ -188,16 +190,25 @@ private bareDoCallTarget ::= (identifier | alias) (EX_DOT identifier)*
 private callTarget ::= atom | identifier | alias | keywordCallTarget | accessExpr
 private callStart ::= EX_IDENTIFIER | EX_ALIAS | EX_ATOM | EX_ATOM_QUOTED
                     | EX_LPAREN | EX_PERCENT | EX_AMPERSAND | EX_RAISE | EX_THROW | EX_SEND | EX_SUPER
-private noParensArgStart ::= !EX_DO (keywordPairItem | expression)
+private noParensArgStart ::= !EX_DO (keywordPairItemNoString | expression)
 private noParensArgs ::= noParensKeywordArgs | noParensPositionalArgs
-private noParensKeywordArgs ::= keywordPairItem (EX_COMMA eoe* keywordPairItem)*
-private noParensPositionalArgs ::= expression (EX_COMMA eoe* expression)* keywordTail?
-private keywordTail ::= EX_COMMA eoe* keywordPairItem (EX_COMMA eoe* keywordPairItem)*
+private noParensKeywordArgs ::= keywordPairItemNoString (EX_COMMA eoe* keywordPairItemNoString)*
+private noParensPositionalArgs ::= expression (EX_COMMA eoe* !stringKeywordKey expression)* keywordTail?
+private keywordTail ::= EX_COMMA eoe* keywordPairItemNoString (EX_COMMA eoe* keywordPairItemNoString)*
 private keywordCallTarget ::= EX_RAISE | EX_THROW | EX_SEND | EX_SUPER
 
 // Dot access: expr.field or Mod.Func
 dotAccess ::= EX_DOT &dotTarget dotTarget
-private dotTarget ::= identifier | keywordCallTarget
+private dotTarget ::= identifier | keywordCallTarget | EX_ALIAS | operatorIdentifier
+private operatorIdentifier ::= EX_EXCLAMATION | EX_PLUS | EX_MINUS | EX_STAR | EX_SLASH | EX_EQ | EX_LT | EX_GT | EX_PIPE | EX_AMPERSAND | EX_CARET | EX_TILDE
+                            | EX_EQ_EQ | EX_NOT_EQ | EX_EQ_EQ_EQ | EX_NOT_EQ_EQ | EX_EQ_TILDE
+                            | EX_LT_EQ | EX_GT_EQ | EX_LT_GT
+                            | EX_PLUS_PLUS | EX_MINUS_MINUS | EX_PLUS_PLUS_PLUS | EX_MINUS_MINUS_MINUS
+                            | EX_STAR_STAR | EX_SLASH_SLASH
+                            | EX_DOT_DOT | EX_DOT_DOT_SLASH_SLASH
+                            | EX_PIPE_PIPE | EX_PIPE_PIPE_PIPE | EX_AMP_AMP | EX_AMP_AMP_AMP
+                            | EX_PIPE_GT | EX_LT_LT_LT | EX_GT_GT_GT | EX_LT_LT_TILDE | EX_TILDE_GT_GT | EX_LT_TILDE | EX_TILDE_GT | EX_LT_TILDE_GT | EX_LT_PIPE_GT
+                            | EX_LT_LT | EX_GT_GT
 
 // Anonymous call: func.()
 private anonymousCall ::= EX_DOT &EX_LPAREN EX_LPAREN callArgs? EX_RPAREN
@@ -226,7 +237,7 @@ private noDoBlockOrExpr ::= noDoBlockAndExpr (orOp opSep noDoBlockAndExpr)*
 private noDoBlockAndExpr ::= noDoBlockCompExpr (andOp opSep noDoBlockCompExpr)*
 private noDoBlockCompExpr ::= noDoBlockRelExpr (compOp opSep noDoBlockRelExpr)*
 private noDoBlockRelExpr ::= noDoBlockArrowExpr (relOp opSep noDoBlockArrowExpr)*
-private noDoBlockArrowExpr ::= noDoBlockInExpr (opSep &arrowOp arrowOp opSep noDoBlockInExpr)*
+private noDoBlockArrowExpr ::= noDoBlockInExpr (arrowOpLookahead (EX_EOL | EX_COMMENT)* arrowOp opSep noDoBlockInExpr)*
 private noDoBlockInExpr ::= noDoBlockXorExpr (inOp opSep noDoBlockXorExpr)*
 private noDoBlockXorExpr ::= noDoBlockConcatExpr (EX_SLASH_SLASH opSep noDoBlockXorExpr)?
 private noDoBlockConcatExpr ::= noDoBlockRangeExpr (concatOp opSep noDoBlockConcatExpr)?
@@ -237,11 +248,12 @@ private noDoBlockPowerExpr ::= noDoBlockUnaryExpr (EX_STAR_STAR opSep noDoBlockU
 private noDoBlockUnaryExpr ::= unaryOp noDoBlockUnaryExpr | callExprNoDoBlock | captureExpr | primaryExpr
 
 private noParensArgsNoDoBlock ::= noParensKeywordArgsNoDoBlock | noParensPositionalArgsNoDoBlock
-private noParensKeywordArgsNoDoBlock ::= keywordPairItemNoDoBlock (EX_COMMA eoe* keywordPairItemNoDoBlock)*
-private noParensPositionalArgsNoDoBlock ::= noDoBlockExpr (EX_COMMA eoe* noDoBlockExpr)* keywordTailNoDoBlock?
-private keywordTailNoDoBlock ::= EX_COMMA eoe* keywordPairItemNoDoBlock (EX_COMMA eoe* keywordPairItemNoDoBlock)*
+private noParensKeywordArgsNoDoBlock ::= keywordPairItemNoStringNoDoBlock (EX_COMMA eoe* keywordPairItemNoStringNoDoBlock)*
+private noParensPositionalArgsNoDoBlock ::= noDoBlockExpr (EX_COMMA eoe* !stringKeywordKey noDoBlockExpr)* keywordTailNoDoBlock?
+private keywordTailNoDoBlock ::= EX_COMMA eoe* keywordPairItemNoStringNoDoBlock (EX_COMMA eoe* keywordPairItemNoStringNoDoBlock)*
 private keywordPairItemNoDoBlock ::= keywordPairNoDoBlock
 private keywordPairNoDoBlock ::= keywordKey opSep noDoBlockContainerExpr
+private keywordPairItemNoStringNoDoBlock ::= !stringKeywordKey keywordPairNoDoBlock
 
 // =============================================================================
 // Primary expressions
@@ -391,14 +403,15 @@ private atomAlias ::= EX_COLON alias
 
 // List: [1, 2, 3] or [a: 1, b: 2] or [h | t]
 list ::= EX_LBRACKET opSep listContents? opSep EX_RBRACKET { pin=1 }
-private listContents ::= opSep listElement (EX_COMMA opSep listElement)* EX_COMMA? opSep (EX_PIPE containerExpr)?
-                       | containerExpr EX_PIPE containerExpr
+private listContents ::= opSep containerExpr (opSep EX_PIPE opSep containerExpr)+
+                       | opSep listElement (EX_COMMA opSep listElement)* EX_COMMA? opSep (EX_PIPE containerExpr)?
 private listElement ::= (keywordPairItem | containerExpr) { recoverWhile=listRecovery }
 
 // Keyword pair: key: value
 keywordPair ::= keywordKey opSep containerExpr
 private keywordPairIncomplete ::= keywordKey { recoverWhile=keywordPairRecovery }
 private keywordPairItem ::= keywordPair
+private keywordPairItemNoString ::= !stringKeywordKey keywordPair
 private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON | stringKeywordKey | EX_IDENTIFIER EX_COLON
 private stringKeywordKey ::= string EX_COLON | interpolatedString EX_COLON
 
@@ -411,7 +424,7 @@ private tupleElement ::= containerExpr { recoverWhile=tupleRecovery }
 // Map: %{key: value} or %{"key" => value}
 map ::= EX_PERCENT_LBRACE opSep mapContents? opSep EX_RBRACE { pin=1 }
 private mapContents ::= mapUpdateContents | mapPairContents
-private mapUpdateContents ::= containerExpr EX_PIPE mapPairContents
+private mapUpdateContents ::= containerExpr opSep EX_PIPE opSep mapPairContents
 private mapPairContents ::= opSep mapPair (EX_COMMA opSep mapPair)* EX_COMMA?
 private mapPair ::= (assocPair | keywordPairItem | keywordPairIncomplete) { recoverWhile=mapRecovery }
 assocPair ::= containerExpr opSep EX_FAT_ARROW opSep containerExpr

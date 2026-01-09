@@ -8,5 +8,5 @@ Elixir File
         ExIdentifierImpl(IDENTIFIER)
           PsiElement(IDENTIFIER)('b')
     PsiElement(.)('.')
-    PsiErrorElement:'(', IDENTIFIER, raise, send, super or throw expected
+    PsiErrorElement:'!', '!=', '!==', '&', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '..', '..//', '/', '//', <, <<, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>', '>>>', ALIAS, IDENTIFIER, '^', raise, send, super, throw, '|', '|>', '||', '|||', '~', '~>', '~>>' expected
       <empty list>

@@ -3,5 +3,5 @@ Elixir File
     ExAliasImpl(ALIAS)
       PsiElement(ALIAS)('Mod')
     PsiElement(.)('.')
-    PsiErrorElement:'(', ALIAS, IDENTIFIER, raise, send, super, throw or '{' expected
+    PsiErrorElement:'!', '!=', '!==', '&', '&&', '&&&', '(', '*', '**', '+', '++', '+++', '-', '--', '---', '..', '..//', '/', '//', <, <<, <<<, <<~, <=, <>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>', '>>>', ALIAS, IDENTIFIER, '^', raise, send, super, throw, '{', '|', '|>', '||', '|||', '~', '~>' and ... expected
       <empty list>
