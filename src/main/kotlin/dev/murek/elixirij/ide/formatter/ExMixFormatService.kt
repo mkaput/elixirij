@@ -6,13 +6,17 @@ import com.intellij.execution.process.ProcessEvent
 import com.intellij.formatting.service.AsyncDocumentFormattingService
 import com.intellij.formatting.service.AsyncFormattingRequest
 import com.intellij.formatting.service.FormattingService
-import com.intellij.openapi.util.TextRange
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.PsiFile
 import dev.murek.elixirij.ExBundle
 import dev.murek.elixirij.lang.ExFile
 import dev.murek.elixirij.mix.mix
 import dev.murek.elixirij.toolchain.elixirToolchain
 import java.nio.charset.StandardCharsets
+import java.nio.file.Path
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 class ExMixFormatService : AsyncDocumentFormattingService() {
     override fun canFormat(file: PsiFile): Boolean {
@@ -30,45 +34,59 @@ class ExMixFormatService : AsyncDocumentFormattingService() {
     override fun createFormattingTask(request: AsyncFormattingRequest): FormattingTask? {
         val context = request.context
         val project = context.project
-        val file = context.containingFile
-        if (!request.formattingRanges.isWholeFile(file.textRange)) return null
-
         val workingDirectory = project.mix.projectRootFor(context.containingFile) ?: return null
-        val stdinFilename = resolveStdinFilename(request)
-        val commandLine = project.mix.buildMixCommandLine(
-            workingDirectory,
-            "format",
-            "--stdin-filename",
-            stdinFilename,
-            "-",
-        ) ?: return null
-        val handler = OSProcessHandler(commandLine.withCharset(StandardCharsets.UTF_8))
-
         return object : FormattingTask {
+            private var handler: OSProcessHandler? = null
+            private var tempFile: Path? = null
+
             override fun run() {
-                handler.addProcessListener(object : CapturingProcessAdapter() {
+                val extension = resolveFormatExtension(context.containingFile)
+                val formatFile = try {
+                    createTempFormatFile(workingDirectory, extension, request.documentText)
+                } catch (_: Exception) {
+                    request.onError(getName(), ExBundle.message("formatter.mixFormat.failed"))
+                    return
+                }
+                val commandLine = project.mix.buildMixCommandLine(
+                    workingDirectory,
+                    "format",
+                    formatFile.toString(),
+                )
+
+                if (commandLine == null) {
+                    formatFile.deleteIfExists()
+                    return
+                }
+
+                val processHandler = OSProcessHandler(commandLine.withCharset(StandardCharsets.UTF_8))
+                tempFile = formatFile
+                handler = processHandler
+
+                processHandler.addProcessListener(object : CapturingProcessAdapter() {
                     override fun processTerminated(event: ProcessEvent) {
                         val output = output
-                        if (event.exitCode == 0) {
-                            request.onTextReady(output.stdout)
-                        } else {
-                            val message = output.stderr.ifBlank { output.stdout }
-                            request.onError(
-                                getName(),
-                                message.ifBlank { ExBundle.message("formatter.mixFormat.failed") })
+                        val formattedFile = tempFile
+                        try {
+                            if (event.exitCode == 0 && formattedFile != null) {
+                                request.onTextReady(formattedFile.readText(StandardCharsets.UTF_8))
+                            } else {
+                                val message = output.stderr.ifBlank { output.stdout }
+                                request.onError(
+                                    getName(),
+                                    message.ifBlank { ExBundle.message("formatter.mixFormat.failed") })
+                            }
+                        } finally {
+                            formattedFile?.deleteIfExists()
                         }
                     }
                 })
 
-                handler.startNotify()
-                handler.processInput.use { stdin ->
-                    stdin.write(request.documentText.toByteArray(StandardCharsets.UTF_8))
-                    stdin.flush()
-                }
+                processHandler.startNotify()
             }
 
             override fun cancel(): Boolean {
-                handler.destroyProcess()
+                handler?.destroyProcess()
+                tempFile?.deleteIfExists()
                 return true
             }
 
@@ -76,16 +94,22 @@ class ExMixFormatService : AsyncDocumentFormattingService() {
         }
     }
 
-    private fun resolveStdinFilename(request: AsyncFormattingRequest): String =
-        request.context.virtualFile
-            ?.takeIf { it.isInLocalFileSystem }
-            ?.path
-            ?: request.ioFile?.path
-            ?: DEFAULT_STDIN_FILENAME
+}
 
-    private fun List<TextRange>.isWholeFile(fileRange: TextRange): Boolean = size == 1 && first() == fileRange
+private const val DEFAULT_MIX_FORMAT_EXTENSION = "exs"
 
-    companion object {
-        private const val DEFAULT_STDIN_FILENAME = "stdin.exs"
-    }
+private fun resolveFormatExtension(file: PsiFile): String =
+    file.fileType.defaultExtension.takeIf { it.isNotBlank() } ?: DEFAULT_MIX_FORMAT_EXTENSION
+
+private fun createTempFormatFile(workingDirectory: Path, extension: String, content: String): Path {
+    val suffix = if (extension.startsWith(".")) extension else ".$extension"
+    val tempFile = FileUtil.createTempFile(
+        workingDirectory.toFile(),
+        "elixirij-format-",
+        suffix,
+        true,
+        true,
+    )
+    tempFile.toPath().writeText(content, StandardCharsets.UTF_8)
+    return tempFile.toPath()
 }
