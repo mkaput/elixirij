@@ -9,6 +9,7 @@ Targets the latest IntelliJ Platform version and modern Elixir language conventi
   others
 - write tests for every change, unless introducing "declarative" features (code commenter etc.)
 - when bugfixing: write minimal reproduction test that fails, then fix, then confirm test passes
+- do not mock IntelliJ Platform internals; prefer real platform test fixtures and pipelines instead
 
 ## Code rules
 
