@@ -361,6 +361,20 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
         )
     }
 
+    fun `test parser errors inside call arguments do not hang`() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+            defmodule MyModule do
+              def example do
+                foo(:bar(
+              end
+            end
+            """.trimIndent()
+        )
+        myFixture.doHighlighting()
+    }
+
     private fun doTest(code: String) {
         val blankPattern = Regex("<blank>(.*?)</blank>", setOf(RegexOption.DOT_MATCHES_ALL))
         val blankRanges = mutableListOf<IntRange>()
