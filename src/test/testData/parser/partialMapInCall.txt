@@ -6,7 +6,7 @@ Elixir File
       PsiElement(()('(')
       ExMapImpl(MAP)
         PsiElement(%{)('%{')
-        PsiElement(IDENTIFIER)('a')
-        PsiElement(:)(':')
-        PsiErrorElement:',', COMMENT, EOL or '}' expected
+        PsiErrorElement:'.', ATOM_QUOTED, COMMENT, EOL, IDENTIFIER, KW_IDENTIFIER, STRING, STRING_BEGIN, '[' or '}' expected, got 'a'
           <empty list>
+      PsiElement(IDENTIFIER)('a')
+      PsiElement(:)(':')

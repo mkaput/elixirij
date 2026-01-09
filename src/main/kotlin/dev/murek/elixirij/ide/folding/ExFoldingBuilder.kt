@@ -95,7 +95,7 @@ class ExFoldingBuilder : FoldingBuilderEx(), DumbAware {
 
     private fun listPlaceholder(element: ExList): String {
         if (hasToken(element, EX_PIPE)) return "[...]"
-        val expressions = element.expressionList
+        val expressions = directExpressions(element)
         val isSimple = expressions.size == 1 && isSimpleExpression(expressions.single())
         return if (isSimple) {
             bracketPlaceholder("[", "]", element, skipFirstLine = true)
@@ -105,7 +105,7 @@ class ExFoldingBuilder : FoldingBuilderEx(), DumbAware {
     }
 
     private fun tuplePlaceholder(element: ExTuple): String {
-        val expressions = element.expressionList
+        val expressions = directExpressions(element)
         val isSimple = expressions.size == 1 && isSimpleExpression(expressions.single())
         return if (isSimple) {
             bracketPlaceholder("{", "}", element, skipFirstLine = true)
@@ -124,7 +124,7 @@ class ExFoldingBuilder : FoldingBuilderEx(), DumbAware {
     }
 
     private fun bitstringPlaceholder(element: ExBitstring): String {
-        val expressions = element.expressionList
+        val expressions = directExpressions(element)
         val isSimple = expressions.size == 1 && isSimpleExpression(expressions.single())
         return if (isSimple) {
             bracketPlaceholder("<<", ">>", element, skipFirstLine = true)
@@ -265,9 +265,12 @@ class ExFoldingBuilder : FoldingBuilderEx(), DumbAware {
         val doBlock = element as? ExDoBlock ?: return null
         val contents = PsiTreeUtil.getChildOfType(doBlock, ExDoContents::class.java) ?: return null
         if (PsiTreeUtil.findChildOfType(contents, ExDoBlock::class.java) != null) return null
-        val expressions = contents.expressionList
+        val expressions = directExpressions(contents)
         return expressions.singleOrNull()
     }
+
+    private fun directExpressions(element: PsiElement): List<ExExpression> =
+        PsiTreeUtil.getChildrenOfTypeAsList(element, ExExpression::class.java)
 
     private fun onlyFnBodyExpression(element: PsiElement): ExExpression? {
         val fnExpr = element as? ExFnExpr ?: return null

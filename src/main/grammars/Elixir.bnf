@@ -1,16 +1,17 @@
 {
   parserClass="dev.murek.elixirij.lang.parser.ExParser"
+  parserUtilClass="dev.murek.elixirij.lang.parser.ExParserUtil"
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  
+
   psiClassPrefix="Ex"
   psiImplClassSuffix="Impl"
   psiPackage="dev.murek.elixirij.lang.psi"
   psiImplPackage="dev.murek.elixirij.lang.psi.impl"
-  
+
   elementTypeHolderClass="dev.murek.elixirij.lang.psi.ExTypes"
   elementTypeClass="dev.murek.elixirij.lang.psi.ExElementType"
   tokenTypeClass="dev.murek.elixirij.lang.psi.ExTokenType"
-  
+
   // Use tokens from ElementTypes.kt
   generate=[tokens="no"]
   parserImports=[
@@ -18,16 +19,16 @@
     "static com.intellij.psi.StringEscapesTokenTypes.*"
     "static com.intellij.lang.parser.GeneratedParserUtilBase.*"
   ]
-  
+
   tokens = [
     space='regexp:\s+'
     comment='regexp:#[^\r\n]*'
   ]
-  
+
   // Expression hierarchy - all expression types extend from expression
   extends(".*Expr")=expression
   extends("literal|atom|identifier|alias|aliasMulti|list|tuple|map|struct|bitstring|sigil|heredoc|charlistHeredoc|parenExpr|doBlock")=expression
-  
+
   // Named rules for binary operators (for better PSI structure)
   name("stabExpr")="stab expression"
   name("inMatchExpr")="in-match expression"
@@ -57,7 +58,6 @@ private tupleRecovery ::= !(EX_COMMA | EX_RBRACE)
 private mapRecovery ::= !(EX_COMMA | EX_RBRACE | EX_EOL)
 private bitstringRecovery ::= !(EX_COMMA | EX_GT_GT)
 private callArgRecovery ::= !(EX_COMMA | EX_RPAREN)
-private keywordPairRecovery ::= !(EX_COMMA | EX_RBRACKET | EX_RBRACE | EX_RPAREN | EX_END)
 
 // =============================================================================
 // Expression hierarchy - following operator precedence (lowest to highest)
@@ -69,7 +69,7 @@ expression ::= stabExpr
 
 // Container expression: used inside lists, maps, tuples, bitstrings where | and :: have special meaning
 // Starts from matchExpr to skip stab, inMatch, when, type, and pipe operators
-private containerExpr ::= matchExpr
+private containerExpr ::= <<containerExprFast>>
 
 // Precedence 10: -> (right associative) - stab operator
 stabExpr ::= inMatchExpr (EX_ARROW opSep stabExpr)?
@@ -252,7 +252,6 @@ private noParensArgsNoDoBlock ::= noParensKeywordArgsNoDoBlock | noParensPositio
 private noParensKeywordArgsNoDoBlock ::= keywordPairItemNoStringNoDoBlock (EX_COMMA eoe* keywordPairItemNoStringNoDoBlock)*
 private noParensPositionalArgsNoDoBlock ::= noDoBlockExpr (EX_COMMA eoe* !stringKeywordKey noDoBlockExpr)* keywordTailNoDoBlock?
 private keywordTailNoDoBlock ::= EX_COMMA eoe* keywordPairItemNoStringNoDoBlock (EX_COMMA eoe* keywordPairItemNoStringNoDoBlock)*
-private keywordPairItemNoDoBlock ::= keywordPairNoDoBlock
 private keywordPairNoDoBlock ::= keywordKey opSep noDoBlockContainerExpr
 private keywordPairItemNoStringNoDoBlock ::= !stringKeywordKey keywordPairNoDoBlock
 
@@ -410,7 +409,6 @@ private listElement ::= (keywordPairItem | containerExpr) { recoverWhile=listRec
 
 // Keyword pair: key: value
 keywordPair ::= keywordKey opSep containerExpr
-private keywordPairIncomplete ::= keywordKey { recoverWhile=keywordPairRecovery }
 private keywordPairItem ::= keywordPair
 private keywordPairItemNoString ::= !stringKeywordKey keywordPair
 private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON | stringKeywordKey | EX_IDENTIFIER EX_COLON
@@ -424,10 +422,13 @@ private tupleElement ::= containerExpr opSep? &(EX_COMMA | EX_RBRACE) { recoverW
 
 // Map: %{key: value} or %{"key" => value}
 map ::= EX_PERCENT_LBRACE opSep mapContents? opSep EX_RBRACE { pin=1 }
-private mapContents ::= mapUpdateContents | mapPairContents
-private mapUpdateContents ::= containerExpr opSep EX_PIPE opSep mapPairContents
-private mapPairContents ::= opSep mapPair (EX_COMMA opSep mapPair)* EX_COMMA?
-private mapPair ::= (assocPair | keywordPairItem | keywordPairIncomplete) { recoverWhile=mapRecovery }
+private mapContents ::= mapUpdateContents | mapConstructionContents
+private mapUpdateContents ::= <<mapUpdateStart>> containerExpr opSep EX_PIPE opSep mapTailArguments
+private mapConstructionContents ::= mapTailArguments
+private mapTailArguments ::= keywordList
+                           | (<<mapAssocPairStart>> assocPairList (EX_COMMA opSep keywordList)?)
+private assocPairList ::= assocPairItem (EX_COMMA opSep assocPairItem)* (EX_COMMA opSep)?
+private assocPairItem ::= assocPair { recoverWhile=mapRecovery }
 assocPair ::= containerExpr opSep EX_FAT_ARROW opSep containerExpr
 
 // Struct: %ModuleName{key: value} or %module{key: value}
@@ -451,8 +452,6 @@ private callArgs ::= opSep? callArg (EX_COMMA opSep callArg)* (EX_COMMA opSep)? 
 private callArg ::= (keywordPairItem | expression) opSep? { recoverWhile=callArgRecovery }
 
 // Argument list: used in function heads and guards
-private argList ::= argListElement (EX_COMMA argListElement)* EX_COMMA?
-private argListElement ::= (keywordPairItem | inMatchExpr) { recoverWhile=callArgRecovery }
 
 // Keyword list: comma-separated keyword pairs
 private keywordList ::= keywordPairItem (EX_COMMA eoe* keywordPairItem)* (EX_COMMA eoe*)?

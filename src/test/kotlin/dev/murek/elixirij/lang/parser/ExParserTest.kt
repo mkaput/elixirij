@@ -2,6 +2,7 @@ package dev.murek.elixirij.lang.parser
 
 import com.intellij.testFramework.ParsingTestCase
 import dev.murek.elixirij.lang.ExParserDefinition
+import kotlin.system.measureTimeMillis
 
 class ExParserTest : ParsingTestCase(
     "parser",
@@ -14,6 +15,19 @@ class ExParserTest : ParsingTestCase(
 
     private fun doTest() = doTest(true, true)
     private fun doPartialTest() = doTest(true, false)
+    private fun doTestWithDeadline(deadlineMillis: Long = 2_000) {
+        val testName = getTestName(true)
+        val testText = loadFile("$testName.$myFileExt")
+        val parseMillis = measureTimeMillis { parseFile(testName, testText) }
+        val checkMillis = measureTimeMillis {
+            checkResult(testName, myFile)
+            ensureNoErrorElements()
+        }
+        assertTrue(
+            "Parser exceeded ${deadlineMillis}ms deadline: ${parseMillis}ms (check=${checkMillis}ms)",
+            parseMillis <= deadlineMillis
+        )
+    }
 
     // =============================================================================
     // A. Edge Cases
@@ -108,6 +122,8 @@ class ExParserTest : ParsingTestCase(
     fun testTuplePipelineElement() = doTest()
     fun testMapUpdateSyntax() = doTest()
     fun testLargeNestedDataPerformance() = doTest()
+    fun testLargeModuleParserDeadline() = doTestWithDeadline()
+
     // =============================================================================
     // 1. Literals
     // =============================================================================

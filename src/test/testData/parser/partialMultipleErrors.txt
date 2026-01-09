@@ -6,6 +6,8 @@ Elixir File
         ExIntegerImpl(INTEGER)
           PsiElement(INTEGER)('1')
       PsiElement(,)(',')
+      PsiErrorElement:'{' unexpected
+        <empty list>
       PsiWhiteSpace(' ')
       ExTupleImpl(TUPLE)
         PsiElement({)('{')

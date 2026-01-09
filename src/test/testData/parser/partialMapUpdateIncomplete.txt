@@ -2,7 +2,7 @@ Elixir File
   ExTopLevelExpressionsImpl(TOP_LEVEL_EXPRESSIONS)
     ExMapImpl(MAP)
       PsiElement(%{)('%{')
-      PsiErrorElement:COMMENT, EOL or '}' expected, got 'map'
+      PsiErrorElement:'!', '%', '%{', '&', '+', '-', '.', <<, <atom>, <literal>, '@', ALIAS, ATOM_QUOTED, CHARLIST_HEREDOC, COMMENT, EOL, HEREDOC, IDENTIFIER, KW_IDENTIFIER, SIGIL, STRING, STRING_BEGIN, '[', '^', fn, not, raise, send, super, throw, '{', '}' or '~' expected, got 'map'
         <empty list>
     PsiElement(IDENTIFIER)('map')
     PsiWhiteSpace(' ')
