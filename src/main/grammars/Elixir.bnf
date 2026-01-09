@@ -48,6 +48,7 @@ private topLevelExpression ::= bareDoCall | expression { recoverWhile=topLevelRe
 private eoe ::= (EX_EOL | EX_SEMICOLON)+
 private opSep ::= (EX_EOL | EX_COMMENT)*
 private arrowOpLookahead ::= &((EX_EOL | EX_COMMENT)* arrowOp)
+private containerEndLookahead ::= &((EX_EOL | EX_COMMENT)* (EX_COMMA | EX_RBRACE | EX_RPAREN | EX_RBRACKET))
 private arrowOpContinuation ::= (EX_EOL | EX_COMMENT)* arrowOp opSep inExpr
 private topLevelRecovery ::= !(EX_EOL | EX_SEMICOLON)
 private doRecovery ::= !(EX_ELSE | EX_AFTER | EX_CATCH | EX_RESCUE | EX_END | EX_EOL)
@@ -106,7 +107,7 @@ relExpr ::= arrowExpr (relOp opSep arrowExpr)*
 private relOp ::= EX_LT_EQ | EX_GT_EQ | EX_LT | EX_GT
 
 // Precedence 160: |>, <<<, >>>, <<~, ~>>, <~, ~>, <~>, <|> (left associative)
-arrowExpr ::= inExpr (arrowOpLookahead arrowOpContinuation)*
+arrowExpr ::= inExpr (!containerEndLookahead arrowOpLookahead arrowOpContinuation)*
 private arrowOp ::= EX_PIPE_GT | EX_LT_LT_LT | EX_GT_GT_GT | EX_LT_LT_TILDE | EX_TILDE_GT_GT | EX_LT_TILDE | EX_TILDE_GT | EX_LT_TILDE_GT | EX_LT_PIPE_GT
 
 // Precedence 170: in, not in (left associative)
@@ -237,7 +238,7 @@ private noDoBlockOrExpr ::= noDoBlockAndExpr (orOp opSep noDoBlockAndExpr)*
 private noDoBlockAndExpr ::= noDoBlockCompExpr (andOp opSep noDoBlockCompExpr)*
 private noDoBlockCompExpr ::= noDoBlockRelExpr (compOp opSep noDoBlockRelExpr)*
 private noDoBlockRelExpr ::= noDoBlockArrowExpr (relOp opSep noDoBlockArrowExpr)*
-private noDoBlockArrowExpr ::= noDoBlockInExpr (arrowOpLookahead (EX_EOL | EX_COMMENT)* arrowOp opSep noDoBlockInExpr)*
+private noDoBlockArrowExpr ::= noDoBlockInExpr (!containerEndLookahead arrowOpLookahead (EX_EOL | EX_COMMENT)* arrowOp opSep noDoBlockInExpr)*
 private noDoBlockInExpr ::= noDoBlockXorExpr (inOp opSep noDoBlockXorExpr)*
 private noDoBlockXorExpr ::= noDoBlockConcatExpr (EX_SLASH_SLASH opSep noDoBlockXorExpr)?
 private noDoBlockConcatExpr ::= noDoBlockRangeExpr (concatOp opSep noDoBlockConcatExpr)?
@@ -417,9 +418,9 @@ private stringKeywordKey ::= string EX_COLON | interpolatedString EX_COLON
 
 // Tuple: {1, 2, 3}
 tuple ::= EX_LBRACE opSep tupleContents? opSep EX_RBRACE { pin=1 }
-private tupleContents ::= tupleElement (EX_COMMA opSep tupleElement)* (EX_COMMA opSep tupleKeywordList)? EX_COMMA?
-private tupleKeywordList ::= keywordPairItem (EX_COMMA opSep keywordPairItem)*
-private tupleElement ::= containerExpr { recoverWhile=tupleRecovery }
+private tupleContents ::= opSep? tupleElement (EX_COMMA eoe* tupleElement)* (EX_COMMA eoe* tupleKeywordList)? (EX_COMMA eoe*)?
+private tupleKeywordList ::= keywordPairItem (EX_COMMA eoe* keywordPairItem)*
+private tupleElement ::= containerExpr opSep? &(EX_COMMA | EX_RBRACE) { recoverWhile=tupleRecovery }
 
 // Map: %{key: value} or %{"key" => value}
 map ::= EX_PERCENT_LBRACE opSep mapContents? opSep EX_RBRACE { pin=1 }

@@ -13,17 +13,11 @@ Elixir File
           ExIntegerImpl(INTEGER)
             PsiElement(INTEGER)('2')
         PsiElement(,)(',')
-        PsiWhiteSpace(' ')
-        ExCallExprImpl(CALL_EXPR)
-          ExIdentifierImpl(IDENTIFIER)
-            PsiElement(IDENTIFIER)('def')
-          PsiWhiteSpace(' ')
-          ExIdentifierImpl(IDENTIFIER)
-            PsiElement(IDENTIFIER)('foo')
-          PsiWhiteSpace(' ')
-          ExDoBlockImpl(DO_BLOCK)
-            PsiElement(do)('do')
-            ExDoContentsImpl(DO_CONTENTS)
-              <empty list>
-            PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '..', '..//', '/', '//', '::', ';', <, <-, <=, <>, <unary expr>, '=', '==', '===', '=~', '>', '>=', ALIAS, COMMENT, EOL, IDENTIFIER, '\\', after, and, catch, else, end, in, not, or, rescue, when, '|', '||' or '|||' expected
-              <empty list>
+        PsiErrorElement:';', ATOM_QUOTED, COMMENT, EOL, IDENTIFIER, KW_IDENTIFIER, STRING, STRING_BEGIN or '}' expected, got 'def'
+          <empty list>
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('def')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('foo')
+      PsiWhiteSpace(' ')
+      PsiElement(do)('do')

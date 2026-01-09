@@ -43,8 +43,6 @@ Elixir File
                 PsiElement(STRING_PART)('opacity-0')
               PsiElement(STRING_END)('"')
           PsiElement(EOL)('\n')
-          PsiErrorElement:<<<, <<~, <|>, <~, <~>, '>>>', COMMENT, EOL, '|>', '~>' or '~>>' expected, got '}'
-            <empty list>
           PsiWhiteSpace('  ')
           PsiElement(})('}')
       PsiElement(EOL)('\n')

@@ -17,8 +17,6 @@ Elixir File
       PsiWhiteSpace(' ')
       ExTupleImpl(TUPLE)
         PsiElement({)('{')
-        ExLiteralImpl(LITERAL)
-          ExIntegerImpl(INTEGER)
-            PsiElement(INTEGER)('3')
-        PsiErrorElement:',', COMMENT, EOL or '}' expected
+        PsiErrorElement:COMMENT, EOL or '}' expected, got '3'
           <empty list>
+      PsiElement(INTEGER)('3')

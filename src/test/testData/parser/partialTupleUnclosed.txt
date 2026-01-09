@@ -6,9 +6,7 @@ Elixir File
         ExIntegerImpl(INTEGER)
           PsiElement(INTEGER)('1')
       PsiElement(,)(',')
-      PsiWhiteSpace(' ')
-      ExLiteralImpl(LITERAL)
-        ExIntegerImpl(INTEGER)
-          PsiElement(INTEGER)('2')
-      PsiErrorElement:',', COMMENT, EOL or '}' expected
+      PsiErrorElement:';', <keyword pair>, COMMENT, EOL or '}' expected, got '2'
         <empty list>
+    PsiWhiteSpace(' ')
+    PsiElement(INTEGER)('2')

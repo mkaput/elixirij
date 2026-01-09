@@ -33,6 +33,4 @@ Elixir File
             PsiElement())(')')
           PsiElement())(')')
       PsiElement(EOL)('\n')
-      PsiErrorElement:<<<, <<~, <|>, <~, <~>, '>>>', COMMENT, EOL, '|>', '~>' or '~>>' expected, got '}'
-        <empty list>
       PsiElement(})('}')
