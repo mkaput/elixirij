@@ -351,6 +351,16 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
         myFixture.doHighlighting()
     }
 
+    fun `test parser errors do not highlight atom call targets`() {
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <blank>:bar</blank>(
+            end
+            """.trimIndent()
+        )
+    }
+
     private fun doTest(code: String) {
         val blankPattern = Regex("<blank>(.*?)</blank>", setOf(RegexOption.DOT_MATCHES_ALL))
         val blankRanges = mutableListOf<IntRange>()
