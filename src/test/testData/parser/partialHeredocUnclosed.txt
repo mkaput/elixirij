@@ -4,6 +4,8 @@ Elixir File
       ExInterpolatedStringImpl(INTERPOLATED_STRING)
         PsiElement(STRING_BEGIN)('"""')
         ExStringPartImpl(STRING_PART)
-          PsiElement(STRING_PART)('\nhello')
+          PsiElement(STRING_PART)('\n')
+        ExStringPartImpl(STRING_PART)
+          PsiElement(STRING_PART)('hello')
         PsiErrorElement:'.', <string part>, INTERPOLATION_START, STRING_END or '[' expected
           <empty list>

@@ -66,6 +66,7 @@ private callArgRecovery ::= !(EX_COMMA | EX_RPAREN)
 
 // Using fake rule to define expression base type
 expression ::= stabExpr
+private noArrowExpr ::= inMatchExpr
 
 // Container expression: used inside lists, maps, tuples, bitstrings where | and :: have special meaning
 // Starts from matchExpr to skip stab, inMatch, when, type, and pipe operators
@@ -191,10 +192,10 @@ private bareDoCallTarget ::= (identifier | alias) (EX_DOT identifier)*
 private callTarget ::= atom | identifier | alias | keywordCallTarget | accessExpr
 private callStart ::= EX_IDENTIFIER | EX_ALIAS | EX_ATOM | EX_ATOM_QUOTED
                     | EX_LPAREN | EX_PERCENT | EX_AMPERSAND | EX_RAISE | EX_THROW | EX_SEND | EX_SUPER
-private noParensArgStart ::= !EX_DO (keywordPairItemNoString | expression)
+private noParensArgStart ::= !EX_DO (keywordPairItemNoString | noArrowExpr)
 private noParensArgs ::= noParensKeywordArgs | noParensPositionalArgs
 private noParensKeywordArgs ::= keywordPairItemNoString (EX_COMMA eoe* keywordPairItemNoString)*
-private noParensPositionalArgs ::= expression (EX_COMMA eoe* !stringKeywordKey expression)* keywordTail?
+private noParensPositionalArgs ::= noArrowExpr (EX_COMMA eoe* !stringKeywordKey noArrowExpr)* keywordTail?
 private keywordTail ::= EX_COMMA eoe* keywordPairItemNoString (EX_COMMA eoe* keywordPairItemNoString)*
 private keywordCallTarget ::= EX_RAISE | EX_THROW | EX_SEND | EX_SUPER
 
@@ -250,7 +251,7 @@ private noDoBlockUnaryExpr ::= unaryOp noDoBlockUnaryExpr | callExprNoDoBlock | 
 
 private noParensArgsNoDoBlock ::= noParensKeywordArgsNoDoBlock | noParensPositionalArgsNoDoBlock
 private noParensKeywordArgsNoDoBlock ::= keywordPairItemNoStringNoDoBlock (EX_COMMA eoe* keywordPairItemNoStringNoDoBlock)*
-private noParensPositionalArgsNoDoBlock ::= noDoBlockExpr (EX_COMMA eoe* !stringKeywordKey noDoBlockExpr)* keywordTailNoDoBlock?
+private noParensPositionalArgsNoDoBlock ::= noDoBlockInMatchExpr (EX_COMMA eoe* !stringKeywordKey noDoBlockInMatchExpr)* keywordTailNoDoBlock?
 private keywordTailNoDoBlock ::= EX_COMMA eoe* keywordPairItemNoStringNoDoBlock (EX_COMMA eoe* keywordPairItemNoStringNoDoBlock)*
 private keywordPairNoDoBlock ::= keywordKey opSep noDoBlockContainerExpr
 private keywordPairItemNoStringNoDoBlock ::= !stringKeywordKey keywordPairNoDoBlock
@@ -328,7 +329,7 @@ private stabNoArgsClause ::= EX_ARROW stabBody { pin=1 }
 private stabArgs ::= stabArgList eoe* whenClause?
 private stabArgList ::= stabArg (EX_COMMA eoe* stabArg)*
 private stabArg ::= matchExpr
-private stabBody ::= eoe? matchExpr (eoe matchExpr !EX_ARROW !EX_COMMA !EX_WHEN)*
+private stabBody ::= eoe? matchExpr (eoe !(matchExpr EX_COMMA) matchExpr !EX_ARROW !EX_WHEN)*
 private whenClause ::= EX_WHEN matchExpr
 
 // Do blocks: do ... end (with optional clauses)

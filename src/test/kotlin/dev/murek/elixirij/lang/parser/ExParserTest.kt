@@ -128,6 +128,8 @@ class ExParserTest : ParsingTestCase(
     fun testTypeUnionInStructField() = doTest()
     fun testDocHeredocEscapedTerminator() = doTest()
     fun testFnClauseGuardNewlineInAnonymousFn() = doTest()
+    fun testFnClauseGuardSameLine() = doTest()
+
     // =============================================================================
     // 1. Literals
     // =============================================================================

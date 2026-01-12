@@ -25,5 +25,5 @@ Elixir File
         PsiElement(do)('do')
         ExDoContentsImpl(DO_CONTENTS)
           <empty list>
-        PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', '-', '--', '---', '->', '..', '..//', '/', '//', '::', ';', <, <-, <=, <>, <unary expr>, '=', '==', '===', '=~', '>', '>=', ALIAS, COMMENT, EOL, IDENTIFIER, '\\', after, and, catch, else, end, in, not, or, rescue, when, '|', '||' or '|||' expected
+        PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', '-', '--', '---', '..', '..//', '/', '//', '::', ';', <, <-, <=, <>, <unary expr>, '=', '==', '===', '=~', '>', '>=', ALIAS, COMMENT, EOL, IDENTIFIER, '\\', after, and, catch, else, end, in, not, or, rescue, when, '|', '||' or '|||' expected
           <empty list>
