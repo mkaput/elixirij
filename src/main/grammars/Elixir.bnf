@@ -426,8 +426,8 @@ private mapContents ::= mapUpdateContents | mapConstructionContents
 private mapUpdateContents ::= <<mapUpdateStart>> containerExpr opSep EX_PIPE opSep mapTailArguments
 private mapConstructionContents ::= mapTailArguments
 private mapTailArguments ::= keywordList
-                           | (<<mapAssocPairStart>> assocPairList (EX_COMMA opSep keywordList)?)
-private assocPairList ::= assocPairItem (EX_COMMA opSep assocPairItem)* (EX_COMMA opSep)?
+                           | (<<mapAssocPairStart>> assocPairList (EX_COMMA opSep keywordList)? (EX_COMMA opSep)?)
+private assocPairList ::= assocPairItem (EX_COMMA opSep assocPairItem)*
 private assocPairItem ::= assocPair { recoverWhile=mapRecovery }
 assocPair ::= containerExpr opSep EX_FAT_ARROW opSep containerExpr
 
