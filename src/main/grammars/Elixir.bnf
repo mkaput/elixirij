@@ -408,7 +408,7 @@ private listContents ::= opSep containerExpr (opSep EX_PIPE opSep containerExpr)
 private listElement ::= (keywordPairItem | containerExpr) { recoverWhile=listRecovery }
 
 // Keyword pair: key: value
-keywordPair ::= keywordKey opSep containerExpr
+keywordPair ::= keywordKey opSep typeExpr
 private keywordPairItem ::= keywordPair
 private keywordPairItemNoString ::= !stringKeywordKey keywordPair
 private keywordKey ::= EX_KW_IDENTIFIER | EX_ATOM_QUOTED EX_COLON | stringKeywordKey | EX_IDENTIFIER EX_COLON
@@ -429,7 +429,7 @@ private mapTailArguments ::= keywordList
                            | (<<mapAssocPairStart>> assocPairList (EX_COMMA opSep keywordList)? (EX_COMMA opSep)?)
 private assocPairList ::= assocPairItem (EX_COMMA opSep assocPairItem)*
 private assocPairItem ::= assocPair { recoverWhile=mapRecovery }
-assocPair ::= containerExpr opSep EX_FAT_ARROW opSep containerExpr
+assocPair ::= typeExpr opSep EX_FAT_ARROW opSep typeExpr
 
 // Struct: %ModuleName{key: value} or %module{key: value}
 struct ::= EX_PERCENT structTarget EX_LBRACE opSep mapContents? opSep EX_RBRACE { pin=1 }

@@ -19,6 +19,7 @@ import dev.murek.elixirij.lang.EX_FLOAT
 import dev.murek.elixirij.lang.EX_GT_GT
 import dev.murek.elixirij.lang.EX_HEREDOC
 import dev.murek.elixirij.lang.EX_INTEGER
+import dev.murek.elixirij.lang.EX_KW_IDENTIFIER
 import dev.murek.elixirij.lang.EX_LBRACE
 import dev.murek.elixirij.lang.EX_LBRACKET
 import dev.murek.elixirij.lang.EX_LPAREN
@@ -47,7 +48,48 @@ object ExParserUtil {
     @JvmStatic
     fun mapUpdateStart(builder: PsiBuilder, level: Int): Boolean {
         if (!GeneratedParserUtilBase.recursion_guard_(builder, level, "mapUpdateStart")) return false
-        return scanForTopLevel(builder, EX_PIPE, EX_FAT_ARROW)
+        val marker = builder.mark()
+        var depth = 0
+
+        while (true) {
+            val type: IElementType = builder.tokenType ?: break
+
+            if (depth == 0) {
+                when (type) {
+                    EX_KW_IDENTIFIER,
+                    EX_COLON,
+                    EX_FAT_ARROW,
+                    EX_COMMA,
+                    EX_RBRACE -> {
+                        marker.rollbackTo()
+                        return false
+                    }
+
+                    EX_PIPE -> {
+                        marker.rollbackTo()
+                        return true
+                    }
+                }
+            }
+
+            when (type) {
+                EX_LPAREN,
+                EX_LBRACKET,
+                EX_LBRACE,
+                EX_PERCENT_LBRACE,
+                EX_LT_LT -> depth++
+
+                EX_RPAREN,
+                EX_RBRACKET,
+                EX_RBRACE,
+                EX_GT_GT -> if (depth > 0) depth--
+            }
+
+            builder.advanceLexer()
+        }
+
+        marker.rollbackTo()
+        return false
     }
 
     /**
