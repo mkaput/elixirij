@@ -419,8 +419,9 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 }
 
 <IN_HEREDOC> {
-    "\"\"\""                           { return endString(EX_STRING_END); }
+    ^{HORIZONTAL_SPACE}*"\"\"\""        { return endString(EX_STRING_END); }
     {ESCAPED_NEWLINE}                  { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {EOL_CHAR}                         { return EX_STRING_PART; }
     {UNICODE_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {UNICODE_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {HEX_ESC_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
@@ -439,7 +440,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
     {GENERIC_ESC}                      { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     "#{"                               { return beginInterpolation(IN_HEREDOC); }
-    [^\"#]+                            { return EX_STRING_PART; }
+    [^\"#\r\n]+                        { return EX_STRING_PART; }
     "\""                               { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
@@ -474,8 +475,9 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 }
 
 <IN_CHARLIST_HEREDOC> {
-    "\'\'\'"                           { return endString(EX_CHARLIST_END); }
+    ^{HORIZONTAL_SPACE}*"\'\'\'"        { return endString(EX_CHARLIST_END); }
     {ESCAPED_NEWLINE}                  { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
+    {EOL_CHAR}                         { return EX_CHARLIST_PART; }
     {UNICODE_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {UNICODE_SHORT}                    { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     {HEX_ESC_BRACED}                   { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
@@ -494,7 +496,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN; }
     {GENERIC_ESC}                      { return StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN; }
     "#{"                               { return beginInterpolation(IN_CHARLIST_HEREDOC); }
-    [^\'#]+                            { return EX_CHARLIST_PART; }
+    [^\'#\r\n]+                        { return EX_CHARLIST_PART; }
     "\'"                               { return EX_CHARLIST_PART; }
     "#"                                { return EX_CHARLIST_PART; }
     "\\"                               { return EX_CHARLIST_PART; }
@@ -718,8 +720,9 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 }
 
 <IN_SIGIL_HEREDOC_DQUOTE> {
-    "\"\"\"" {SIGIL_MODIFIERS}         { sigilLetter = 0; return endString(EX_STRING_END); }
+    ^{HORIZONTAL_SPACE}*"\"\"\""{SIGIL_MODIFIERS} { sigilLetter = 0; return endString(EX_STRING_END); }
     {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {EOL_CHAR}                         { return EX_STRING_PART; }
     {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     {HEX_ESC_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
@@ -738,7 +741,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
     {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_HEREDOC_DQUOTE); }
-    [^\"#]+                            { return EX_STRING_PART; }
+    [^\"#\r\n]+                        { return EX_STRING_PART; }
     "\""                               { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
@@ -746,8 +749,9 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
 }
 
 <IN_SIGIL_HEREDOC_SQUOTE> {
-    "\'\'\'" {SIGIL_MODIFIERS}         { sigilLetter = 0; return endString(EX_STRING_END); }
+    ^{HORIZONTAL_SPACE}*"\'\'\'"{SIGIL_MODIFIERS} { sigilLetter = 0; return endString(EX_STRING_END); }
     {ESCAPED_NEWLINE}                  { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
+    {EOL_CHAR}                         { return EX_STRING_PART; }
     {UNICODE_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     {UNICODE_SHORT}                    { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     {HEX_ESC_BRACED}                   { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
@@ -766,7 +770,7 @@ SIGIL_SLASH_CONTENT=({ESCAPED_SLASH}|[^/])*
     \\x                                { return sigilAllowsEscapes() ? StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN : EX_STRING_PART; }
     {GENERIC_ESC}                      { return sigilAllowsEscapes() ? StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN : EX_STRING_PART; }
     "#{"                               { return beginInterpolation(IN_SIGIL_HEREDOC_SQUOTE); }
-    [^\'#]+                            { return EX_STRING_PART; }
+    [^\'#\r\n]+                        { return EX_STRING_PART; }
     "\'"                               { return EX_STRING_PART; }
     "#"                                { return EX_STRING_PART; }
     "\\"                               { return EX_STRING_PART; }
