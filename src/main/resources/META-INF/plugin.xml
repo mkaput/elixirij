@@ -69,4 +69,9 @@
 
     <notificationGroup id="ElixirIJ" displayType="BALLOON" key="notification.group.elixirij"/>
   </extensions>
+
+  <actions>
+    <action id="ElixirIJ.CheckExpertUpdatesAction"
+            class="dev.murek.elixirij.ide.actions.CheckExpertUpdatesAction"/>
+  </actions>
 </idea-plugin>

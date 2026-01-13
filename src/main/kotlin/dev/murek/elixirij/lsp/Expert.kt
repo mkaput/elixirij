@@ -63,10 +63,10 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
         ExpertMode.CUSTOM -> settings.expertCustomExecutablePath?.let { Path(it) }?.takeIf { it.exists() }
     }
 
-    override fun checkUpdates() {
+    override fun checkUpdates(force: Boolean) {
         if (settings.expertMode == ExpertMode.AUTOMATIC) {
             val path = getDownloadedBinaryPath()
-            if (isStale(path)) {
+            if (force || isStale(path)) {
                 downloadExecutable()
             }
         }

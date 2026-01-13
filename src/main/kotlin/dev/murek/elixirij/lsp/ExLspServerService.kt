@@ -28,7 +28,7 @@ interface ExLspServerService {
     /**
      * Trigger update check/fresh install if needed and permitted by the user for this project.
      */
-    fun checkUpdates()
+    fun checkUpdates(force: Boolean = false)
 
     /**
      * Returns `true` if the language server is currently downloading.

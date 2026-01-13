@@ -63,10 +63,10 @@ class ElixirLS(private val project: Project, private val cs: CoroutineScope) : E
         ElixirLSMode.CUSTOM -> settings.elixirLSCustomExecutablePath?.let { Path(it) }?.takeIf { it.exists() }
     }
 
-    override fun checkUpdates() {
+    override fun checkUpdates(force: Boolean) {
         if (settings.elixirLSMode == ElixirLSMode.AUTOMATIC) {
             val path = getLauncherScriptPath()
-            if (isStale(path)) {
+            if (force || isStale(path)) {
                 downloadAndExtract()
             }
         }

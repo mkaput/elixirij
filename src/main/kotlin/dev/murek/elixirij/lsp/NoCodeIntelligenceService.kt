@@ -10,7 +10,7 @@ object NoCodeIntelligenceService : ExLspServerService {
 
     override fun currentExecutable(): Path? = null
 
-    override fun checkUpdates() {}
+    override fun checkUpdates(force: Boolean) {}
 
     override val isDownloading: Boolean = false
 
