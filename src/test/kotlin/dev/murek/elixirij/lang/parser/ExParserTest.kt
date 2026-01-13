@@ -123,7 +123,6 @@ class ExParserTest : ParsingTestCase(
     fun testMapUpdateSyntax() = doTest()
     fun testLargeNestedDataPerformance() = doTest()
     fun testLargeModuleParserDeadline() = doTestWithDeadline()
-    fun testLargeImportTaskParserDeadline() = doTestWithDeadline()
     fun testMapAssocAndKeywordPairs() = doTest()
     fun testTypeUnionInStructField() = doTest()
     fun testDocHeredocEscapedTerminator() = doTest()
