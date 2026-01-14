@@ -3,12 +3,11 @@ package dev.murek.elixirij.lsp
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 
-
 /**
- * Startup activity to check and download Elixir language servers if needed.
+ * Startup activity to check and download the Expert language server if needed.
  */
 class ExLspServerStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
-        ExLspServerService.getConfiguredServiceInstance(project).checkUpdates()
+        Expert.getInstance(project).checkUpdates()
     }
 }

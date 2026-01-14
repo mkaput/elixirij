@@ -14,7 +14,7 @@ class ExLspServerSupportProvider : LspServerSupportProvider {
         project: Project, file: VirtualFile, serverStarter: LspServerSupportProvider.LspServerStarter
     ) {
         if (file.fileType.isElixir) {
-            val lsp = ExLspServerService.getConfiguredServiceInstance(project)
+            val lsp = Expert.getInstance(project)
             if (lsp.checkReady()) {
                 lsp.ensureServerStarted(serverStarter)
             }

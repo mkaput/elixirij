@@ -40,7 +40,7 @@ private val LOG = logger<Expert>()
  * The entry-point interface for getting the Expert LS instance for a project.
  */
 @Service(Service.Level.PROJECT)
-class Expert(private val project: Project, private val cs: CoroutineScope) : ExLspServerService {
+class Expert(private val project: Project, private val cs: CoroutineScope) {
     companion object {
         @JvmStatic
         fun getInstance(project: Project): Expert = project.service()
@@ -49,21 +49,45 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
     private val settings = ExSettings.getInstance(project)
 
     private val downloading = AtomicBoolean(false)
-    override val isDownloading: Boolean get() = downloading.get()
 
-    override fun ensureServerStarted(serverStarter: LspServerSupportProvider.LspServerStarter) {
-        val executable = currentExecutable()
-        check(executable != null)
+    /**
+     * Returns `true` if the language server is currently downloading.
+     */
+    val isDownloading: Boolean get() = downloading.get()
+
+    /**
+     * Starts Expert for the project if a ready executable is available.
+     */
+    fun ensureServerStarted(serverStarter: LspServerSupportProvider.LspServerStarter) {
+        val executable = currentExecutable() ?: return
         LOG.info("Starting Expert from $executable")
         serverStarter.ensureServerStarted(ExpertLspServerDescriptor(project, executable))
     }
 
-    override fun currentExecutable(): Path? = when (settings.expertMode) {
+    /**
+     * Returns `true` if Expert is ready to be used.
+     *
+     * If `true`, then [currentExecutable] **must** return a non-null value.
+     * It is crucial that once Expert becomes _ready_, it will stay in this state forever.
+     */
+    fun checkReady(): Boolean = currentExecutable() != null
+
+    /**
+     * Get a ready to use Expert executable for this project, or `null` if none is available.
+     *
+     * If returned `null` and you're in an interactive context (e.g., user clicked a button),
+     * consider calling [checkUpdates] to let the user download and install Expert.
+     */
+    fun currentExecutable(): Path? = when (settings.expertMode) {
+        ExpertMode.DISABLED -> null
         ExpertMode.AUTOMATIC -> getDownloadedBinaryPath().takeIf { it.exists() }
         ExpertMode.CUSTOM -> settings.expertCustomExecutablePath?.let { Path(it) }?.takeIf { it.exists() }
     }
 
-    override fun checkUpdates(force: Boolean) {
+    /**
+     * Trigger an update check/fresh install if needed and permitted by the user for this project.
+     */
+    fun checkUpdates(force: Boolean = false) {
         if (settings.expertMode == ExpertMode.AUTOMATIC) {
             val path = getDownloadedBinaryPath()
             if (force || isStale(path)) {
@@ -72,7 +96,10 @@ class Expert(private val project: Project, private val cs: CoroutineScope) : ExL
         }
     }
 
-    override fun deleteCached() {
+    /**
+     * Deletes the cached Expert executable.
+     */
+    fun deleteCached() {
         Files.deleteIfExists(getDownloadedBinaryPath())
     }
 

@@ -4,7 +4,7 @@ import com.intellij.testFramework.LightPlatformTestCase
 
 class ExSettingsTest : LightPlatformTestCase() {
 
-    fun `test default code intelligence service is none in tests`() {
-        assertEquals(CodeIntelligenceService.NONE, ExSettings.getInstance(project).codeIntelligenceService)
+    fun `test expert is disabled in tests`() {
+        assertEquals(ExpertMode.DISABLED, ExSettings.getInstance(project).expertMode)
     }
 }
