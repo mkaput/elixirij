@@ -55,6 +55,16 @@ class ExHighlightingAnnotatorTest : BasePlatformTestCase() {
         )
     }
 
+    fun `test defdelegate keyword and function name are highlighted`() {
+        doTest(
+            """
+            <info textAttributesKey="ELIXIR_SPECIAL_FORM">defmodule</info> MyModule do
+              <info textAttributesKey="ELIXIR_SPECIAL_FORM">defdelegate</info> <info textAttributesKey="ELIXIR_FUNCTION_DECLARATION">compile_document</info>(document), to: Proxy
+            end
+        """.trimIndent()
+        )
+    }
+
     fun `test defmacro keyword and macro name are highlighted`() {
         doTest(
             """

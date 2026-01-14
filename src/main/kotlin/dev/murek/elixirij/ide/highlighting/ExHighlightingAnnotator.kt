@@ -37,6 +37,7 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
         "__MODULE__",
         "__STACKTRACE__",
         "def",
+        "defdelegate",
         "defexception",
         "defguard",
         "defguardp",
@@ -65,7 +66,7 @@ class ExHighlightingAnnotator : Annotator, DumbAware {
         "with"
     )
 
-    private val functionDeclarationNames = setOf("def", "defp")
+    private val functionDeclarationNames = setOf("def", "defp", "defdelegate")
     private val macroDeclarationNames = setOf("defmacro", "defmacrop", "defguard", "defguardp")
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
