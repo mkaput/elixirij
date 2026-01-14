@@ -6,5 +6,5 @@ Elixir File
       PsiWhiteSpace(' ')
       ExListImpl(LIST)
         PsiElement([)('[')
-        PsiErrorElement:'!=', '!==', '&&', '&&&', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', COMMENT, EOL, '[', '\\', ']', and, do, in, not, or, when, '|', '|>' and ... expected
+        PsiErrorElement:'!=', '!==', '&&', '&&&', '(', '*', '**', '+', '++', '+++', ',', '-', '--', '---', '.', '..', '..//', '/', '//', '::', <, <-, <<<, <<~, <=, <>, <keyword pair>, <unary expr>, <|>, <~, <~>, '=', '==', '===', '=~', '>', '>=', '>>>', COMMENT, EOL, '[', '\\', ']', and, do, in, not, or, when, '|' and ... expected
           <empty list>
