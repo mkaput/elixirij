@@ -23,6 +23,9 @@ class ExFoldingBuilder : FoldingBuilderEx(), DumbAware {
                 if (isFoldable(element) && shouldFold(element, document)) {
                     descriptors.add(FoldingDescriptor(element.node, element.textRange))
                 }
+                if (element is ExDoContents || element is ExTopLevelExpressions) {
+                    addRequireAliasImportFoldRegions(element, document, descriptors)
+                }
                 super.visitElement(element)
             }
         })
@@ -289,6 +292,61 @@ class ExFoldingBuilder : FoldingBuilderEx(), DumbAware {
             node = node.treeNext
         }
         return found
+    }
+
+    private fun addRequireAliasImportFoldRegions(
+        container: PsiElement,
+        document: Document,
+        descriptors: MutableList<FoldingDescriptor>
+    ) {
+        val expressions = directExpressions(container)
+        var index = 0
+        while (index < expressions.size) {
+            val startIndex = index
+            val types = linkedSetOf<RequireAliasImport>()
+            while (index < expressions.size) {
+                val type = requireAliasImportType(expressions[index]) ?: break
+                types.add(type)
+                index++
+            }
+            if (types.isNotEmpty()) {
+                if (index - startIndex > 1) {
+                    val start = expressions[startIndex]
+                    val end = expressions[index - 1]
+                    val range = TextRange(start.textRange.startOffset, end.textRange.endOffset)
+                    if (isMultiline(range, document)) {
+                        descriptors.add(
+                            FoldingDescriptor(start.node, range, null, requireAliasImportPlaceholder(types))
+                        )
+                    }
+                }
+            } else {
+                index++
+            }
+        }
+    }
+
+    private fun requireAliasImportType(expression: ExExpression): RequireAliasImport? {
+        val callExpr = expression as? ExCallExpr ?: return null
+        val identifier = PsiTreeUtil.getChildrenOfTypeAsList(callExpr, ExIdentifier::class.java).firstOrNull()
+        return RequireAliasImport.fromName(identifier?.text)
+    }
+
+    private fun requireAliasImportPlaceholder(types: Set<RequireAliasImport>): String =
+        RequireAliasImport.entries
+            .asSequence()
+            .filter { it in types }
+            .joinToString("/") { it.keyword }
+            .ifEmpty { "..." } + " ..."
+
+    private enum class RequireAliasImport(val keyword: String) {
+        REQUIRE("require"),
+        ALIAS("alias"),
+        IMPORT("import");
+
+        companion object {
+            fun fromName(name: String?): RequireAliasImport? = entries.firstOrNull { it.keyword == name }
+        }
     }
 
     private data class InlineResult(

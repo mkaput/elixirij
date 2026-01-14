@@ -55,6 +55,20 @@ class ExFoldingBuilderTest : BasePlatformTestCase() {
 
     fun `test no fold single line list`() = testFoldingFile("list_single_line.ex")
 
+    fun `test fold require series`() = testFoldingFile("require_series.ex")
+
+    fun `test fold alias series`() = testFoldingFile("alias_series.ex")
+
+    fun `test fold import series`() = testFoldingFile("import_series.ex")
+
+    fun `test fold require alias series`() = testFoldingFile("require_alias_series.ex")
+
+    fun `test fold require import series`() = testFoldingFile("require_import_series.ex")
+
+    fun `test fold alias import series`() = testFoldingFile("alias_import_series.ex")
+
+    fun `test fold require alias import series`() = testFoldingFile("require_alias_import_series.ex")
+
     private fun testFoldingFile(name: String) {
         myFixture.configureByFile(name)
         myFixture.testFolding("$testDataPath/$name")
