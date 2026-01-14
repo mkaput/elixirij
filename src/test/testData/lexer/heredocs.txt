@@ -1,3 +1,5 @@
 STRING_BEGIN ('"""')
-STRING_PART ('\nheredoc string\n')
+STRING_PART ('\n')
+STRING_PART ('heredoc string')
+STRING_PART ('\n')
 STRING_END ('"""')
