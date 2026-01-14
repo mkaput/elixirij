@@ -169,7 +169,7 @@ private noParensCall ::= !literal callTarget !EX_LPAREN ((&noParensArgStart noPa
                     | (&noParensArgStart noParensArgs doBlock?)
                     | doBlock)
 
-callExpr ::= &callStart (noParensCall | bareDoCall | parenCallChain | anonymousCallChain)
+callExpr ::= &callStart (parenCallChain | anonymousCallChain | noParensCall | bareDoCall)
 private parenCallChain ::= callBaseNoParen callAccessSuffix* parenCall callChainTail doBlock?
 private anonymousCallChain ::= callBase callAccessSuffix* anonymousCall callChainTail doBlock?
 private callChainTail ::= (callAccessSuffix* &callInvocationSuffixStart callInvocationSuffix)* callAccessSuffix*
