@@ -1,6 +1,6 @@
 # HEEx Support Specification
 
-This document defines the architecture and implementation plan for adding HEEx (HTML-aware EEx) support to ElixirIJ.
+This document defines the architecture and implementation plan for adding HEEx (HTML-aware EEx) support to Elixirij.
 The goal is to match the practical baseline implemented by IntelliJ Elixir and then build a clean foundation for
 future features (completion, navigation, inspections) without shipping those yet.
 
@@ -39,28 +39,28 @@ The canonical HEEx implementation lives in the Phoenix LiveView repository and i
 the `~H` sigil. These modules are the reference for expected behavior:
 
 - `Phoenix.LiveView.HTMLEngine` (`lib/phoenix_live_view/html_engine.ex`)
-  - Entry point for `.heex` compilation; calls `EEx.compile_string/2` with `Phoenix.LiveView.TagEngine` as the engine.
-  - Implements `Phoenix.LiveView.TagEngine` behavior to classify tags:
-    - `":" <> name` → slot tags (`<:slot>`)
-    - `"." <> name` → local components (`<.component>`)
-    - leading uppercase → remote components (`<My.Component>`)
-    - `":" <> "inner_block"` is reserved and errors
-    - HTML tags fallback to `{:tag, name}`
-  - Defines HTML void tags via `void?/1`.
+    - Entry point for `.heex` compilation; calls `EEx.compile_string/2` with `Phoenix.LiveView.TagEngine` as the engine.
+    - Implements `Phoenix.LiveView.TagEngine` behavior to classify tags:
+        - `":" <> name` → slot tags (`<:slot>`)
+        - `"." <> name` → local components (`<.component>`)
+        - leading uppercase → remote components (`<My.Component>`)
+        - `":" <> "inner_block"` is reserved and errors
+        - HTML tags fallback to `{:tag, name}`
+    - Defines HTML void tags via `void?/1`.
 
 - `Phoenix.LiveView.TagEngine` (`lib/phoenix_live_view/tag_engine.ex`)
-  - An `EEx.Engine` implementation; EEx handles `<% %>` tokenization.
-  - Uses `Phoenix.LiveView.Tokenizer` to tokenize HTML + `{...}` interpolations.
-  - Delegates tag classification to the configured tag handler (`HTMLEngine`).
+    - An `EEx.Engine` implementation; EEx handles `<% %>` tokenization.
+    - Uses `Phoenix.LiveView.Tokenizer` to tokenize HTML + `{...}` interpolations.
+    - Delegates tag classification to the configured tag handler (`HTMLEngine`).
 
 - `Phoenix.LiveView.Tokenizer` (`lib/phoenix_live_view/tokenizer.ex`)
-  - Custom tokenizer for HTML + HEEx curly interpolation.
-  - Tracks contexts `:text`, `:script`, `:style`, and HTML comments.
-  - Curly interpolation `{...}` is enabled in `:text` and in attribute values.
-  - Braces are disabled inside `<script>`/`<style>` and can be disabled per-tag via
-    `phx-no-curly-interpolation` attribute.
-  - Curly parsing supports nested braces and escaped braces (`\\{`, `\\}`).
-  - EEx interpolation inside tag attribute values is rejected; HEEx expects `{expr}` syntax.
+    - Custom tokenizer for HTML + HEEx curly interpolation.
+    - Tracks contexts `:text`, `:script`, `:style`, and HTML comments.
+    - Curly interpolation `{...}` is enabled in `:text` and in attribute values.
+    - Braces are disabled inside `<script>`/`<style>` and can be disabled per-tag via
+      `phx-no-curly-interpolation` attribute.
+    - Curly parsing supports nested braces and escaped braces (`\\{`, `\\}`).
+    - EEx interpolation inside tag attribute values is rejected; HEEx expects `{expr}` syntax.
 
 We should strive for maximal compatibility with Phoenix behavior (especially tag classification and curly rules),
 while using IntelliJ’s template-language facilities and maintaining IDE-grade error tolerance and recovery.
@@ -359,93 +359,93 @@ Each phase is intentionally small and should include its tests. Mark completed p
 `DONE ✅` sentence. No phases are marked `DONE ✅` yet.
 
 1. **Phase 1: HEEx language + file type**
-   - Add `HeexLanguage`, `HeexFileType`, bundle strings, icons, and plugin.xml registration.
-   - File type association: `.heex` is recognized in IDE.
-   - Tests:
-     - file type registration test (extension -> `HeexFileType`).
-     - icon presence sanity (resource lookup).
+    - Add `HeexLanguage`, `HeexFileType`, bundle strings, icons, and plugin.xml registration.
+    - File type association: `.heex` is recognized in IDE.
+    - Tests:
+        - file type registration test (extension -> `HeexFileType`).
+        - icon presence sanity (resource lookup).
 
 2. **Phase 2: Template data wiring**
-   - Add `HeexTemplateDataElementType` + `HeexFileViewProvider`.
-   - Ensure HTML is the template data language and outer language ranges are excluded from HTML PSI.
-   - Tests:
-     - view provider test: `getTemplateDataLanguage()` is HTML.
-     - HTML PSI exists for `.heex` file.
+    - Add `HeexTemplateDataElementType` + `HeexFileViewProvider`.
+    - Ensure HTML is the template data language and outer language ranges are excluded from HTML PSI.
+    - Tests:
+        - view provider test: `getTemplateDataLanguage()` is HTML.
+        - HTML PSI exists for `.heex` file.
 
 3. **Phase 3: Minimal HEEx lexer (template markers only)**
-   - Implement `HeexLexer` that recognizes `<% %>` and `{}` markers and emits template text.
-   - No nested brace handling yet; just correct token boundaries for simple cases.
-   - Tests:
-     - lexer: `<%= @x %>` token sequence.
-     - lexer: `{@x}` token sequence.
+    - Implement `HeexLexer` that recognizes `<% %>` and `{}` markers and emits template text.
+    - No nested brace handling yet; just correct token boundaries for simple cases.
+    - Tests:
+        - lexer: `<%= @x %>` token sequence.
+        - lexer: `{@x}` token sequence.
 
 4. **Phase 4: Minimal HEEx grammar + PSI**
-   - Add `Heex.bnf` + parser definition + PSI types.
-   - Parse template text and the basic brace/EEx nodes.
-   - Tests:
-     - parser: mixed HTML + `{}` + `<% %>` yields expected PSI items.
-     - parser: unterminated `<%` recovers with error node.
+    - Add `Heex.bnf` + parser definition + PSI types.
+    - Parse template text and the basic brace/EEx nodes.
+    - Tests:
+        - parser: mixed HTML + `{}` + `<% %>` yields expected PSI items.
+        - parser: unterminated `<%` recovers with error node.
 
 5. **Phase 5: Brace nesting + escaping**
-   - Extend lexer to support nested `{}` and escaped braces `\\{`/`\\}`.
-   - Tests:
-     - lexer: nested brace interpolation `{ %{a: %{b: 1}} }`.
-     - lexer: escaped braces stay inside body.
+    - Extend lexer to support nested `{}` and escaped braces `\\{`/`\\}`.
+    - Tests:
+        - lexer: nested brace interpolation `{ %{a: %{b: 1}} }`.
+        - lexer: escaped braces stay inside body.
 
 6. **Phase 6: Script/style brace suppression**
-   - Disable `{}` interpolation inside `<script>` and `<style>`.
-   - Tests:
-     - lexer: `{}` inside script is template text.
-     - lexer: `{}` inside style is template text.
+    - Disable `{}` interpolation inside `<script>` and `<style>`.
+    - Tests:
+        - lexer: `{}` inside script is template text.
+        - lexer: `{}` inside style is template text.
 
 7. **Phase 7: EEx comment handling**
-   - Ensure `<%# %>` is handled as HEEx comment tokens.
-   - Tests:
-     - lexer: `<%# ignored %>` yields comment token(s).
-     - parser: comment node exists and does not inject.
+    - Ensure `<%# %>` is handled as HEEx comment tokens.
+    - Tests:
+        - lexer: `<%# ignored %>` yields comment token(s).
+        - parser: comment node exists and does not inject.
 
 8. **Phase 8: Elixir injection (brace expressions)**
-   - Inject `ExLanguage` into `{...}` bodies.
-   - Tests:
-     - injection: `{@name}` produces injected Elixir PSI.
+    - Inject `ExLanguage` into `{...}` bodies.
+    - Tests:
+        - injection: `{@name}` produces injected Elixir PSI.
 
 9. **Phase 9: Elixir injection (EEx expressions)**
-   - Inject `ExLanguage` into `<% %>` and `<%= %>` bodies.
-   - Tests:
-     - injection: `<%= @name %>` produces injected Elixir PSI.
-     - no injection: `<%# %>` comment.
+    - Inject `ExLanguage` into `<% %>` and `<%= %>` bodies.
+    - Tests:
+        - injection: `<%= @name %>` produces injected Elixir PSI.
+        - no injection: `<%# %>` comment.
 
 10. **Phase 10: HTML lexer wrapper for component tags**
     - Wrap HTML lexer for HEEx view providers to accept `<.component>` and `<:slot>`.
     - Tests:
-      - HTML PSI: `<.card>` parsed as HTML tag.
-      - HTML PSI: `<:header>` parsed as HTML tag.
+        - HTML PSI: `<.card>` parsed as HTML tag.
+        - HTML PSI: `<:header>` parsed as HTML tag.
 
 11. **Phase 11: HTML inspection suppression**
     - Suppress invalid-tag inspections for `<.component>` and `<:slot>` only.
     - Tests:
-      - inspection: no invalid tag warnings for dot/slot tags.
+        - inspection: no invalid tag warnings for dot/slot tags.
 
 12. **Phase 12: HEEx syntax highlighter**
     - Provide HEEx syntax highlighter that delegates to `HtmlFileHighlighter` and only adds HEEx tokens.
     - Tests:
-      - highlighting: `{}` / `<% %>` delimiters get HEEx-specific keys.
-      - highlighting: HTML attribute names use HTML attribute keys.
+        - highlighting: `{}` / `<% %>` delimiters get HEEx-specific keys.
+        - highlighting: HTML attribute names use HTML attribute keys.
 
 13. **Phase 13: HTML syntax highlighter for HEEx view providers**
     - Provide HEEx-specific HTML highlighter wrapper using the tag-name lexer wrapper.
     - Tests:
-      - highlighting: `<.component>` tag name uses HTML tag name color (not error).
+        - highlighting: `<.component>` tag name uses HTML tag name color (not error).
 
 14. **Phase 14: LSP integration**
     - Treat `.heex` as Elixir-like for LSP startup.
     - Tests:
-      - file-open hook includes `.heex` in LSP start predicate.
+        - file-open hook includes `.heex` in LSP start predicate.
 
 15. **Phase 15: Editor helpers (optional)**
     - Brace matcher and quote handler for HEEx.
     - Tests:
-      - typing test for `{}` or `<% %>` pair completion (fixture-based).
+        - typing test for `{}` or `<% %>` pair completion (fixture-based).
 
 16. **Phase 16: Polishing + regression tests**
     - Add regression tests for key Phoenix behaviors (component tags, slots, curly rules).

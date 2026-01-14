@@ -124,7 +124,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
                     LOG.warn("Expert is unsupported on this platform: ${OS.CURRENT} ${CpuArch.CURRENT}, skipping download")
 
                     @Suppress("DialogTitleCapitalization") NotificationGroupManager.getInstance()
-                        .getNotificationGroup("ElixirIJ").createNotification(
+                        .getNotificationGroup("Elixirij").createNotification(
                             title = ExBundle.message("lsp.expert.download.task.title"),
                             content = ExBundle.message("lsp.expert.download.unsupported.platform"),
                             type = NotificationType.ERROR
@@ -165,7 +165,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
                 }
 
                 @Suppress("DialogTitleCapitalization") NotificationGroupManager.getInstance()
-                    .getNotificationGroup("ElixirIJ").createNotification(
+                    .getNotificationGroup("Elixirij").createNotification(
                         title = ExBundle.message("lsp.expert.download.task.title"),
                         content = ExBundle.message("lsp.expert.download.updated"),
                         type = NotificationType.INFORMATION

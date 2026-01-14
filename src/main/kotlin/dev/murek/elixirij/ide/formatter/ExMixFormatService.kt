@@ -27,7 +27,7 @@ class ExMixFormatService : AsyncDocumentFormattingService() {
 
     override fun getFeatures(): Set<FormattingService.Feature> = emptySet()
 
-    override fun getNotificationGroupId(): String = "ElixirIJ"
+    override fun getNotificationGroupId(): String = "Elixirij"
 
     override fun getName(): String = ExBundle.message("formatter.mixFormat.name")
 

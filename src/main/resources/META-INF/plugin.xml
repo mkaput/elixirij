@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
   <id>dev.murek.elixirij</id>
-  <name>ElixirIJ</name>
+  <name>Elixirij</name>
   <vendor>Marek Kaput</vendor>
 
   <depends>com.intellij.modules.platform</depends>
@@ -67,11 +67,11 @@
       id="dev.murek.elixirij.settings"
       key="configurable.elixir.displayName"/>
 
-    <notificationGroup id="ElixirIJ" displayType="BALLOON" key="notification.group.elixirij"/>
+    <notificationGroup id="Elixirij" displayType="BALLOON" key="notification.group.elixirij"/>
   </extensions>
 
   <actions>
-    <action id="ElixirIJ.CheckExpertUpdatesAction"
+    <action id="Elixirij.CheckExpertUpdatesAction"
             class="dev.murek.elixirij.ide.actions.CheckExpertUpdatesAction"/>
   </actions>
 </idea-plugin>

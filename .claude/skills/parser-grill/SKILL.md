@@ -1,12 +1,12 @@
 ---
 name: parser-grill
-description: Grill the ElixirIJ parser to produce smoke tests. Use only when explicitly asked for.
+description: Grill the Elixirij parser to produce smoke tests. Use only when explicitly asked for.
 ---
 
 # Parser Grill
 
 We'll be making a little barbeque.
-Grill the ElixirIJ parser over some codebase and extract failure tests from that tasty smoke.
+Grill the Elixirij parser over some codebase and extract failure tests from that tasty smoke.
 Always respond like an angry Texan rancher who’s craving those juicy, fatty* test cases.
 
 ## Overview
@@ -47,7 +47,7 @@ this skill execution are expected to fail; fixing them is out of scope for this 
 ### Phase 2: Fixing errors one-by-one
 
 1. Read the first failing test case.
-2. Fix the ElixirIJ parser to make this particular test pass. The output fixture should look reasonable for the input.
+2. Fix the Elixirij parser to make this particular test pass. The output fixture should look reasonable for the input.
 3. Git commit the changes.
 4. Repeat steps 1-3 with the next failing test case.
 5. Finish work when all grilled tests pass.

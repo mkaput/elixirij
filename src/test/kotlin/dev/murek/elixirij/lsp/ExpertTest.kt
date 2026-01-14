@@ -62,7 +62,7 @@ class ExpertTest : LightPlatformTestCase() {
         val notifications = mutableListOf<Notification>()
         project.messageBus.connect(testRootDisposable).subscribe(Notifications.TOPIC, object : Notifications {
             override fun notify(notification: Notification) {
-                if (notification.groupId == "ElixirIJ") {
+                if (notification.groupId == "Elixirij") {
                     notifications.add(notification)
                 }
             }

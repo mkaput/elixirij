@@ -1,4 +1,4 @@
-# ElixirIJ
+# Elixirij
 
 A new from-scratch Elixir language support plugin for all IntelliJ Platform-based IDEs.
 Targets the latest IntelliJ Platform version and modern Elixir language conventions.

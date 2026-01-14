@@ -1,7 +1,10 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 
-# elixirij Changelog
+# Elixirij Changelog
 
 ## [Unreleased]
+
 ### Added
-- Initial scaffold created from [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template)
+
+- Initial scaffold created from
+  [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template)
