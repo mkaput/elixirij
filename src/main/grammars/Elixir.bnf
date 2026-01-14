@@ -68,8 +68,7 @@ private callArgRecovery ::= !(EX_COMMA | EX_RPAREN)
 expression ::= stabExpr
 private noArrowExpr ::= inMatchExpr
 
-// Container expression: used inside lists, maps, tuples, bitstrings where | and :: have special meaning
-// Starts from matchExpr to skip stab, inMatch, when, type, and pipe operators
+// Container expression: used inside lists, maps, tuples, bitstrings
 private containerExpr ::= <<containerExprFast>>
 
 // Precedence 10: -> (right associative) - stab operator

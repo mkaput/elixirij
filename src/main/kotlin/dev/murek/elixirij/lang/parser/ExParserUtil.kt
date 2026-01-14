@@ -107,7 +107,7 @@ object ExParserUtil {
      * Parse "container expressions" with a fast path for literal-like constructs.
      *
      * If the fast parse succeeds, we ensure the next token is a container boundary (`,`, `}`, `)`,
-     * `]`, `|`, `=>`, or EOF). Otherwise, we roll back and parse via the full `matchExpr`.
+     * `]`, `=>`, or EOF). Otherwise, we roll back and parse via the full `expression`.
      */
     @JvmStatic
     fun containerExprFast(builder: PsiBuilder, level: Int): Boolean {
@@ -145,7 +145,7 @@ object ExParserUtil {
         }
 
         marker.rollbackTo()
-        return ExParser.matchExpr(builder, level + 1)
+        return ExParser.expression(builder, level + 1)
     }
 
 
@@ -218,7 +218,6 @@ object ExParserUtil {
             tokenType == EX_RBRACE ||
             tokenType == EX_RPAREN ||
             tokenType == EX_RBRACKET ||
-            tokenType == EX_PIPE ||
             tokenType == EX_FAT_ARROW
         marker.rollbackTo()
         return result

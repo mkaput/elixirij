@@ -114,6 +114,7 @@ class ExParserTest : ParsingTestCase(
     fun testTypeUnionMultiline() = doTest()
     fun testPipeIntoKernelBang() = doTest()
     fun testTypespecListUnion() = doTest()
+    fun testTypespecTupleUnion() = doTest()
     fun testMultilineTupleInKeyword() = doTest()
     fun testModuleAttributeNestedAliasCall() = doTest()
     fun testMapStringKey() = doTest()
