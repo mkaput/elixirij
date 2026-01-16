@@ -33,6 +33,30 @@ We target at least the following behaviors observed in IntelliJ Elixir's HEEx su
 - Suppression of HTML “invalid tag name” inspection for HEEx component tags
 - CSS/JS language injection inside `<style>` and `<script>` blocks
 
+## Reference: Elixir EEx implementation
+
+EEx is part of Elixir itself and defines the core tokenization and engine semantics that HEEx builds upon.
+These modules are the canonical reference for tag syntax, token boundaries, and engine callbacks:
+
+- `EEx` (`lib/eex/lib/eex.ex`)
+    - Documents the supported tags:
+        - `<% %>` (execute, discard output), `<%= %>` (execute, output),
+          `<%%` (escape), and `<%!-- --%>` (comment, discarded).
+        - `<%#` is deprecated in favor of `<%!--` (warning emitted).
+    - Default engine is `EEx.SmartEngine`.
+
+- `EEx.Compiler` (`lib/eex/lib/eex/compiler.ex`)
+    - Tokenizes the template into `{:text, ...}`, `{:expr, ...}`, and block
+      variants `{:start_expr | :middle_expr | :end_expr, ...}`.
+    - Recognizes markers immediately after `<%`: `""`, `"="`, `"/"`, `"|"`.
+      Markers `"/"` and `"|"` are reserved for custom engines.
+    - Implements `<%!-- --%>` multi-line comments and `<%%` escaping.
+
+- `EEx.Engine` and `EEx.SmartEngine` (`lib/eex/lib/eex/engine.ex`, `lib/eex/lib/eex/smart_engine.ex`)
+    - `EEx.Engine` defines callbacks for template text and expressions, and
+      restricts marker behavior.
+    - `EEx.SmartEngine` adds `@assign` handling on top of the base engine.
+
 ## Reference: Phoenix LiveView HEEx implementation
 
 The canonical HEEx implementation lives in the Phoenix LiveView repository and is used for `.heex` templates and
@@ -64,6 +88,283 @@ the `~H` sigil. These modules are the reference for expected behavior:
 
 We should strive for maximal compatibility with Phoenix behavior (especially tag classification and curly rules),
 while using IntelliJ’s template-language facilities and maintaining IDE-grade error tolerance and recovery.
+
+## Reference: IntelliJ Elixir (intellij-elixir) implementation
+
+IntelliJ Elixir implements EEx/LEEx as a template language with HTML (or other file types) as the template-data
+language. HEEx support is mentioned in the v22.0.0 changelog, but there is no dedicated `heex` package or `.heex`
+file type entry in this snapshot; the existing EEx template stack is the closest concrete reference.
+
+Key pieces worth mirroring or adapting:
+
+- **Template language wiring**
+    - `org.elixir_lang.eex.file.ViewProvider` is a `MultiplePsiFilesPerDocumentFileViewProvider` and
+      `ConfigurableTemplateLanguageFileViewProvider` that chooses the template-data language from
+      `TemplateDataLanguageMappings` or by stripping the last extension (e.g., `*.html.eex` → HTML), then falls
+      back to `Language.defaultTemplateLanguageFileType()`.
+    - The view provider includes `EEx`, template-data language, and `ElixirLanguage` in `getLanguages()`, and uses a
+      custom `EmbeddedElixir` element type when parsing Elixir inside template data.
+
+- **Template data element type**
+    - `org.elixir_lang.eex.element_type.TemplateData` extends `TemplateDataElementType` using an outer
+      `OuterLanguageElementType` (`TemplateData.EEX`) and token type `Types.DATA`, with a base lexer of
+      `org.elixir_lang.eex.lexer.TemplateData`.
+    - `TemplateData` lexer merges all EEx tag tokens into a single outer token, keeping non-template text as
+      `DATA`, which is then lexed by the template-data language.
+
+- **EEx lexer model**
+    - `EEx.flex` defines `<% %>` tokenization with marker states (`#`, `=`, `/`, `|`) and a separate comment state.
+    - `LookAhead` wraps the Flex lexer and merges `DATA`, `ELIXIR`, and `COMMENT` tokens for stable outer-language
+      boundaries.
+
+- **Highlighter layering**
+    - `org.elixir_lang.eex.TemplateHighlighter` is a layered editor highlighter that uses:
+        - the template-data language syntax highlighter for `Types.DATA`,
+        - the Elixir highlighter for `Types.ELIXIR`,
+        - and an EEx-specific lexer for template tags.
+
+- **File types + registration**
+    - `org.elixir_lang.eex.file.Type` is a `TemplateLanguageFileType` (extension `eex`), and
+      `org.elixir_lang.leex.file.Type` extends it for `leex`.
+    - `resources/META-INF/plugin.xml` registers the EEx language parser definition and file view provider factory
+      for EEx/LEEx.
+
+- **Inline HEEx via sigil injection**
+    - `org.elixir_lang.injection.ElixirSigilInjector` injects `HTMLLanguage` into `~H` sigils (and `EEx` into `~L`)
+      using `MultiHostInjector`. This is an opt-in experimental feature documented in `README.md`.
+
+This reference suggests a pragmatic approach: use IntelliJ’s template-language infrastructure (view provider +
+template data element type + layered highlighters) as the baseline, then layer HEEx-specific lexing, tag handling,
+and inspection suppression on top.
+
+## Reference tests: IntelliJ Elixir (EEx / HEEx)
+
+This is the definitive list of EEx/HEEx-related tests and fixtures present in the IntelliJ Elixir snapshot used
+by this spec. Use these as a behavioral source of truth and mirror them where applicable.
+
+### EEx lexer tests (LookAhead)
+
+Located under `tests/org/elixir_lang/eex/lexer/look_ahead`:
+
+All three tests assert exact token sequences and lexer state transitions (Flex states).
+For each variant below, the **input** is the literal string shown and the **expected output** is the ordered
+token sequence with the lexer state after each `advance()`:
+
+**BodylessTest** (parameterized by single tag variant)
+
+- Input: `<%#%>`
+  Expected tokens:
+    - `<%` → `OPENING`, next state `MARKER_MAYBE`
+    - `#` → `COMMENT_MARKER`, next state `COMMENT`
+    - `%>` → `CLOSING`, next state `WHITESPACE_MAYBE`
+- Input: `<%%%>` (escaped opening followed by close)
+  Expected tokens:
+    - `<%%` → `ESCAPED_OPENING`, next state `YYINITIAL`
+    - `%>` → `DATA`, next state `YYINITIAL`
+- Input: `<%/%>`
+  Expected tokens:
+    - `<%` → `OPENING`, next state `MARKER_MAYBE`
+    - `/` → `FORWARD_SLASH_MARKER`, next state `ELIXIR`
+    - `%>` → `CLOSING`, next state `WHITESPACE_MAYBE`
+- Input: `<%=%>`
+  Expected tokens:
+    - `<%` → `OPENING`, next state `MARKER_MAYBE`
+    - `=` → `EQUALS_MARKER`, next state `ELIXIR`
+    - `%>` → `CLOSING`, next state `WHITESPACE_MAYBE`
+- Input: `<%|%>`
+  Expected tokens:
+    - `<%` → `OPENING`, next state `MARKER_MAYBE`
+    - `|` → `PIPE_MARKER`, next state `ELIXIR`
+    - `%>` → `CLOSING`, next state `WHITESPACE_MAYBE`
+
+**WhiteSpaceBodyTest** (same variants, body is a single space)
+
+- Input: `<% %>`
+  Expected tokens:
+    - `<%` → `OPENING`, next state `MARKER_MAYBE`
+    - `` (empty) → `EMPTY_MARKER`, next state `ELIXIR`
+    - ` ` → `ELIXIR`, next state `ELIXIR`
+    - `%>` → `CLOSING`, next state `WHITESPACE_MAYBE`
+- Input: `<%# %>`
+  Expected tokens:
+    - `<%` → `OPENING`, next state `MARKER_MAYBE`
+    - `#` → `COMMENT_MARKER`, next state `COMMENT`
+    - ` ` → `COMMENT`, next state `COMMENT`
+    - `%>` → `CLOSING`, next state `WHITESPACE_MAYBE`
+- Input: `<%% %>`
+  Expected tokens:
+    - `<%%` → `ESCAPED_OPENING`, next state `YYINITIAL`
+    - ` %>` → `DATA`, next state `YYINITIAL`
+- Input: `<%/ %>`, `<%= %>`, `<%| %>`
+  Expected tokens:
+    - `<%` → `OPENING`, next state `MARKER_MAYBE`
+    - `/` or `=` or `|` → marker token, next state `ELIXIR`
+    - ` ` → `ELIXIR`, next state `ELIXIR`
+    - `%>` → `CLOSING`, next state `WHITESPACE_MAYBE`
+
+**MinimalBodyTest** (parameterized by **pairs** of tag variants)
+
+- Tag variants (single tag, body is `"body"`):
+    - `<%body%>`
+        - `<%` → `OPENING`, next state `MARKER_MAYBE`
+        - `` (empty) → `EMPTY_MARKER`, next state `ELIXIR`
+        - `body` → `ELIXIR`, next state `ELIXIR`
+        - `%>` → `CLOSING`, next state `WHITESPACE_MAYBE`
+    - `<%#body%>`
+        - `<%` → `OPENING`, next state `MARKER_MAYBE`
+        - `#` → `COMMENT_MARKER`, next state `COMMENT`
+        - `body` → `COMMENT`, next state `COMMENT`
+        - `%>` → `CLOSING`, next state `WHITESPACE_MAYBE`
+    - `<%%body%>` (escaped opening; `body%>` is a single `DATA` token)
+        - `<%%` → `ESCAPED_OPENING`, next state `YYINITIAL`
+        - `body%>` → `DATA`, next state `YYINITIAL`
+    - `<%/body%>`
+        - `<%` → `OPENING`, next state `MARKER_MAYBE`
+        - `/` → `FORWARD_SLASH_MARKER`, next state `ELIXIR`
+        - `body` → `ELIXIR`, next state `ELIXIR`
+        - `%>` → `CLOSING`, next state `WHITESPACE_MAYBE`
+    - `<%=body%>`
+        - `<%` → `OPENING`, next state `MARKER_MAYBE`
+        - `=` → `EQUALS_MARKER`, next state `ELIXIR`
+        - `body` → `ELIXIR`, next state `ELIXIR`
+        - `%>` → `CLOSING`, next state `WHITESPACE_MAYBE`
+    - `<%|body%>`
+        - `<%` → `OPENING`, next state `MARKER_MAYBE`
+        - `|` → `PIPE_MARKER`, next state `ELIXIR`
+        - `body` → `ELIXIR`, next state `ELIXIR`
+        - `%>` → `CLOSING`, next state `WHITESPACE_MAYBE`
+- Input: concatenation of any two variants above (36 combinations).
+  Expected output: exact concatenation of both token sequences (no over-consumption across the boundary).
+
+### EEx parser fixture corpus (non-test inputs)
+
+Located under `testData/org/elixir_lang/eex/psi/parser/test` (fixtures only in this snapshot):
+
+These are **inputs** only; the IntelliJ Elixir snapshot does not include explicit expected outputs for them.
+If we adopt them, we should capture and lock PSI tree snapshots from our implementation to define expected output.
+
+- `DoEExClosingWhiteSpaceEExOpening.eex`
+- `EExTemplate.eex`
+- `EExTemplateWithBindings.eex`
+- `EExTokenizerTestComments.eex`
+- `EExTokenizerTestCommentsWithDoEnd.eex`
+- `EExTokenizerTestQuotation.eex`
+- `EExTokenizerTestQuotationWithDoEnd.eex`
+- `EExTokenizerTestQuotationWithInterpolation1.eex`
+- `EExTokenizerTestQuotationWithInterpolation2.eex`
+- `EExTokenizerTestStringWithEmbeddedCode.eex`
+- `EExTokenizerTestStringsWithEmbeddedDoEnd.eex`
+- `EExTokenizerTestStringsWithEmbeddedKeywordsBlocks.eex`
+- `EExTokenizerTestStringsWithEmbeddedStabOperatorEnd.eex`
+- `EExTokenizerTestStringsWithMoreThanOneLine.eex`
+- `EExTokenizerTestStringsWithMoreThanOneLineAndExpressionWithMoreThanOneLine.eex`
+- `EExTokenizerTestTrimMode.eex`
+- `EExTokenizerTestTrimModeSetToFalse.eex`
+- `EExTokenizerTestTrimModeWithCRLF.eex`
+- `EExTokenizerTestTrimModeWithComment.eex`
+- `Fn1Clause.eex`
+- `Fn1ClauseCall.eex`
+- `Fn2ClauseCall.eex`
+- `FnEExClosing.eex`
+- `FnEExElixirEExStabBody.eex`
+- `FnEExElixirStabBody.eex`
+- `FnElixirEExElixirStabBody.eex`
+- `FnElixirEExStabBody.eex`
+- `FnUnexpectedEnd.eex`
+- `PhoenixTemplatesLayoutApp.html.eex`
+- `PhoenixTemplatesPageIndex.html.eex`
+- `PhoenixTemplatesUserEdit.html.eex`
+- `PhoenixTemplatesUserForm.html.eex`
+- `PhoenixTemplatesUserIndex.html.eex`
+- `PhoenixTemplatesUserNew.html.eex`
+- `PhoenixTemplatesUserShow.html.eex`
+- `StringSample.eex`
+
+### EEx completion test
+
+- `tests/org/elixir_lang/code_insight/completion/contributor/CallDefinitionClauseTest`
+    - `testExecuteOnEExFunctionFrom` uses fixtures `eex_function.ex` and `eex.ex`.
+    - Input:
+        - `eex_function.ex` contains:
+            - `EEx.function_from_file(:def, :function_from_file_sample, "sample.eex", [:a, :b])`
+            - `EEx.function_from_string(:def, :function_from_string_sample, "<%= a + b %>", [:a, :b])`
+            - Completion caret at `f<caret>` inside `def usage do`.
+        - `eex.ex` provides the `EEx` module definition.
+    - Expected output:
+        - Completion list contains `function_from_file_sample` and `function_from_string_sample` only.
+        - Each lookup element tail text is exactly ` (eex_function.ex defmodule EExFunction)`.
+
+### EEx parsing coverage in Elixir stdlib
+
+- `tests/org/elixir_lang/parser_definition/ElixirLangElixirParsingTestCase`
+    - Input → expected output (`Parse.CORRECT` = no error elements and quoting succeeds):
+        - `lib/eex/lib/eex.ex` → `Parse.CORRECT`
+        - `lib/eex/lib/eex/compiler.ex` → `Parse.CORRECT`
+        - `lib/eex/lib/eex/engine.ex` → `Parse.CORRECT`
+        - `lib/eex/lib/eex/smart_engine.ex` → `Parse.CORRECT`
+        - `lib/eex/lib/eex/tokenizer.ex` → `Parse.CORRECT`
+        - `lib/mix/lib/mix/tasks/compile.leex.ex` → `Parse.CORRECT` (LEEx-related but adjacent)
+
+### Decompiler regression with EEx module
+
+- `tests/org/elixir_lang/beam/DecompilerTest`
+    - Input: module name `Elixir.EExTestWeb.PageController`.
+    - Expected output: decompiled text matches
+      `testData/org/elixir_lang/beam/decompiler/Elixir.EExTestWeb.PageController.ex` exactly.
+
+### HEEx tests
+
+No HEEx-specific tests or `.heex` fixtures were found in this IntelliJ Elixir snapshot (no `*heex*` test classes
+and no `.heex` files under `testData`).
+
+## EEx vs HEEx differences (behavioral outline)
+
+This section is meant to keep the two template systems distinct while maximizing shared infrastructure.
+
+- **Template model**
+    - EEx is a general-purpose templating system that treats the surrounding content as opaque text
+      (or a template-data language chosen by file extension).
+    - HEEx is HTML-aware and relies on HTML tokenization and tag structure for correctness and IDE features.
+
+- **Interpolation syntax**
+    - EEx: `<% %>` / `<%= %>` tags are the primary embedding mechanism; `<%%` escapes.
+    - HEEx: supports EEx tags *and* `{...}` interpolation in text and attributes; curly interpolation is
+      disabled in `<script>`/`<style>` and can be disabled per-tag.
+
+- **Comments**
+    - EEx: canonical comment form is `<%!-- --%>`; `<%#` is deprecated.
+    - HEEx: uses EEx comment tags for template comments; keep `<%# %>` support for parity with existing tooling.
+
+- **Tag semantics**
+    - EEx has no concept of HTML tags or components.
+    - HEEx classifies tags (HTML, components, slots, remote components) via `Phoenix.LiveView.TagEngine`.
+
+- **Expression handling**
+    - EEx engines interpret markers (`""`, `"="`, `"/"`, `"|"`) and handle assigns via `EEx.SmartEngine`.
+    - HEEx delegates code handling to the tag engine and HTML tokenizer and must enforce HEEx-specific
+      constraints (e.g., no EEx interpolation in attribute values; `{expr}` instead).
+
+## Shared foundation: EEx + HEEx
+
+Much of the template-language scaffolding can be shared. Implementing EEx first provides:
+
+- the template language file type and view provider pattern,
+- template-data element type and outer-language token boundaries,
+- layered syntax highlighting approach,
+- EEx lexer/parser model for `<% %>` tags.
+
+HEEx then extends this with HTML-specific tokenization, curly interpolation rules, tag-name adjustments,
+and inspection suppression for components/slots.
+
+### Shared components mapped to phases
+
+- **EEx Phase 1 (language + file type)** → reused by HEEx Phase 7 (HEEx language + file type).
+- **EEx Phase 2 (template data wiring + view provider)** → HEEx Phase 8 adapts this with HTML as fixed
+  template data language and HEEx-specific outer element types.
+- **EEx Phase 3 (lexer + parser for `<% %>` tags)** → HEEx Phase 9/10 extend this with `{}` interpolation
+  and HEEx PSI nodes.
+- **EEx Phase 4 (layered highlighter)** → HEEx Phase 17 keeps the layered approach and adds HEEx tokens.
+- **EEx Phase 5 (Elixir injection for `<% %>` bodies)** → HEEx Phase 14 reuses the injector and adds `{}` bodies.
 
 ## Compatibility & error tolerance
 
@@ -244,7 +545,7 @@ HTML/XML lexers treat tag names starting with `.` as invalid. To keep HTML parsi
 implement a lexer wrapper for HTML:
 
 - `HeexHtmlTagNameLexer` wraps the HTML lexer.
-- It substitutes the leading `.` (and optionally `:` for slots) with a valid character (e.g., `C`) **in the input
+- It substitutes the leading `.` with a valid character (e.g., `C`) **in the input
   used by the lexer only** (via a `CharSequence` wrapper). Offsets remain unchanged.
 - This makes `<.component>` lex as a normal tag while preserving original offsets for PSI and highlighting.
 
@@ -252,11 +553,10 @@ The wrapper is used only for the HTML template-data parser/highlighter of HEEx f
 
 ### Slot tags `<:slot>`
 
-HEEx slot tags use `:` as a prefix. HTML may accept `:` in tag names but XML constraints vary. To be safe,
-apply the same substitution approach as with `.`:
-
-- Detect `<:` and `</:` in the lexer wrapper.
-- Substitute `:` for a valid character during HTML lexing.
+HEEx slot tags use `:` as a prefix. IntelliJ’s HTML/XML lexers already accept `:` in tag names
+(`TAG_NAME`/`NAME` patterns include `:` at the start), and `XmlUtil.isValidTagNameChar` treats `:` as valid.
+Therefore **no lexer substitution is required** for `:`. We should still suppress unknown-tag inspections for
+slot tags, but we don’t need to rewrite tag names for parsing/highlighting.
 
 ### HTML inspection suppression
 
@@ -324,6 +624,25 @@ Optional v1 (small, low risk):
 
 ## Test plan
 
+### EEx template tests
+
+- `test eex file type registration` – `.eex` resolves to `EexFileType`.
+- `test eex template data language from extension` – `foo.html.eex` uses HTML as template data language.
+
+### EEx lexer tests (Kotlin)
+
+- `test eex output tag` – `<%= @x %>` emits output-open/body/close.
+- `test eex comment tag` – `<%# ignored %>` yields comment token(s).
+- `test eex escaped opening` – `<%%` is tokenized as escaped opening.
+
+### EEx parser tests
+
+- `test eex file with mixed items` – template text + `<% %>` produces expected PSI items.
+
+### EEx injection tests
+
+- `test elixir injection in eex` – `<%= @name %>` is injected with Elixir language.
+
 ### Lexer tests (Kotlin)
 
 - `test heex brace interpolation` – `{ @user.name }` is tokenized as expr start/body/end.
@@ -358,108 +677,139 @@ Optional v1 (small, low risk):
 Each phase is intentionally small and should include its tests. Mark completed phases with a trailing
 `DONE ✅` sentence. No phases are marked `DONE ✅` yet.
 
-1. **Phase 1: HEEx language + file type**
+1. **Phase 1: EEx language + file type**
+    - Add `EexLanguage`, `EexFileType`, bundle strings, icons, and plugin.xml registration.
+    - File type association: `.eex` is recognized in IDE.
+    - Tests:
+        - file type registration test (extension -> `EexFileType`).
+        - icon presence sanity (resource lookup).
+
+2. **Phase 2: EEx template data wiring**
+    - Add `EexTemplateDataElementType` + `EexFileViewProvider`.
+    - Select template data language by stripping the last extension (`*.html.eex` → HTML), then fall back to
+      `TemplateDataLanguageMappings` and `Language.defaultTemplateLanguageFileType()`.
+    - Tests:
+        - view provider test: `foo.html.eex` uses HTML template data language.
+        - template data PSI exists for `.eex` file.
+
+3. **Phase 3: EEx lexer + minimal grammar**
+    - Implement `EexLexer` for `<% %>`, `<%= %>`, `<%# %>`, `<%%`, and `<%!-- --%>` (comment).
+    - Add `Eex.bnf` + parser definition + PSI types for EEx tags.
+    - Tests:
+        - lexer: `<%= @x %>` token sequence.
+        - lexer: `<%%` escaped opening token.
+        - parser: mixed template text + `<% %>` yields expected PSI items.
+
+4. **Phase 4: EEx syntax highlighter**
+    - Provide layered syntax highlighting with template-data language + Elixir.
+    - Tests:
+        - highlighting: EEx tag delimiters get EEx-specific keys.
+        - highlighting: template data tokens use underlying language keys.
+
+5. **Phase 5: EEx injection**
+    - Inject `ExLanguage` into EEx body nodes (`<% %>`, `<%= %>`).
+    - Tests:
+        - injection: `<%= @name %>` produces injected Elixir PSI.
+        - no injection: comment tag.
+
+6. **Phase 6: EEx editor helpers (optional)**
+    - Brace matcher for `<% %>` and quote/typing helpers if needed.
+
+7. **Phase 7: HEEx language + file type**
     - Add `HeexLanguage`, `HeexFileType`, bundle strings, icons, and plugin.xml registration.
     - File type association: `.heex` is recognized in IDE.
     - Tests:
         - file type registration test (extension -> `HeexFileType`).
         - icon presence sanity (resource lookup).
 
-2. **Phase 2: Template data wiring**
+8. **Phase 8: HEEx template data wiring**
     - Add `HeexTemplateDataElementType` + `HeexFileViewProvider`.
     - Ensure HTML is the template data language and outer language ranges are excluded from HTML PSI.
     - Tests:
         - view provider test: `getTemplateDataLanguage()` is HTML.
         - HTML PSI exists for `.heex` file.
 
-3. **Phase 3: Minimal HEEx lexer (template markers only)**
-    - Implement `HeexLexer` that recognizes `<% %>` and `{}` markers and emits template text.
+9. **Phase 9: HEEx lexer (template markers only)**
+    - Extend `EexLexer` with `{}` recognition for HEEx and emit template text accordingly.
     - No nested brace handling yet; just correct token boundaries for simple cases.
     - Tests:
         - lexer: `<%= @x %>` token sequence.
         - lexer: `{@x}` token sequence.
 
-4. **Phase 4: Minimal HEEx grammar + PSI**
+10. **Phase 10: HEEx grammar + PSI**
     - Add `Heex.bnf` + parser definition + PSI types.
     - Parse template text and the basic brace/EEx nodes.
     - Tests:
         - parser: mixed HTML + `{}` + `<% %>` yields expected PSI items.
         - parser: unterminated `<%` recovers with error node.
 
-5. **Phase 5: Brace nesting + escaping**
+11. **Phase 11: Brace nesting + escaping**
     - Extend lexer to support nested `{}` and escaped braces `\\{`/`\\}`.
     - Tests:
         - lexer: nested brace interpolation `{ %{a: %{b: 1}} }`.
         - lexer: escaped braces stay inside body.
 
-6. **Phase 6: Script/style brace suppression**
+12. **Phase 12: Script/style brace suppression**
     - Disable `{}` interpolation inside `<script>` and `<style>`.
     - Tests:
         - lexer: `{}` inside script is template text.
         - lexer: `{}` inside style is template text.
 
-7. **Phase 7: EEx comment handling**
-    - Ensure `<%# %>` is handled as HEEx comment tokens.
+13. **Phase 13: EEx comment handling in HEEx**
+    - Ensure `<%# %>` and `<%!-- --%>` are handled as HEEx comment tokens.
     - Tests:
         - lexer: `<%# ignored %>` yields comment token(s).
         - parser: comment node exists and does not inject.
 
-8. **Phase 8: Elixir injection (brace expressions)**
-    - Inject `ExLanguage` into `{...}` bodies.
+14. **Phase 14: Elixir injection (HEEx braces + EEx expressions)**
+    - Inject `ExLanguage` into `{...}` bodies and `<% %>`/`<%= %>` bodies.
     - Tests:
         - injection: `{@name}` produces injected Elixir PSI.
-
-9. **Phase 9: Elixir injection (EEx expressions)**
-    - Inject `ExLanguage` into `<% %>` and `<%= %>` bodies.
-    - Tests:
         - injection: `<%= @name %>` produces injected Elixir PSI.
-        - no injection: `<%# %>` comment.
+        - no injection: comment tags.
 
-10. **Phase 10: HTML lexer wrapper for component tags**
+15. **Phase 15: HTML lexer wrapper for component tags**
     - Wrap HTML lexer for HEEx view providers to accept `<.component>` and `<:slot>`.
     - Tests:
         - HTML PSI: `<.card>` parsed as HTML tag.
         - HTML PSI: `<:header>` parsed as HTML tag.
 
-11. **Phase 11: HTML inspection suppression**
+16. **Phase 16: HTML inspection suppression**
     - Suppress invalid-tag inspections for `<.component>` and `<:slot>` only.
     - Tests:
         - inspection: no invalid tag warnings for dot/slot tags.
 
-12. **Phase 12: HEEx syntax highlighter**
+17. **Phase 17: HEEx syntax highlighter**
     - Provide HEEx syntax highlighter that delegates to `HtmlFileHighlighter` and only adds HEEx tokens.
     - Tests:
         - highlighting: `{}` / `<% %>` delimiters get HEEx-specific keys.
         - highlighting: HTML attribute names use HTML attribute keys.
 
-13. **Phase 13: HTML syntax highlighter for HEEx view providers**
+18. **Phase 18: HTML syntax highlighter for HEEx view providers**
     - Provide HEEx-specific HTML highlighter wrapper using the tag-name lexer wrapper.
     - Tests:
         - highlighting: `<.component>` tag name uses HTML tag name color (not error).
 
-14. **Phase 14: LSP integration**
+19. **Phase 19: LSP integration**
     - Treat `.heex` as Elixir-like for LSP startup.
     - Tests:
         - file-open hook includes `.heex` in LSP start predicate.
 
-15. **Phase 15: Editor helpers (optional)**
+20. **Phase 20: HEEx editor helpers (optional)**
     - Brace matcher and quote handler for HEEx.
     - Tests:
         - typing test for `{}` or `<% %>` pair completion (fixture-based).
 
-16. **Phase 16: Polishing + regression tests**
+21. **Phase 21: Polishing + regression tests**
     - Add regression tests for key Phoenix behaviors (component tags, slots, curly rules).
     - Expand edge-case parser recovery tests.
 
-## Open questions / decisions
+## Decisions and confirmations
 
-1. **Lexer implementation**: Kotlin lexer vs JFlex. Kotlin is preferred for flexible brace handling.
-2. **Slot tag handling**: confirm whether `<:slot>` needs lexer substitution on the IntelliJ XML parser.
-3. **Injection boundaries**: decide whether `<%` bodies should allow nested `%>` in strings (likely no).
-4. **LSP inclusion**: verify LSP server supports `.heex` before auto-starting in these files.
-
-## Notes on platform conventions
-
-- Use light services only when required (e.g., injection registration is a project-level extension, not a service).
-- Use Kotlin coroutines for any background work (no heavy blocking).
-- Prefer expression functions for simple getters.
+1. **Lexer implementation**: Kotlin lexer (preferred for nested `{}` and context tracking).
+2. **Slot tag handling**: `<:slot>` does **not** need lexer substitution; `:` is accepted by IntelliJ HTML/XML
+   lexers and tag-name validation.
+3. **Injection boundaries**: EEx closes on the first `%>` even inside strings. Verified by
+   `elixir -e 'EEx.compile_string("<%= \"%>\" %>")'` which fails with an unterminated string error.
+4. **LSP inclusion**: Expert supports `.heex` (component navigation works); allow LSP auto-start for HEEx. Assume same
+   happens for EEx.
