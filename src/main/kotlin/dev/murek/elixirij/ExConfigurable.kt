@@ -33,6 +33,7 @@ class ExConfigurable(private val project: Project) : BoundConfigurable(
                 )
                     .applyToComponent {
                         toolchainField = this
+                        name = "toolchainPathField"
 
                         // Show auto-detected path as placeholder
                         (textField as? JBTextField)?.emptyText?.text =
@@ -65,12 +66,21 @@ class ExConfigurable(private val project: Project) : BoundConfigurable(
             buttonsGroup {
                 row {
                     radioButton(ExBundle.message("configurable.expert.mode.disabled"), ExpertMode.DISABLED)
+                        .applyToComponent {
+                            name = "expertModeDisabledRadio"
+                        }
                 }
                 row {
                     radioButton(ExBundle.message("configurable.expert.mode.automatic"), ExpertMode.AUTOMATIC)
+                        .applyToComponent {
+                            name = "expertModeAutomaticRadio"
+                        }
                 }
                 row {
                     radioButton(ExBundle.message("configurable.expert.mode.custom"), ExpertMode.CUSTOM)
+                        .applyToComponent {
+                            name = "expertModeCustomRadio"
+                        }
                 }
             }.bind(settings::expertMode)
 
@@ -79,6 +89,9 @@ class ExConfigurable(private val project: Project) : BoundConfigurable(
                     FileChooserDescriptorFactory.createSingleFileOrExecutableAppDescriptor()
                         .withTitle(ExBundle.message("configurable.expert.customPath.browseTitle")), project
                 )
+                    .applyToComponent {
+                        name = "expertCustomPathField"
+                    }
                     .bindText(settings::expertCustomExecutablePath.toNonNullableProperty(""))
                     .align(AlignX.FILL)
             }
