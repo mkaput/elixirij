@@ -1,5 +1,6 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
+import org.gradle.api.tasks.Delete
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.utils.asPath
 import kotlin.io.path.div
@@ -129,10 +130,12 @@ kover {
 }
 
 // Add generated sources to the source sets and configure the parser-grill source set.
+val generatedGrammarRoot = layout.buildDirectory.dir("generated/grammarkit")
+
 sourceSets {
     val main by getting {
         java {
-            srcDir("src/gen")
+            srcDir(generatedGrammarRoot)
         }
     }
 
@@ -176,18 +179,25 @@ tasks {
         dependsOn(patchChangelog)
     }
 
+    val cleanGeneratedGrammar by registering(Delete::class) {
+        delete(generatedGrammarRoot)
+    }
+
     generateParser {
         sourceFile.set(file("src/main/grammars/Elixir.bnf"))
-        targetRootOutputDir.set(file("src/gen"))
+        targetRootOutputDir.set(generatedGrammarRoot)
         pathToParser.set("/dev/murek/elixirij/lang/parser/ExParser.java")
         pathToPsiRoot.set("/dev/murek/elixirij/lang/psi")
         purgeOldFiles.set(true)
+        outputs.cacheIf { false }
+        dependsOn(cleanGeneratedGrammar)
     }
 
     generateLexer {
         sourceFile.set(file("src/main/grammars/Elixir.flex"))
-        targetOutputDir.set(file("src/gen/dev/murek/elixirij/lang/lexer"))
+        targetOutputDir.set(generatedGrammarRoot.map { it.dir("dev/murek/elixirij/lang/lexer") })
         purgeOldFiles.set(true)
+        outputs.cacheIf { false }
 
         dependsOn(generateParser)
     }
