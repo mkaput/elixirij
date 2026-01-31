@@ -11,6 +11,14 @@ class ExConfigurableTest : LightPlatformTestCase() {
 
     private val settings get() = ExSettings.getInstance(project)
 
+    override fun tearDown() {
+        try {
+            settings.reset()
+        } finally {
+            super.tearDown()
+        }
+    }
+
     fun `test toolchain path updates setting`() {
         settings.elixirToolchainPath = "/tmp/elixir"
 

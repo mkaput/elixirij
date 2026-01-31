@@ -5,6 +5,7 @@ import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.ModificationTracker
 import kotlinx.coroutines.CoroutineScope
+import org.jetbrains.annotations.VisibleForTesting
 
 enum class ExpertMode { DISABLED, AUTOMATIC, CUSTOM }
 
@@ -20,9 +21,7 @@ class ExSettings(
         // sticky lines / document symbols. Disabling Expert in unit-test mode keeps
         // highlighting fast and deterministic and prevents hangs when the server is
         // unavailable or waiting on external resources.
-        if (ApplicationManager.getApplication()?.isUnitTestMode == true) {
-            state.expertMode = ExpertMode.DISABLED
-        }
+        applyTestDefaultsIfNeeded()
     }
 
     class State : BaseState() {
@@ -41,4 +40,18 @@ class ExSettings(
     var expertCustomExecutablePath: String? by state::expertCustomExecutablePath
 
     override fun getModificationCount(): Long = stateModificationCount
+
+    @VisibleForTesting
+    fun reset() {
+        loadState(State())
+        state.expertMode = ExpertMode.DISABLED
+    }
+
+    private fun applyTestDefaultsIfNeeded() {
+        val app = ApplicationManager.getApplication()
+        val isUnitTestProperty = System.getProperty("idea.is.unit.test") == "true"
+        if (isUnitTestProperty || app?.isUnitTestMode == true || app?.isHeadlessEnvironment == true) {
+            state.expertMode = ExpertMode.DISABLED
+        }
+    }
 }

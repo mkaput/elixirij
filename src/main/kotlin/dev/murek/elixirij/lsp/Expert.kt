@@ -7,6 +7,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.diagnostic.rethrowControlFlowException
 import com.intellij.openapi.progress.coroutineToIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
@@ -173,6 +174,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
 
                 LspServerManager.getInstance(project).stopAndRestartIfNeeded(ExLspServerSupportProvider::class.java)
             } catch (e: Throwable) {
+                rethrowControlFlowException(e)
                 thisLogger().error("Failed to download expert", e)
 
             } finally {

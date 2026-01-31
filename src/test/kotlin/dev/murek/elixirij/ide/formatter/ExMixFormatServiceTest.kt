@@ -15,6 +15,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.div
+import kotlin.io.path.exists
 import kotlin.io.path.writeText
 
 /**
@@ -47,40 +48,16 @@ class ExMixFormatServiceTest : LightPlatformTestCase() {
 
         toolchainRoot = Files.createTempDirectory("elixir-toolchain-")
         settings = ExSettings.getInstance(project)
+        settings.reset()
 
-        elixir = toolchainRoot / "elixir"
-        elixirc = toolchainRoot / "elixirc"
-        mix = toolchainRoot / "mix"
-        iex = toolchainRoot / "iex"
-
-        elixir.writeText("stub")
-        elixirc.writeText("stub")
-        mix.writeText("stub")
-        iex.writeText("stub")
-
-        mix.writeText(
-            $$"""
-            #!/bin/sh
-            if [ "$1" = "format" ]; then
-              file="$2"
-              printf "formatted" > "$file"
-              exit 0
-            fi
-            exit 1
-            """.trimIndent()
-        )
-
-        elixir.toFile().setExecutable(true)
-        elixirc.toFile().setExecutable(true)
-        mix.toFile().setExecutable(true)
-        iex.toFile().setExecutable(true)
+        ensureToolchainFiles()
 
         settings.elixirToolchainPath = elixir.toString()
     }
 
     override fun tearDown() {
         if (::settings.isInitialized) {
-            settings.elixirToolchainPath = null
+            settings.reset()
         }
         if (::toolchainRoot.isInitialized) {
             toolchainRoot.toFile().deleteRecursively()
@@ -100,6 +77,7 @@ class ExMixFormatServiceTest : LightPlatformTestCase() {
         val sourcePath = libDir / "sample.ex"
         sourcePath.writeText("unformatted")
 
+        ensureToolchainFiles()
         mix.writeText(
             $$"""
             #!/bin/sh
@@ -127,6 +105,7 @@ class ExMixFormatServiceTest : LightPlatformTestCase() {
     }
 
     private fun formatFile(sourcePath: Path, ranges: List<TextRange>? = null): String {
+        ensureToolchainFiles()
         checkNotNull(project.elixirToolchain)
 
         val virtualFile = checkNotNull(
@@ -157,4 +136,40 @@ class ExMixFormatServiceTest : LightPlatformTestCase() {
         checkNotNull(
             FormattingService.EP_NAME.extensionList.firstOrNull { it is ExMixFormatService }
         ) { "ExMixFormatService should be registered" }
+
+    private fun ensureToolchainFiles() {
+        settings.elixirToolchainPath?.let { configured ->
+            toolchainRoot = Path.of(configured).parent
+        }
+        if (!toolchainRoot.exists()) {
+            toolchainRoot = toolchainRoot.createDirectories()
+        }
+
+        elixir = toolchainRoot / "elixir"
+        elixirc = toolchainRoot / "elixirc"
+        mix = toolchainRoot / "mix"
+        iex = toolchainRoot / "iex"
+
+        if (!elixir.exists()) elixir.writeText("stub")
+        if (!elixirc.exists()) elixirc.writeText("stub")
+        if (!mix.exists()) {
+            mix.writeText(
+                $$"""
+                #!/bin/sh
+                if [ "$1" = "format" ]; then
+                  file="$2"
+                  printf "formatted" > "$file"
+                  exit 0
+                fi
+                exit 1
+                """.trimIndent()
+            )
+        }
+        if (!iex.exists()) iex.writeText("stub")
+
+        elixir.toFile().setExecutable(true)
+        elixirc.toFile().setExecutable(true)
+        mix.toFile().setExecutable(true)
+        iex.toFile().setExecutable(true)
+    }
 }

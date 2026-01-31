@@ -1,5 +1,6 @@
 package dev.murek.elixirij.lsp
 
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.platform.lsp.api.LspServerDescriptor
 import com.intellij.util.io.awaitExit
 import kotlinx.coroutines.Dispatchers
@@ -14,8 +15,11 @@ import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
+import kotlin.concurrent.thread
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+
+private val LOG = Logger.getInstance("dev.murek.elixirij.lsp.LspServerVerification")
 
 /**
  * Verifies an LSP server by launching it, performing initialization handshake,
@@ -36,6 +40,19 @@ suspend fun verifyLspServer(
         withContext(Dispatchers.IO) {
             val commandLine = descriptor.createCommandLine().withCharset(Charsets.UTF_8)
             val process = commandLine.createProcess()
+            val startedAt = System.currentTimeMillis()
+            val stderrLines = mutableListOf<String>()
+            thread(name = "expert-lsp-stderr", isDaemon = true) {
+                process.errorStream.bufferedReader().useLines { lines ->
+                    lines.forEach { line ->
+                        synchronized(stderrLines) {
+                            if (stderrLines.size < 200) {
+                                stderrLines.add(line)
+                            }
+                        }
+                    }
+                }
+            }
 
             try {
                 // Create a minimal client that does nothing (we only need to send requests)
@@ -50,6 +67,12 @@ suspend fun verifyLspServer(
                         CompletableFuture.completedFuture(null)
 
                     override fun logMessage(message: MessageParams?) {}
+
+                    override fun registerCapability(params: RegistrationParams?): CompletableFuture<Void> =
+                        CompletableFuture.completedFuture(null)
+
+                    override fun unregisterCapability(params: UnregistrationParams?): CompletableFuture<Void> =
+                        CompletableFuture.completedFuture(null)
                 }
 
                 val launcher = LSPLauncher.createClientLauncher(client, process.inputStream, process.outputStream)
@@ -79,6 +102,10 @@ suspend fun verifyLspServer(
                 initializeParams.workspaceFolders = listOf(
                     WorkspaceFolder(rootUri, rootDir.fileName?.toString() ?: "workspace")
                 )
+                LOG.info(
+                    "Verifying LSP server: cmd='${commandLine.commandLineString}' " +
+                        "workDir='${commandLine.workDirectory}' rootUri='$rootUri'"
+                )
                 val initializeResult = server.initialize(initializeParams).await()
 
                 // Send initialized notification
@@ -102,11 +129,21 @@ suspend fun verifyLspServer(
 
                 serverInfo
             } finally {
+                if (!process.isAlive) {
+                    LOG.warn("LSP process exited early with code=${process.exitValue()}")
+                }
                 // Ensure the process is terminated
                 if (process.isAlive) {
                     process.destroyForcibly()
                 }
                 process.awaitExit()
+                val elapsedMs = System.currentTimeMillis() - startedAt
+                if (stderrLines.isNotEmpty()) {
+                    val snapshot = synchronized(stderrLines) { stderrLines.toList() }
+                    LOG.warn("LSP stderr (${snapshot.size} lines, ${elapsedMs}ms):\n${snapshot.joinToString("\n")}")
+                } else {
+                    LOG.info("LSP verification completed in ${elapsedMs}ms (no stderr output).")
+                }
             }
         }
     }

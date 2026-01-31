@@ -12,19 +12,35 @@ import kotlinx.coroutines.runBlocking
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.FileTime
+import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.setLastModifiedTime
+import kotlin.io.path.name
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 
+/**
+ * These tests must exercise the real Expert binary download/startup path.
+ * Do not replace it with a mock or fake server, as the goal is to detect
+ * breakage against current Expert releases.
+ */
 class ExpertTest : LightPlatformTestCase() {
     private val expert get() = Expert.getInstance(project)
 
     override fun setUp() {
         super.setUp()
+        cleanupBrokenBurritoEntries()
         ExSettings.getInstance(project).expertMode = ExpertMode.AUTOMATIC
+    }
+
+    override fun tearDown() {
+        try {
+            ExSettings.getInstance(project).reset()
+        } finally {
+            super.tearDown()
+        }
     }
 
     private val serverName: String
@@ -80,6 +96,35 @@ class ExpertTest : LightPlatformTestCase() {
         return captured
     }
 
+    /**
+     * Remove incomplete Expert Burrito runtime directories that are missing `_metadata.json`.
+     *
+     * Expert uses Burrito to manage its runtime. If a previous download was interrupted,
+     * Burrito can leave an empty runtime directory without metadata. In that state, Expert
+     * fails to boot and the LSP handshake times out. This cleanup keeps the test focused on
+     * verifying the real Expert binary startup rather than being derailed by stale runtimes.
+     */
+    private fun cleanupBrokenBurritoEntries() {
+        val home = System.getProperty("user.home")
+        val candidates = listOf(
+            Path(home, "Library", "Application Support", ".burrito"),
+            Path(home, ".burrito"),
+        )
+
+        for (root in candidates) {
+            if (!root.exists()) continue
+            Files.list(root).use { entries ->
+                entries.filter { it.fileName.name.startsWith("expert_erts-") }
+                    .forEach { entry ->
+                        val metadata = entry.resolve("_metadata.json")
+                        if (!metadata.exists()) {
+                            entry.toFile().deleteRecursively()
+                        }
+                    }
+            }
+        }
+    }
+
     fun `test download`() {
         expert.deleteCached()
 
@@ -114,6 +159,7 @@ class ExpertTest : LightPlatformTestCase() {
     }
 
     fun `test server verification returns server info`() {
+        // Intentionally uses the real Expert binary; do not mock this.
         // Ensure project base path exists (it may have been cleaned up between tests)
         project.basePath?.let { Files.createDirectories(Path.of(it)) }
 

@@ -11,6 +11,14 @@ import java.nio.file.Files
 import kotlin.io.path.deleteIfExists
 
 class ExLspServerSupportProviderTest : LightPlatformTestCase() {
+    override fun tearDown() {
+        try {
+            ExSettings.getInstance(project).reset()
+        } finally {
+            super.tearDown()
+        }
+    }
+
     fun `test starts expert when enabled and ready`() {
         val settings = ExSettings.getInstance(project)
         val executable = Files.createTempFile("expert", ".bin")

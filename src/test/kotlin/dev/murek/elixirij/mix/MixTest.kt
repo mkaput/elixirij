@@ -10,6 +10,22 @@ import kotlin.io.path.div
 import kotlin.io.path.writeText
 
 class MixTest : LightPlatformTestCase() {
+    private lateinit var settings: ExSettings
+
+    override fun setUp() {
+        super.setUp()
+        settings = ExSettings.getInstance(project)
+    }
+
+    override fun tearDown() {
+        try {
+            if (::settings.isInitialized) {
+                settings.reset()
+            }
+        } finally {
+            super.tearDown()
+        }
+    }
 
     fun `test project root for file resolves mix root`() {
         val projectRoot = Path.of(checkNotNull(project.basePath))
@@ -27,7 +43,6 @@ class MixTest : LightPlatformTestCase() {
 
     fun `test build mix command line uses toolchain and args`() {
         val toolchainRoot = Files.createTempDirectory("elixir-toolchain-")
-        val settings = ExSettings.getInstance(project)
         val workingDir = Files.createTempDirectory("elixir-mix-working-")
         try {
             val elixir = toolchainRoot / "elixir"
@@ -63,7 +78,6 @@ class MixTest : LightPlatformTestCase() {
                 commandLine.parametersList.parameters,
             )
         } finally {
-            settings.elixirToolchainPath = null
             toolchainRoot.toFile().deleteRecursively()
             workingDir.toFile().deleteRecursively()
         }
