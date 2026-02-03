@@ -2,7 +2,7 @@
 <idea-plugin>
   <id>dev.murek.elixirij</id>
   <name>Elixirij</name>
-  <vendor>Marek Kaput</vendor>
+  <vendor url="https://murek.dev" email="marek.kaput@outlook.com">Marek Kaput</vendor>
 
   <depends>com.intellij.modules.platform</depends>
   <depends optional="true" config-file="dev.murek.elixirij-spellchecker.xml">com.intellij.spellchecker</depends>
@@ -56,8 +56,6 @@
                implementationClass="dev.murek.elixirij.ide.highlighting.ExHighlightingAnnotator"/>
     <annotator language="Elixir"
                implementationClass="dev.murek.elixirij.ide.highlighting.ExEscapeSequenceAnnotator"/>
-
-    <postStartupActivity implementation="dev.murek.elixirij.lsp.ExLspServerStartupActivity"/>
 
     <platform.lsp.serverSupportProvider implementation="dev.murek.elixirij.lsp.ExLspServerSupportProvider"/>
 
