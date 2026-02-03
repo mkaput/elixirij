@@ -71,7 +71,7 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
      * If `true`, then [currentExecutable] **must** return a non-null value.
      * It is crucial that once Expert becomes _ready_, it will stay in this state forever.
      */
-    fun checkReady(): Boolean = currentExecutable() != null
+    fun checkReady(): Boolean = !isDownloading && currentExecutable() != null
 
     /**
      * Get a ready to use Expert executable for this project, or `null` if none is available.

@@ -17,6 +17,8 @@ class ExLspServerSupportProvider : LspServerSupportProvider {
             val lsp = Expert.getInstance(project)
             if (lsp.checkReady()) {
                 lsp.ensureServerStarted(serverStarter)
+            } else {
+                lsp.checkUpdates()
             }
         }
     }
