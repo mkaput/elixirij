@@ -10,3 +10,4 @@
 build
 erl_crash.dump
 src/gen
+.env

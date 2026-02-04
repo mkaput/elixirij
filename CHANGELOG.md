@@ -4,8 +4,6 @@
 
 ## [Unreleased]
 
-## [0.0.2] - 2026-02-04
-
 ### Changed
 
 - Release metadata bump to `0.0.2` (no functional changes).
