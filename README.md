@@ -1,8 +1,8 @@
 # Elixirij
 
 ![Build](https://github.com/mkaput/elixirij/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
+[![Version](https://img.shields.io/jetbrains/plugin/v/30071-elixirij.svg)](https://plugins.jetbrains.com/plugin/30071-elixirij)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/30071-elixirij.svg)](https://plugins.jetbrains.com/plugin/30071-elixirij)
 
 <!-- Plugin description -->
 Provides [Elixir](https://elixir-lang.org/) language support for all JetBrains IDEs.
@@ -21,10 +21,10 @@ This plugin has been vibecoded a lot, but it's pretty useful for me, and I thoug
 
 - Using JetBrains Marketplace:
 
-  Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID) and install it by clicking
+  Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/30071-elixirij) and install it by clicking
   the <kbd>Install to ...</kbd> button in case your IDE is running.
 
-  You can also download the [latest release](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID/versions) from
+  You can also download the [latest release](https://plugins.jetbrains.com/plugin/30071-elixirij/versions) from
   JetBrains Marketplace and install it manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
 
