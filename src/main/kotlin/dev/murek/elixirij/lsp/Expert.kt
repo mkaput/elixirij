@@ -7,7 +7,6 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.diagnostic.rethrowControlFlowException
 import com.intellij.openapi.progress.coroutineToIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
@@ -33,6 +32,7 @@ import kotlin.io.path.getLastModifiedTime
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.toKotlinInstant
 
 private val LOG = logger<Expert>()
@@ -174,7 +174,9 @@ class Expert(private val project: Project, private val cs: CoroutineScope) {
 
                 LspServerManager.getInstance(project).stopAndRestartIfNeeded(ExLspServerSupportProvider::class.java)
             } catch (e: Throwable) {
-                rethrowControlFlowException(e)
+                if (e is CancellationException) {
+                    throw e
+                }
                 thisLogger().error("Failed to download expert", e)
 
             } finally {

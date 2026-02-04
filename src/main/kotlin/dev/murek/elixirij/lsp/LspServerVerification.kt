@@ -11,7 +11,6 @@ import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.launch.LSPLauncher
 import org.eclipse.lsp4j.services.LanguageClient
 import org.eclipse.lsp4j.services.LanguageServer
-import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
@@ -83,28 +82,14 @@ suspend fun verifyLspServer(
 
                 // Send initialize request
                 val initializeParams = descriptor.createInitializeParams()
-                val existingRootUri = initializeParams.rootUri?.takeIf { it.isNotBlank() }
-                val uriRootDir = existingRootUri?.let { uri ->
-                    runCatching { Path.of(URI(uri)) }.getOrNull()
-                }
                 val rootDir = commandLine.workDirectory?.toPath()
-                    ?: uriRootDir
                     ?: Files.createTempDirectory("elixirij-lsp-verify")
                 Files.createDirectories(rootDir)
-                val systemIndependentPath = rootDir.toAbsolutePath().toString().replace('\\', '/')
-                val rootUri = if (systemIndependentPath.startsWith('/')) {
-                    "file://$systemIndependentPath"
-                } else {
-                    "file:///$systemIndependentPath"
-                }
-                initializeParams.rootUri = rootUri
-                initializeParams.rootPath = rootDir.toString()
-                initializeParams.workspaceFolders = listOf(
-                    WorkspaceFolder(rootUri, rootDir.fileName?.toString() ?: "workspace")
-                )
+                val workspaceFolder = workspaceFolderFor(rootDir)
+                initializeParams.workspaceFolders = listOf(workspaceFolder)
                 LOG.info(
                     "Verifying LSP server: cmd='${commandLine.commandLineString}' " +
-                        "workDir='${commandLine.workDirectory}' rootUri='$rootUri'"
+                        "workDir='${commandLine.workDirectory}' rootUri='${workspaceFolder.uri}'"
                 )
                 val initializeResult = server.initialize(initializeParams).await()
 
@@ -147,4 +132,10 @@ suspend fun verifyLspServer(
             }
         }
     }
+}
+
+private fun workspaceFolderFor(rootDir: Path): WorkspaceFolder {
+    val rootUri = rootDir.toUri().toString()
+    val name = rootDir.fileName?.toString() ?: "workspace"
+    return WorkspaceFolder(rootUri, name)
 }
