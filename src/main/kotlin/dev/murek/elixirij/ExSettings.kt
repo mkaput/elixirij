@@ -39,11 +39,17 @@ class ExSettings(
     var expertMode: ExpertMode by state::expertMode
     var expertCustomExecutablePath: String? by state::expertCustomExecutablePath
 
+    override fun loadState(state: State) {
+        super.loadState(state)
+        applyTestDefaultsIfNeeded()
+    }
+
     override fun getModificationCount(): Long = stateModificationCount
 
     @VisibleForTesting
     fun reset() {
-        loadState(State())
+        state.elixirToolchainPath = null
+        state.expertCustomExecutablePath = null
         state.expertMode = ExpertMode.DISABLED
     }
 

@@ -13,4 +13,13 @@ class ExSettingsTest : LightPlatformTestCase() {
         settings.reset()
         assertEquals(ExpertMode.DISABLED, settings.expertMode)
     }
+
+    fun `test loadState keeps expert disabled in tests`() {
+        val settings = ExSettings.getInstance(project)
+        val newState = ExSettings.State().apply { expertMode = ExpertMode.AUTOMATIC }
+
+        settings.loadState(newState)
+
+        assertEquals(ExpertMode.DISABLED, settings.expertMode)
+    }
 }
