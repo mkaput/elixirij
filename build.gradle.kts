@@ -129,7 +129,7 @@ kover {
     }
 }
 
-// Add generated sources to the source sets and configure the parser-grill source set.
+// Add generated sources to the main source set.
 val generatedGrammarRoot = layout.buildDirectory.dir("generated/grammarkit")
 
 sourceSets {
@@ -137,36 +137,6 @@ sourceSets {
         java {
             srcDir(generatedGrammarRoot)
         }
-    }
-
-    val skills by creating {
-        kotlin.srcDir("src/skills/kotlin")
-        compileClasspath += main.output + main.compileClasspath
-    }
-}
-
-dependencies {
-    val skills by sourceSets.getting
-    add(skills.implementationConfigurationName, kotlin("stdlib"))
-}
-
-configurations {
-    // Skills use IntelliJ test framework classes, so inherit test deps/runtime.
-    val skills by sourceSets.getting
-    val test by sourceSets.getting
-
-    named(skills.implementationConfigurationName) {
-        extendsFrom(configurations[test.implementationConfigurationName])
-    }
-    named(skills.compileOnlyConfigurationName) {
-        extendsFrom(configurations[test.compileOnlyConfigurationName])
-    }
-    named(skills.runtimeOnlyConfigurationName) {
-        extendsFrom(configurations[test.runtimeOnlyConfigurationName])
-    }
-    named(skills.runtimeClasspathConfigurationName) {
-        extendsFrom(configurations["intellijPlatformTestRuntimeClasspath"])
-        extendsFrom(configurations["intellijPlatformTestRuntimeFixClasspath"])
     }
 }
 
@@ -207,27 +177,6 @@ tasks {
         dependsOn(generateLexer)
     }
 
-    register<JavaExec>("runParserGrill") {
-        val skills by sourceSets.getting
-        val main by sourceSets.getting
-
-        description = $$"$parser-grill agent skill implementation detail"
-        dependsOn(skills.classesTaskName)
-        classpath = skills.runtimeClasspath + main.runtimeClasspath
-        mainClass.set("dev.murek.elixirij.skills.ParserGrillKt")
-        workingDir = projectDir
-        // Isolate IntelliJ test framework caches/logs from the Gradle transforms cache.
-        val sandboxDir = layout.buildDirectory.dir("parser-grill-idea").get().asPath
-        systemProperty("idea.config.path", sandboxDir / "config")
-        systemProperty("idea.system.path", sandboxDir / "system")
-        systemProperty("idea.log.path", sandboxDir / "log")
-        systemProperty("idea.plugins.path", sandboxDir / "plugins")
-        // Required for IntelliJ test framework reflection on JDK 21.
-        jvmArgs(
-            "--add-opens=java.base/java.lang=ALL-UNNAMED",
-            "--add-opens=java.desktop/javax.swing=ALL-UNNAMED",
-        )
-    }
 }
 
 intellijPlatformTesting {
