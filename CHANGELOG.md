@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Automatic exclusion of Mix-generated and dependency directories (`_build`, `deps`, `.elixir_ls`, `.expert`) for detected Mix roots, including nested/umbrella roots.
+
 ## [0.0.2] - 2026-02-04
 
 **Full Changelog**: https://github.com/mkaput/elixirij/compare/v0.0.1...0.0.2

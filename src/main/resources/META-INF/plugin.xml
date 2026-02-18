@@ -58,6 +58,7 @@
                implementationClass="dev.murek.elixirij.ide.highlighting.ExEscapeSequenceAnnotator"/>
 
     <platform.lsp.serverSupportProvider implementation="dev.murek.elixirij.lsp.ExLspServerSupportProvider"/>
+    <directoryIndexExcludePolicy implementation="dev.murek.elixirij.project.ExDirectoryIndexExcludePolicy"/>
 
     <projectConfigurable
       parentId="language"
