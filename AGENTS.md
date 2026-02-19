@@ -11,6 +11,7 @@ Targets the latest IntelliJ Platform version and modern Elixir language conventi
 - when bugfixing: write minimal reproduction test that fails, then fix, then confirm test passes
 - remember to run tests for related changes
 - don’t mock IntelliJ Platform internals; prefer real platform test fixtures and pipelines instead
+- ensure any feature/bugfix work is covered in @CHANGELOG.md
 
 ## Code rules
 
