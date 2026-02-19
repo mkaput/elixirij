@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.annotations.VisibleForTesting
 
 enum class ExpertMode { DISABLED, AUTOMATIC, CUSTOM }
+enum class ExpertReleaseChannel { STABLE, NIGHTLY }
 
 @Service(Service.Level.PROJECT)
 @State(name = "Elixir", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
@@ -27,6 +28,7 @@ class ExSettings(
     class State : BaseState() {
         var elixirToolchainPath by string()
         var expertMode by enum(ExpertMode.AUTOMATIC)
+        var expertReleaseChannel by enum(ExpertReleaseChannel.STABLE)
         var expertCustomExecutablePath by string()
     }
 
@@ -37,6 +39,7 @@ class ExSettings(
 
     var elixirToolchainPath: String? by state::elixirToolchainPath
     var expertMode: ExpertMode by state::expertMode
+    var expertReleaseChannel: ExpertReleaseChannel by state::expertReleaseChannel
     var expertCustomExecutablePath: String? by state::expertCustomExecutablePath
 
     override fun loadState(state: State) {
@@ -51,6 +54,7 @@ class ExSettings(
         state.elixirToolchainPath = null
         state.expertCustomExecutablePath = null
         state.expertMode = ExpertMode.DISABLED
+        state.expertReleaseChannel = ExpertReleaseChannel.STABLE
     }
 
     private fun applyTestDefaultsIfNeeded() {

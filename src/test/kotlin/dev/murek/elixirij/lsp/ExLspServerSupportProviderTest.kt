@@ -6,6 +6,7 @@ import com.intellij.testFramework.LightPlatformTestCase
 import com.intellij.testFramework.LightVirtualFile
 import dev.murek.elixirij.ExSettings
 import dev.murek.elixirij.ExpertMode
+import dev.murek.elixirij.ExpertReleaseChannel
 import dev.murek.elixirij.lang.ExFileType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -63,6 +64,7 @@ class ExLspServerSupportProviderTest : LightPlatformTestCase() {
         // Intentionally uses the real Expert download; do not replace with a mock.
         val settings = ExSettings.getInstance(project)
         settings.expertMode = ExpertMode.AUTOMATIC
+        settings.expertReleaseChannel = ExpertReleaseChannel.NIGHTLY
 
         expert.deleteCached()
 

@@ -7,6 +7,7 @@ import com.intellij.platform.lsp.api.LspServerSupportProvider
 import com.intellij.testFramework.LightPlatformTestCase
 import dev.murek.elixirij.ExSettings
 import dev.murek.elixirij.ExpertMode
+import dev.murek.elixirij.ExpertReleaseChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.nio.file.Files
@@ -32,7 +33,10 @@ class ExpertTest : LightPlatformTestCase() {
     override fun setUp() {
         super.setUp()
         cleanupBrokenBurritoEntries()
-        ExSettings.getInstance(project).expertMode = ExpertMode.AUTOMATIC
+        ExSettings.getInstance(project).apply {
+            expertMode = ExpertMode.AUTOMATIC
+            expertReleaseChannel = ExpertReleaseChannel.NIGHTLY
+        }
     }
 
     override fun tearDown() {

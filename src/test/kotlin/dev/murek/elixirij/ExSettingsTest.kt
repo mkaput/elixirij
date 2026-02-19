@@ -14,6 +14,18 @@ class ExSettingsTest : LightPlatformTestCase() {
         assertEquals(ExpertMode.DISABLED, settings.expertMode)
     }
 
+    fun `test expert release channel defaults to stable`() {
+        val settings = ExSettings.getInstance(project)
+        settings.reset()
+        assertEquals(ExpertReleaseChannel.STABLE, settings.expertReleaseChannel)
+    }
+
+    fun `test expert release channel can be changed`() {
+        val settings = ExSettings.getInstance(project)
+        settings.expertReleaseChannel = ExpertReleaseChannel.NIGHTLY
+        assertEquals(ExpertReleaseChannel.NIGHTLY, settings.expertReleaseChannel)
+    }
+
     fun `test loadState keeps expert disabled in tests`() {
         val settings = ExSettings.getInstance(project)
         val newState = ExSettings.State().apply { expertMode = ExpertMode.AUTOMATIC }

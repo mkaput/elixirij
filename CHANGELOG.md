@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Expert automatic mode now supports release channel selection (`stable`/`nightly`).
+
 ## [0.0.3] - 2026-02-19
 
 ### Added
@@ -38,6 +42,9 @@ A new project has seen the light of day!
   [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template)
 
 [Unreleased]: https://github.com/mkaput/elixirij/compare/v0.0.3...HEAD
+
 [0.0.3]: https://github.com/mkaput/elixirij/compare/v0.0.2...v0.0.3
+
 [0.0.2]: https://github.com/mkaput/elixirij/compare/v0.0.1...v0.0.2
+
 [0.0.1]: https://github.com/mkaput/elixirij/commits/v0.0.1
