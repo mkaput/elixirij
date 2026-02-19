@@ -4,12 +4,11 @@ import com.intellij.formatting.FormatTextRanges
 import com.intellij.formatting.service.FormattingService
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.util.TextRange
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiManager
-import com.intellij.testFramework.LightPlatformTestCase
 import dev.murek.elixirij.ExSettings
 import dev.murek.elixirij.lang.ExFile
+import dev.murek.elixirij.testing.BasePlatformLocalFileTestCase
 import dev.murek.elixirij.toolchain.elixirToolchain
 import java.nio.file.Files
 import java.nio.file.Path
@@ -29,9 +28,8 @@ import kotlin.io.path.writeText
  * We call the registered [ExMixFormatService] directly to avoid @ApiStatus.Internal APIs
  * while still exercising the same formatRanges entry point used by the platform.
  */
-class ExMixFormatServiceTest : LightPlatformTestCase() {
+class ExMixFormatServiceTest : BasePlatformLocalFileTestCase() {
 
-    private lateinit var projectRoot: Path
     private lateinit var libDir: Path
     private lateinit var toolchainRoot: Path
     private lateinit var settings: ExSettings
@@ -42,9 +40,8 @@ class ExMixFormatServiceTest : LightPlatformTestCase() {
 
     override fun setUp() {
         super.setUp()
-        projectRoot = Path.of(checkNotNull(project.basePath)).createDirectories()
-        (projectRoot / "mix.exs").writeText("defmodule MixProject do end")
-        libDir = (projectRoot / "lib").createDirectories()
+        (localProjectRoot / "mix.exs").writeText("defmodule MixProject do end")
+        libDir = (localProjectRoot / "lib").createDirectories()
 
         toolchainRoot = Files.createTempDirectory("elixir-toolchain-")
         settings = ExSettings.getInstance(project)
@@ -56,13 +53,16 @@ class ExMixFormatServiceTest : LightPlatformTestCase() {
     }
 
     override fun tearDown() {
-        if (::settings.isInitialized) {
-            settings.reset()
+        try {
+            if (::settings.isInitialized) {
+                settings.reset()
+            }
+            if (::toolchainRoot.isInitialized) {
+                toolchainRoot.toFile().deleteRecursively()
+            }
+        } finally {
+            super.tearDown()
         }
-        if (::toolchainRoot.isInitialized) {
-            toolchainRoot.toFile().deleteRecursively()
-        }
-        super.tearDown()
     }
 
     fun `test mix format returns formatted text`() {
@@ -108,9 +108,7 @@ class ExMixFormatServiceTest : LightPlatformTestCase() {
         ensureToolchainFiles()
         checkNotNull(project.elixirToolchain)
 
-        val virtualFile = checkNotNull(
-            LocalFileSystem.getInstance().refreshAndFindFileByPath(sourcePath.toString())
-        ) { "Virtual file should be found for $sourcePath" }
+        val virtualFile = refreshAndFindVirtualFile(sourcePath)
 
         val psiFile = checkNotNull(PsiManager.getInstance(project).findFile(virtualFile))
         assertTrue(psiFile is ExFile)

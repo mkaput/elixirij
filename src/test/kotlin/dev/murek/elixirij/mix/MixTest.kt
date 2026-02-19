@@ -1,15 +1,13 @@
 package dev.murek.elixirij.mix
 
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.testFramework.LightPlatformTestCase
 import dev.murek.elixirij.ExSettings
+import dev.murek.elixirij.testing.BasePlatformLocalFileTestCase
 import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.div
 import kotlin.io.path.writeText
 
-class MixTest : LightPlatformTestCase() {
+class MixTest : BasePlatformLocalFileTestCase() {
     private lateinit var settings: ExSettings
 
     override fun setUp() {
@@ -28,17 +26,13 @@ class MixTest : LightPlatformTestCase() {
     }
 
     fun `test project root for file resolves mix root`() {
-        val projectRoot = Path.of(checkNotNull(project.basePath))
-        (projectRoot / "mix.exs").writeText("defmodule MixProject do end")
-        val libDir = (projectRoot / "lib").createDirectories()
+        (localProjectRoot / "mix.exs").writeText("defmodule MixProject do end")
+        val libDir = (localProjectRoot / "lib").createDirectories()
         val filePath = libDir / "sample.ex"
         filePath.writeText("defmodule Sample do end")
 
-        val virtualFile = checkNotNull(
-            LocalFileSystem.getInstance().refreshAndFindFileByPath(filePath.toString())
-        ) { "Virtual file should be found for $filePath" }
-
-        assertEquals(projectRoot, project.mix.projectRootFor(virtualFile))
+        val virtualFile = refreshAndFindVirtualFile(filePath)
+        assertEquals(localProjectRoot, project.mix.projectRootFor(virtualFile))
     }
 
     fun `test build mix command line uses toolchain and args`() {
