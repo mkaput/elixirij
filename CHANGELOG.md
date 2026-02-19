@@ -6,7 +6,10 @@
 
 ### Added
 
-- Automatic exclusion of Mix-generated and dependency directories (`_build`, `deps`, `.elixir_ls`, `.expert`) for detected Mix roots, including nested/umbrella roots.
+- Automatic exclusion of Mix-generated and dependency directories (`_build`, `deps`, `.elixir_ls`, `.expert`) for
+  detected Mix roots, including nested/umbrella roots.
+- Elixir code style defaults now use 2-space indentation (including Tab/continuation settings) with spaces instead of
+  hard tabs.
 
 ## [0.0.2] - 2026-02-04
 
