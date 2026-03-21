@@ -1,7 +1,6 @@
 # Elixirij
 
 A new from-scratch Elixir language support plugin for all IntelliJ Platform-based IDEs.
-Targets the latest IntelliJ Platform version and modern Elixir language conventions.
 
 ## Rules
 
@@ -15,6 +14,7 @@ Targets the latest IntelliJ Platform version and modern Elixir language conventi
 
 ## Code rules
 
+- target the latest IntelliJ Platform version (2026.01+) and modern Elixir language conventions (1.20+)
 - use light services and Kotlin coroutines-powered threading model of IntelliJ Platform
 - prefer expression functions (`fun f() = ...`) instead of statement ones (`fun f() { ... }`) for simple cases
 - name tests like this, unless base class (fixtures) requires testCamelCase:
@@ -62,17 +62,4 @@ JAVA_TOOL_OPTIONS="-Didea.tests.overwrite.data=true" ./gradlew test --tests "dev
 # This project uses .editorconfig for code style conventions.
 # Format code using your IDE's auto-format feature (Ctrl+Alt+L in IntelliJ).
 # The build will use the configured EditorConfig settings automatically.
-
-# Run inspections
-./gradlew qodanaScan
 ```
-
-## Git
-
-- only commit what has changed in the current thread, don't commit parallel agent's work
-- short, imperative commit titles (e.g., "add game server S3 bucket")
-- detailed commit descriptions telling:
-    - context behind the changes: what, how and why,
-    - manual testing steps,
-    - special considerations.
-- if commit is meant to fix an issue, add `fix #123` at the end of the commit message.
