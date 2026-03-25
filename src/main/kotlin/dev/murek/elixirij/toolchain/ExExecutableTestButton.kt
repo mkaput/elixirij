@@ -132,7 +132,7 @@ internal class ExExecutableTestButton(
     private suspend fun resolveToolchain(): Pair<ExToolchain?, String?> {
         val currentPath = withContext(Dispatchers.EDT) { fieldToUpdate.text }
 
-        if (!currentPath.isNullOrBlank()) {
+        if (currentPath.isNotBlank()) {
             val toolchain = ExToolchain.createValid(Path(currentPath)).getOrNull()
             return toolchain to currentPath
         }
